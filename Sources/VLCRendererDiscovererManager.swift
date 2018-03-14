@@ -32,6 +32,7 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
             // Create new VLCRendererDiscoverers
             if let rendererDiscoverer = VLCRendererDiscoverer(name: discoverer.name) {
                 rendererDiscoverer.start()
+                rendererDiscoverer.delegate = self
                 discoverers.append(rendererDiscoverer)
             } else {
                 print("Unable to start renderer with name: \(discoverer.name)")
