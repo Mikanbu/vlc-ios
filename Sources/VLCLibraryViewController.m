@@ -275,6 +275,42 @@ static NSString *kUsingTableViewToShowData = @"UsingTableViewToShowData";
     [self.collectionView.collectionViewLayout invalidateLayout];
     [self setViewFromDeviceOrientation];
     [self updateViewsForCurrentDisplayMode];
+
+    VLCRendererDiscovererManager *rendererDiscovererManager = [VLCRendererDiscovererManager sharedInstance];
+
+    if ([rendererDiscovererManager start]) {
+        NSLog(@"Started manager");
+        // check if any renderer discoverers are found and started
+        if ([rendererDiscovererManager.discoverers count] != 0) {
+            NSLog(@"Found in libraryVC");
+            [rendererDiscovererManager addObserver:self
+                   forKeyPath:@"renderers"
+                      options:0
+                      context:NULL];
+
+            // register kvo in case of found renderer
+            // if found show renderer icon on navigation bar
+            // right now we have discoverers not renderers
+            self.navigationItem.rightBarButtonItems = @[self.editButtonItem, _renderers];
+            // remove renderer icon on navigation bar
+//            self.navigationItem.rightBarButtonItem = self.editButtonItem;
+
+        }
+    } else {
+        NSLog(@"Failed to start renderer discoverer");
+    }
+}
+
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+
+    if ([keyPath isEqual:@"renderers"]) {
+        //
+    } else {
+
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
