@@ -53,6 +53,7 @@ static NSString *kUsingTableViewToShowData = @"UsingTableViewToShowData";
     VLCLibraryMode _libraryMode;
     VLCLibraryMode _previousLibraryMode;
     UIBarButtonItem *_menuButton;
+    UIBarButtonItem *_renderers;
     NSMutableArray *_indexPaths;
     id _folderObject;
     VLCFolderCollectionViewFlowLayout *_folderLayout;
@@ -192,6 +193,13 @@ static NSString *kUsingTableViewToShowData = @"UsingTableViewToShowData";
     [super viewDidLoad];
     self.title = NSLocalizedString(@"LIBRARY_ALL_FILES", nil);
     self.navigationItem.leftBarButtonItem = _menuButton;
+
+    _renderers = [[UIBarButtonItem alloc]
+                  initWithImage:[UIImage imageNamed:@"renderer"]
+                  style:UIBarButtonItemStylePlain
+                  target:self
+                  action:@selector(displayRenderer:)];
+
 
     self.editButtonItem.title = NSLocalizedString(@"BUTTON_EDIT", nil);
     self.editButtonItem.tintColor = [UIColor whiteColor];
@@ -1095,6 +1103,10 @@ static NSString *kUsingTableViewToShowData = @"UsingTableViewToShowData";
 {
     if (self.isEditing)
         [self setEditing:NO animated:YES];
+}
+
+- (void)displayRenderer:(id)sender
+{
 }
 
 - (IBAction)backToAllItems:(id)sender
