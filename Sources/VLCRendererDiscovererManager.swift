@@ -13,8 +13,10 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
 
     @objc static let sharedInstance = VLCRendererDiscovererManager();
 
-    private lazy var discoverers: Array<VLCRendererDiscoverer> = [VLCRendererDiscoverer]()
-    private lazy var renderers: Array<VLCRendererItem> = [VLCRendererItem]()
+    // Array of RendererDiscoverers(Chromecast, UPnP, ...)
+    @objc dynamic var discoverers: Array<VLCRendererDiscoverer> = [VLCRendererDiscoverer]()
+
+    @objc dynamic var renderers: Array<VLCRendererItem> = [VLCRendererItem]()
 
     private override init() {
         super.init()
