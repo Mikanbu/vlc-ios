@@ -46,8 +46,10 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
             discoverer.stop()
         }
     }
+}
 
-    //mark: RendererDiscovererDelegate
+// MARK: VLCRendererDiscovererDelegate
+extension VLCRendererDiscovererManager {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         print("RendererDiscovererManager: New item added")
         renderers.append(item)
@@ -63,5 +65,4 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
             print("Issue while removing rendererItem: \(item)")
         }
     }
-
 }
