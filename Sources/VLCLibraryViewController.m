@@ -1143,6 +1143,9 @@ static NSString *kUsingTableViewToShowData = @"UsingTableViewToShowData";
 
 - (void)displayRenderer:(id)sender
 {
+    VLCActionSheet *tmp = [[VLCActionSheet alloc] init:[VLCRendererDiscovererManager sharedInstance].renderers];
+    tmp.modalPresentationStyle = UIModalPresentationCustom;
+    [self presentViewController:tmp animated:YES completion:nil];
 }
 
 - (IBAction)backToAllItems:(id)sender
