@@ -100,16 +100,17 @@ class VLCActionSheetCell: UICollectionViewCell {
 open class VLCActionSheet: UIViewController {
 
     private let cellIdentifier = "VLCActionSheetCell"
-    private let cellHeight = 50
-    // init in param dataset(renderer array)
-    @objc open var data: Array<Any>!
+    private let cellHeight: CGFloat = 50
 
-    private var actions = [Any]()
+    @objc var data: Array<Any>!
+
+    private var action: ((_ item: Any) -> Void)?
 
     // background black layer
     lazy var backgroundView: UIView = {
         let backgroundView = UIView()
 
+        backgroundView.isHidden = true
         backgroundView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
         backgroundView.isUserInteractionEnabled = true
@@ -129,7 +130,7 @@ open class VLCActionSheet: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        collectionView.backgroundColor = .lightGray
+        collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.register(VLCActionSheetCell.self, forCellWithReuseIdentifier: cellIdentifier)
@@ -137,6 +138,15 @@ open class VLCActionSheet: UIViewController {
         return collectionView
     }()
 
+    lazy var cancelButton: UIButton = {
+        let cancelButton = UIButton()
+        cancelButton.titleLabel?.text = "Cancel"
+        cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        return cancelButton
+    }()
+
+    // MARK: Initializer
     @objc init(_ data: Array<Any>) {
         self.data = data
         super.init(nibName: nil, bundle: nil)
@@ -151,22 +161,34 @@ open class VLCActionSheet: UIViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
+    // MARK: Private methods
     @objc private func removeActionSheet() {
-        super.presentingViewController?.dismiss(animated: true, completion: nil)
+        UIView.transition(with: backgroundView, duration: 0.01, options: .transitionCrossDissolve, animations: {
+            self.backgroundView.isHidden = true
+        }, completion: { finished in
+            super.presentingViewController?.dismiss(animated: true, completion: nil)
+        })
+    }
+
+    private func setupCancelButton() {
+//        cancelButton.frame = CGRect(x: 0, y: collectionView.frame.height, width: view.bounds.width, height: cellHeight)
+
+//        cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
+//        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
+//        cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
     }
 
     private func setupCollectionView() {
-        let viewBounds = view.bounds
-        collectionView.frame = CGRect(origin: CGPoint(x: viewBounds.origin.x, y: UIScreen.main.bounds.height),
-                                      size: CGSize(width: viewBounds.size.width, height: viewBounds.size.height / 2))
-//        collectionView.frame = view.bounds
+        collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height / 2)
+        collectionView.frame.origin.y = UIScreen.main.bounds.height
 
         // Setup content inset for scrolling
         var contentHeight:CGFloat = 0.0
 
         for _ in 1...data.count {
-            if (contentHeight < viewBounds.size.height / 2) {
-                contentHeight += CGFloat(cellHeight)
+            // Currently setting a max height of the collectionView to half the screen
+            if (contentHeight < collectionView.frame.origin.y / 2) {
+                contentHeight += cellHeight
             }
         }
         collectionView.frame.origin.y -= contentHeight
@@ -177,18 +199,41 @@ open class VLCActionSheet: UIViewController {
         super.viewDidLoad()
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
+        view.addSubview(cancelButton)
+
+        backgroundView.frame = UIScreen.main.bounds
+
         setupCollectionView()
+        setupCancelButton()
     }
 
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        backgroundView.frame = view.bounds
+    }
+
+    override open func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: {
+            self.backgroundView.isHidden = false
+        }, completion: nil)
+
+        let realFrame = collectionView.frame
+
+        collectionView.frame.origin.y += collectionView.frame.origin.y
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
+            self.collectionView.frame = realFrame
+        }, completion: nil)
+    }
+
+    @objc func addAction(closure action: @escaping (_ item: Any) -> Void) {
+        self.action = action
     }
 }
 
 extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: CGFloat(cellHeight))
+        return CGSize(width: collectionView.frame.width, height: cellHeight)
     }
 }
 
@@ -197,7 +242,7 @@ extension VLCActionSheet: UICollectionViewDelegate {
 
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         //call callback
-        print("didSelect: \(indexPath)")
+        action?(data[indexPath.row])
     }
 }
 
@@ -210,7 +255,13 @@ extension VLCActionSheet: UICollectionViewDataSource {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! VLCActionSheetCell
-        cell.name.text = "(╯°□°）╯︵ ┻━┻"
+
+        if let renderer = data[indexPath.row] as? VLCRendererItem {
+            cell.name.text = renderer.name
+            cell.icon.image = UIImage(named: "rendererBlack")
+        } else {
+            cell.name.text = "(╯°□°）╯︵ ┻━┻"
+        }
         return cell
     }
 }
