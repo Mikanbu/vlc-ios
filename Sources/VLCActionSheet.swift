@@ -12,11 +12,6 @@
 import Foundation
 import UIKit
 
-// TODO: - custom layout x
-//       - custom cell x
-//       - datasource
-//       - gestures (tap away, select renderer)
-
 class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
 
     override init() {
@@ -38,29 +33,33 @@ class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
 class VLCActionSheetCell: UICollectionViewCell {
 
     let icon: UIImageView = {
-        let icon = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        icon.image = UIImage(named: "vlcCone")
-        icon.backgroundColor = .magenta
+        let icon = UIImageView()
         icon.translatesAutoresizingMaskIntoConstraints = false
+        icon.contentMode = .scaleAspectFit
         return icon
     }()
 
     let name: UILabel = {
-        let name = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
-
-        name.text = "testy"
+        let name = UILabel()
+        name.font = UIFont.systemFont(ofSize: 15)
         name.translatesAutoresizingMaskIntoConstraints = false
         return name
     }()
 
     let stackView: UIStackView = {
         let stackView = UIStackView()
-
         stackView.spacing = 15.0
-        stackView.axis = .vertical
-        stackView.alignment = .leading
+        stackView.axis = .horizontal
+        stackView.alignment = .center
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
+    }()
+
+    let separator: UIView = {
+        let separator = UIView()
+        separator.backgroundColor = .darkGray
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        return separator
     }()
 
     override init(frame: CGRect) {
@@ -77,18 +76,24 @@ class VLCActionSheetCell: UICollectionViewCell {
         stackView.addArrangedSubview(icon)
         stackView.addArrangedSubview(name)
         addSubview(stackView)
+        addSubview(separator)
 
-        icon.leadingAnchor.constraint(equalTo: stackView.leadingAnchor)
-        icon.heightAnchor.constraint(equalTo: icon.widthAnchor)
-        icon.trailingAnchor.constraint(equalTo: name.leadingAnchor, constant: 15)
+        separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        separator.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+        separator.topAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
 
-        name.leadingAnchor.constraint(equalTo: icon.trailingAnchor)
-        name.trailingAnchor.constraint(equalTo: stackView.trailingAnchor)
-//        stackView.topAnchor.constraint(equalTo: topAnchor)
-//        stackView.centerXAnchor.constraint(equalTo: centerXAnchor)
-//        stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
-        stackView.leadingAnchor.constraint(equalTo: leadingAnchor)
-        stackView.heightAnchor.constraint(equalTo: heightAnchor)
+        // StackView
+        icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        icon.widthAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
+
+        name.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        name.centerYAnchor.constraint(equalTo: stackView.centerYAnchor).isActive = true
+
+        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 10).isActive = true
+        stackView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
     }
 }
 
