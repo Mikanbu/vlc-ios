@@ -241,8 +241,8 @@ extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
 extension VLCActionSheet: UICollectionViewDelegate {
 
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //call callback
         action?(data[indexPath.row])
+        removeActionSheet()
     }
 }
 
