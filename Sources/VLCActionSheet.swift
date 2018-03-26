@@ -84,7 +84,7 @@ class VLCActionSheetCell: UICollectionViewCell {
         separator.topAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
 
         // StackView
-        icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        icon.heightAnchor.constraint(equalToConstant: 25).isActive = true
         icon.widthAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
 
         name.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
