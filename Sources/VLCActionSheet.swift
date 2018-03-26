@@ -134,7 +134,7 @@ open class VLCActionSheet: UIViewController {
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.register(VLCActionSheetCell.self, forCellWithReuseIdentifier: cellIdentifier)
-
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
 
@@ -142,6 +142,7 @@ open class VLCActionSheet: UIViewController {
         let cancelButton = UIButton()
         cancelButton.titleLabel?.text = "Cancel"
         cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
+        cancelButton.backgroundColor = .orange
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         return cancelButton
     }()
@@ -170,28 +171,40 @@ open class VLCActionSheet: UIViewController {
         })
     }
 
-    private func setupCancelButton() {
-//        cancelButton.frame = CGRect(x: 0, y: collectionView.frame.height, width: view.bounds.width, height: cellHeight)
-
-//        cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
-//        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
-//        cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+    private func setupCancelButtonConstraints() {
+        cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
+        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
+        cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
-    private func setupCollectionView() {
-        collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height / 2)
-        collectionView.frame.origin.y = UIScreen.main.bounds.height
+    private func setupCollectionViewConstraints() {
+        let lesserHeightConstraint = NSLayoutConstraint(item: collectionView,
+                                                  attribute: NSLayoutAttribute.height,
+                                                  relatedBy: NSLayoutRelation.lessThanOrEqual,
+                                                  toItem: nil,
+                                                  attribute: NSLayoutAttribute.height,
+                                                  multiplier: 1,
+                                                  constant: view.bounds.height / 2)
 
-        // Setup content inset for scrolling
-        var contentHeight:CGFloat = 0.0
+        lesserHeightConstraint.priority = UILayoutPriority(rawValue: 1000)
+        lesserHeightConstraint.isActive = true
 
-        for _ in 1...data.count {
-            // Currently setting a max height of the collectionView to half the screen
-            if (contentHeight < collectionView.frame.origin.y / 2) {
-                contentHeight += cellHeight
-            }
-        }
-        collectionView.frame.origin.y -= contentHeight
+        let greaterHeightConstraint = NSLayoutConstraint(item: collectionView,
+                                                        attribute: NSLayoutAttribute.height,
+                                                        relatedBy: NSLayoutRelation.greaterThanOrEqual,
+                                                        toItem: nil,
+                                                        attribute: NSLayoutAttribute.height,
+                                                        multiplier: 1,
+                                                        constant: CGFloat(data.count) * cellHeight)
+
+        greaterHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+        greaterHeightConstraint.isActive = true
+
+        collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor).isActive = true
+        collectionView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     }
 
     // MARK: UIViewController
@@ -203,8 +216,8 @@ open class VLCActionSheet: UIViewController {
 
         backgroundView.frame = UIScreen.main.bounds
 
-        setupCollectionView()
-        setupCancelButton()
+        setupCollectionViewConstraints()
+        setupCancelButtonConstraints()
     }
 
     override open func viewWillAppear(_ animated: Bool) {
