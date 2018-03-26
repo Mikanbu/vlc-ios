@@ -16,10 +16,26 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
     // Array of RendererDiscoverers(Chromecast, UPnP, ...)
     @objc dynamic var discoverers: Array<VLCRendererDiscoverer> = [VLCRendererDiscoverer]()
 
-    @objc dynamic var renderers: Array<VLCRendererItem> = [VLCRendererItem]()
-
     private override init() {
         super.init()
+    }
+
+    @objc func getAllRenderers() -> [VLCRendererItem] {
+        var renderers = [VLCRendererItem]()
+
+        for discoverer in discoverers {
+            renderers += discoverer.renderers
+        }
+        return renderers
+    }
+
+    private func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
+        for discoverer in discoverers {
+            if (discoverer.name == description.name) {
+                return true
+            }
+        }
+        return false
     }
 
     @objc func start() -> Bool {
@@ -27,19 +43,22 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
         guard let tmpDiscoverers: Array<VLCRendererDiscovererDescription> = VLCRendererDiscoverer.list() else {
             return false
         }
-
         for discoverer in tmpDiscoverers {
-            if let rendererDiscoverer = VLCRendererDiscoverer(name: discoverer.name) {
-                if (rendererDiscoverer.start()) {
-                    rendererDiscoverer.delegate = self
-                    discoverers.append(rendererDiscoverer)
+
+            if (!isDuplicateDiscoverer(with: discoverer)) {
+                if let rendererDiscoverer = VLCRendererDiscoverer(name: discoverer.name) {
+                    if (rendererDiscoverer.start()) {
+                        rendererDiscoverer.delegate = self
+                        discoverers.append(rendererDiscoverer)
+                    } else {
+                        print("Unable to start renderer discoverer with name: \(rendererDiscoverer.name)")
+                    }
                 } else {
-                    print("Unable to start renderer discoverer with name: \(rendererDiscoverer.name)")
+                    print("Unable to instanciate renderer discoverer with name: \(discoverer.name)")
                 }
-            } else {
-                print("Unable to instanciate renderer discoverer with name: \(discoverer.name)")
             }
         }
+
         return true
     }
 
@@ -47,6 +66,7 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
         for discoverer in discoverers {
             discoverer.stop()
         }
+        discoverers.removeAll()
     }
 }
 
@@ -54,17 +74,9 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
 extension VLCRendererDiscovererManager {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         print("RendererDiscovererManager: New item added")
-        renderers.append(item)
     }
 
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        if let index = renderers.index(of: item) {
-            //rendererItems should be deallocated here, therefore calling item_release
-            print("RendererDiscovererManager: item removed")
-            renderers.remove(at: index)
-        } else {
-            //might already be removed
-            print("Issue while removing rendererItem: \(item)")
-        }
+        print("RendererDiscovererManager: item removed")
     }
 }
