@@ -140,7 +140,8 @@ open class VLCActionSheet: UIViewController {
 
     lazy var cancelButton: UIButton = {
         let cancelButton = UIButton()
-        cancelButton.titleLabel?.text = "Cancel"
+        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.setTitleColor(.white, for: .normal)
         cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
         cancelButton.backgroundColor = .orange
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
@@ -153,7 +154,6 @@ open class VLCActionSheet: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
-    // This cannot work without a passed collection of data
     public required init?(coder aDecoder: NSCoder) {
         fatalError("Oh noes, no NSCoding")
     }
