@@ -99,6 +99,49 @@ class VLCActionSheetCell: UICollectionViewCell {
     }
 }
 
+class VLCActionSheetSectionHeader: UIView {
+
+    static let identifier = "VLCActionSheetSectionHeader"
+
+    let title: UILabel = {
+        let title = UILabel()
+        title.font = UIFont.systemFont(ofSize: 16)
+        title.translatesAutoresizingMaskIntoConstraints = false
+        return title
+    }()
+
+    let separator: UIView = {
+        let separator = UIView()
+        separator.backgroundColor = .darkGray
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        return separator
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupView()
+    }
+
+    private func setupView() {
+        addSubview(title)
+        addSubview(separator)
+
+        title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        title.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        title.topAnchor.constraint(equalTo: topAnchor).isActive = true
+
+        separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        separator.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+        separator.topAnchor.constraint(equalTo: bottomAnchor).isActive = true
+    }
+}
+
 open class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
@@ -146,6 +189,14 @@ open class VLCActionSheet: UIViewController {
         return cancelButton
     }()
 
+    lazy var headerView: VLCActionSheetSectionHeader = {
+        let headerView = VLCActionSheetSectionHeader()
+        headerView.title.text = "Select a casting device:"
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        headerView.backgroundColor = .white
+        return headerView
+    }()
+
     // MARK: Initializer
     @objc init(_ data: Array<Any>) {
         self.data = data
@@ -175,6 +226,13 @@ open class VLCActionSheet: UIViewController {
         cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+
+    private func setuplHeaderViewConstraints() {
+        headerView.bottomAnchor.constraint(equalTo: collectionView.topAnchor).isActive = true
+        headerView.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
+        headerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     }
 
     private func setupCollectionViewConstraints() {
@@ -211,11 +269,13 @@ open class VLCActionSheet: UIViewController {
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
         view.addSubview(cancelButton)
+        view.addSubview(headerView)
 
         backgroundView.frame = UIScreen.main.bounds
 
         setupCollectionViewConstraints()
         setupCancelButtonConstraints()
+        setuplHeaderViewConstraints()
     }
 
     override open func viewWillAppear(_ animated: Bool) {
