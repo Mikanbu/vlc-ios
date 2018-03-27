@@ -180,8 +180,9 @@ open class VLCActionSheet: UIViewController {
     lazy var headerView: VLCActionSheetSectionHeader = {
         let headerView = VLCActionSheetSectionHeader()
         headerView.title.text = "Select a casting device:"
+        headerView.backgroundColor = .vlcOrangeTint()
+        headerView.title.textColor = .white
         headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.backgroundColor = .white
         return headerView
     }()
 
@@ -268,20 +269,30 @@ open class VLCActionSheet: UIViewController {
 
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        collectionView.isHidden = true
+        headerView.isHidden = true
     }
 
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // This hidden dance is to avoid a horrible glitch!
+        collectionView.isHidden = false
+        headerView.isHidden = false
+
         UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: {
             self.backgroundView.isHidden = false
         }, completion: nil)
 
-        let realFrame = collectionView.frame
+        let realCollectionViewFrame = collectionView.frame
+        let realHeaderViewFrame = headerView.frame
 
         collectionView.frame.origin.y += collectionView.frame.origin.y
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
-            self.collectionView.frame = realFrame
+        headerView.frame.origin.y += collectionView.frame.origin.y
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
+            self.collectionView.frame = realCollectionViewFrame
+            self.headerView.frame = realHeaderViewFrame
         }, completion: nil)
     }
 
