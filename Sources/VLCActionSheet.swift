@@ -123,6 +123,7 @@ class VLCActionSheetSectionHeader: UIView {
 
         title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         title.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        title.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         title.topAnchor.constraint(equalTo: topAnchor).isActive = true
 
         separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
@@ -183,9 +184,10 @@ open class VLCActionSheet: UIViewController {
 
     lazy var headerView: VLCActionSheetSectionHeader = {
         let headerView = VLCActionSheetSectionHeader()
-        headerView.title.text = "Select a casting device:"
-        headerView.backgroundColor = .vlcOrangeTint()
+        headerView.title.text = "Select a casting device"
         headerView.title.textColor = .white
+        headerView.title.textAlignment = .center
+        headerView.backgroundColor = .vlcOrangeTint()
         headerView.translatesAutoresizingMaskIntoConstraints = false
         return headerView
     }()
