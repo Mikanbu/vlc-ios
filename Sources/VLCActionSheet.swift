@@ -137,7 +137,7 @@ class VLCActionSheetSectionHeader: UIView {
 }
 
 // MARK: VLCActionSheet
-open class VLCActionSheet: UIViewController {
+class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
 
@@ -262,7 +262,7 @@ open class VLCActionSheet: UIViewController {
     }
 
     // MARK: UIViewController
-    override open func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
@@ -276,13 +276,13 @@ open class VLCActionSheet: UIViewController {
         setuplHeaderViewConstraints()
     }
 
-    override open func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         collectionView.isHidden = true
         headerView.isHidden = true
     }
 
-    override open func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // This hidden dance is to avoid a horrible glitch!
