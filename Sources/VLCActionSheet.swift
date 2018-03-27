@@ -57,13 +57,6 @@ class VLCActionSheetCell: UICollectionViewCell {
         return stackView
     }()
 
-    let separator: UIView = {
-        let separator = UIView()
-        separator.backgroundColor = .darkGray
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        return separator
-    }()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -78,12 +71,6 @@ class VLCActionSheetCell: UICollectionViewCell {
         stackView.addArrangedSubview(icon)
         stackView.addArrangedSubview(name)
         addSubview(stackView)
-        addSubview(separator)
-
-        separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        separator.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-        separator.topAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
 
         // StackView
         icon.heightAnchor.constraint(equalToConstant: 25).isActive = true
