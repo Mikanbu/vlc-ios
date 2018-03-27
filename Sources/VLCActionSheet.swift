@@ -12,6 +12,7 @@
 import Foundation
 import UIKit
 
+// MARK: VLCRendererCollectionViewLayout
 class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
 
     override init() {
@@ -30,6 +31,7 @@ class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
     }
 }
 
+// MARK: VLCActionSheetCell
 class VLCActionSheetCell: UICollectionViewCell {
 
     static let identifier = "VLCActionSheetCell"
@@ -86,6 +88,7 @@ class VLCActionSheetCell: UICollectionViewCell {
     }
 }
 
+// MARK: VLCActionSheetSectionHeader
 class VLCActionSheetSectionHeader: UIView {
 
     static let identifier = "VLCActionSheetSectionHeader"
@@ -129,6 +132,7 @@ class VLCActionSheetSectionHeader: UIView {
     }
 }
 
+// MARK: VLCActionSheet
 open class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
@@ -301,6 +305,7 @@ open class VLCActionSheet: UIViewController {
     }
 }
 
+// MARK: UICollectionViewDelegateFlowLayout
 extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: cellHeight)
