@@ -296,7 +296,7 @@ open class VLCActionSheet: UIViewController {
         collectionView.frame.origin.y += collectionView.frame.origin.y
         headerView.frame.origin.y += collectionView.frame.origin.y
 
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
             self.collectionView.frame = realCollectionViewFrame
             self.headerView.frame = realHeaderViewFrame
         }, completion: nil)
