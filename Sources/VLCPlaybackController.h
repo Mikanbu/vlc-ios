@@ -86,6 +86,8 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 @property (nonatomic, readonly) NSDictionary *mediaOptionsDictionary;
 @property (nonatomic, readonly) NSTimer* sleepTimer;
 
+@property (nonatomic) VLCRendererItem *renderer;
+
 + (VLCPlaybackController *)sharedInstance;
 - (VLCTime *)playedTime;
 #pragma mark - playback
