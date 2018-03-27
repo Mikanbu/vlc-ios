@@ -117,19 +117,22 @@ class VLCActionSheetSectionHeader: UIView {
         setupView()
     }
 
-    private func setupView() {
-        addSubview(title)
+    private func setupSeparator() {
         addSubview(separator)
-
-        title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        title.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        title.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        title.topAnchor.constraint(equalTo: topAnchor).isActive = true
 
         separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         separator.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
         separator.topAnchor.constraint(equalTo: bottomAnchor).isActive = true
+    }
+
+    private func setupView() {
+        addSubview(title)
+
+        title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        title.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        title.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        title.topAnchor.constraint(equalTo: topAnchor).isActive = true
     }
 }
 
