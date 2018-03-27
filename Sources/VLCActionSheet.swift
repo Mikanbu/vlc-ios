@@ -170,8 +170,9 @@ open class VLCActionSheet: UIViewController {
         let cancelButton = UIButton()
         cancelButton.setTitle("Cancel", for: .normal)
         cancelButton.setTitleColor(.white, for: .normal)
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
-        cancelButton.backgroundColor = .orange
+        cancelButton.backgroundColor = .vlcOrangeTint()
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         return cancelButton
     }()
