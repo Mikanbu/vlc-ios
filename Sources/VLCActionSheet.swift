@@ -32,6 +32,8 @@ class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
 
 class VLCActionSheetCell: UICollectionViewCell {
 
+    static let identifier = "VLCActionSheetCell"
+
     let icon: UIImageView = {
         let icon = UIImageView()
         icon.translatesAutoresizingMaskIntoConstraints = false
@@ -99,7 +101,6 @@ class VLCActionSheetCell: UICollectionViewCell {
 
 open class VLCActionSheet: UIViewController {
 
-    private let cellIdentifier = "VLCActionSheetCell"
     private let cellHeight: CGFloat = 50
 
     @objc var data: Array<Any>!
@@ -109,7 +110,6 @@ open class VLCActionSheet: UIViewController {
     // background black layer
     lazy var backgroundView: UIView = {
         let backgroundView = UIView()
-
         backgroundView.isHidden = true
         backgroundView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -120,20 +120,18 @@ open class VLCActionSheet: UIViewController {
 
     lazy var collectionViewLayout: VLCRendererCollectionViewLayout = {
         let collectionViewLayout = VLCRendererCollectionViewLayout()
-
         return collectionViewLayout
     }()
 
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: UIScreen.main.bounds, collectionViewLayout: collectionViewLayout)
-
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
-        collectionView.register(VLCActionSheetCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView.register(VLCActionSheetCell.self, forCellWithReuseIdentifier: VLCActionSheetCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -252,7 +250,6 @@ extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
 
 // MARK: UICollectionViewDelegate
 extension VLCActionSheet: UICollectionViewDelegate {
-
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         action?(data[indexPath.row])
         removeActionSheet()
@@ -261,13 +258,12 @@ extension VLCActionSheet: UICollectionViewDelegate {
 
 // MARK: UICollectionViewDataSource
 extension VLCActionSheet: UICollectionViewDataSource {
-
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return data.count
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! VLCActionSheetCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier, for: indexPath) as! VLCActionSheetCell
 
         if let renderer = data[indexPath.row] as? VLCRendererItem {
             cell.name.text = renderer.name
