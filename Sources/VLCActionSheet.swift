@@ -290,8 +290,8 @@ class VLCActionSheet: UIViewController {
         greaterCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 999)
 
         NSLayoutConstraint.activate([
-            lesserCollectionViewHeightConstraint,
             greaterCollectionViewHeightConstraint,
+            lesserCollectionViewHeightConstraint,
             collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor),
             collectionView.widthAnchor.constraint(equalTo: view.widthAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
