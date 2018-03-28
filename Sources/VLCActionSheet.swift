@@ -125,20 +125,22 @@ class VLCActionSheetSectionHeader: UIView {
 
     private func setupSeparator() {
         addSubview(separator)
-
-        separator.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        separator.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-        separator.topAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            separator.leadingAnchor.constraint(equalTo: leadingAnchor),
+            separator.widthAnchor.constraint(equalTo: widthAnchor),
+            separator.heightAnchor.constraint(equalToConstant: 0.5),
+            separator.topAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func setupView() {
         addSubview(title)
-
-        title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        title.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        title.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        title.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            title.centerYAnchor.constraint(equalTo: centerYAnchor),
+            title.centerXAnchor.constraint(equalTo: centerXAnchor),
+            title.topAnchor.constraint(equalTo: topAnchor)
+        ])
     }
 }
 
@@ -232,17 +234,21 @@ class VLCActionSheet: UIViewController {
     }
 
     private func setupCancelButtonConstraints() {
-        cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
-        cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
+        NSLayoutConstraint.activate([
+            cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor),
+            cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor),
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            cancelButton.heightAnchor.constraint(equalToConstant: cellHeight)
+        ])
     }
 
     private func setuplHeaderViewConstraints() {
-        headerView.bottomAnchor.constraint(equalTo: collectionView.topAnchor).isActive = true
-        headerView.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
-        headerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            headerView.bottomAnchor.constraint(equalTo: collectionView.topAnchor),
+            headerView.heightAnchor.constraint(equalToConstant: cellHeight),
+            headerView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        ])
     }
 
     private func setupCollectionViewConstraints() {
@@ -255,7 +261,6 @@ class VLCActionSheet: UIViewController {
                                                   constant: view.bounds.height / 2)
 
         lesserHeightConstraint.priority = UILayoutPriority(rawValue: 1000)
-        lesserHeightConstraint.isActive = true
 
         let greaterHeightConstraint = NSLayoutConstraint(item: collectionView,
                                                         attribute: NSLayoutAttribute.height,
@@ -266,18 +271,23 @@ class VLCActionSheet: UIViewController {
                                                         constant: CGFloat(data.count) * cellHeight)
 
         greaterHeightConstraint.priority = UILayoutPriority(rawValue: 999)
-        greaterHeightConstraint.isActive = true
 
-        collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor).isActive = true
-        collectionView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            lesserHeightConstraint,
+            greaterHeightConstraint,
+            collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor),
+            collectionView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        ])
     }
 
     private func setupBottomBackgroundView() {
-        bottomBackgroundView.topAnchor.constraint(equalTo: cancelButton.topAnchor).isActive = true
-        bottomBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        bottomBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        bottomBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            bottomBackgroundView.topAnchor.constraint(equalTo: cancelButton.topAnchor),
+            bottomBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bottomBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 
     @available(iOS 11.0, *)
