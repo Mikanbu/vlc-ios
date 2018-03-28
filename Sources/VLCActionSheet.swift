@@ -226,6 +226,17 @@ class VLCActionSheet: UIViewController {
         return lesserCollectionViewHeightConstraint
     }()
 
+    lazy var bottomBackgroundViewHeightConstraint: NSLayoutConstraint = {
+        let bottomBackgroundViewHeightConstraint = NSLayoutConstraint(item: bottomBackgroundView,
+                                                                      attribute: .height,
+                                                                      relatedBy: .equal,
+                                                                      toItem: nil,
+                                                                      attribute: .height,
+                                                                      multiplier: 1,
+                                                                      constant: cellHeight)
+        return bottomBackgroundViewHeightConstraint
+    }()
+
     // MARK: Initializer
     @objc init(_ data: Array<Any>) {
         self.data = data
@@ -289,6 +300,7 @@ class VLCActionSheet: UIViewController {
 
     private func setupBottomBackgroundView() {
         NSLayoutConstraint.activate([
+            bottomBackgroundViewHeightConstraint,
             bottomBackgroundView.topAnchor.constraint(equalTo: cancelButton.topAnchor),
             bottomBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bottomBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -298,7 +310,7 @@ class VLCActionSheet: UIViewController {
 
     @available(iOS 11.0, *)
     override func viewSafeAreaInsetsDidChange() {
-        bottomBackgroundView.heightAnchor.constraint(equalToConstant: cellHeight + view.safeAreaInsets.bottom).isActive = true
+        bottomBackgroundViewHeightConstraint.constant = cellHeight + view.safeAreaInsets.bottom
     }
 
     // MARK: UIViewController
