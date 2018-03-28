@@ -254,7 +254,8 @@ class VLCActionSheet: UIViewController {
     // MARK: Private methods
     @objc private func removeActionSheet() {
         UIView.transition(with: backgroundView, duration: 0.01, options: .transitionCrossDissolve, animations: {
-            self.backgroundView.isHidden = true
+            [weak self] in
+            self?.backgroundView.isHidden = true
         }, completion: { finished in
             super.presentingViewController?.dismiss(animated: true, completion: nil)
         })
@@ -345,7 +346,8 @@ class VLCActionSheet: UIViewController {
         headerView.isHidden = false
 
         UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: {
-            self.backgroundView.isHidden = false
+            [weak self] in
+            self?.backgroundView.isHidden = false
         }, completion: nil)
 
         let realCollectionViewFrame = collectionView.frame
@@ -355,16 +357,16 @@ class VLCActionSheet: UIViewController {
         headerView.frame.origin.y += collectionView.frame.origin.y
 
         UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
-            self.collectionView.frame = realCollectionViewFrame
-            self.headerView.frame = realHeaderViewFrame
+            [weak self] in
+            self?.collectionView.frame = realCollectionViewFrame
+            self?.headerView.frame = realHeaderViewFrame
         }, completion: nil)
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-
-        coordinator.animate(alongsideTransition: { (context) in
-            self.lesserCollectionViewHeightConstraint.constant = size.height / 2
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            self?.lesserCollectionViewHeightConstraint.constant = size.height / 2
         })
     }
 
