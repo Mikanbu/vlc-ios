@@ -29,6 +29,10 @@ class VLCRendererCollectionViewLayout: UICollectionViewFlowLayout {
         minimumLineSpacing = 1
         minimumInteritemSpacing = 0
     }
+
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        return true
+    }
 }
 
 // MARK: VLCActionSheetCell
