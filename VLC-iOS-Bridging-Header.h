@@ -3,6 +3,7 @@
 #import <PAPasscode/PAPasscodeViewController.h>
 #import <XKKeychain/XKKeychain.h>
 
+#import "UIDevice+VLC.h"
 #import "UIColor+Presets.h"
 #import "VLCAboutViewController.h"
 #import "VLCCloudServicesTableViewController.h"
