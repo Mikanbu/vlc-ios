@@ -74,17 +74,23 @@ class VLCActionSheetCell: UICollectionViewCell {
         stackView.addArrangedSubview(name)
         addSubview(stackView)
 
-        // StackView
-        icon.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        icon.widthAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
+        var guide: LayoutAnchorContainer = self
 
-        name.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
-        name.centerYAnchor.constraint(equalTo: stackView.centerYAnchor).isActive = true
+        if #available(iOS 11.0, *) {
+            guide = safeAreaLayoutGuide
+        }
+        NSLayoutConstraint.activate([
+            icon.heightAnchor.constraint(equalToConstant: 25),
+            icon.widthAnchor.constraint(equalTo: icon.heightAnchor),
 
-        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 10).isActive = true
-        stackView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-        stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+            name.trailingAnchor.constraint(equalTo: stackView.trailingAnchor),
+            name.centerYAnchor.constraint(equalTo: stackView.centerYAnchor),
+
+            stackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 10),
+            stackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: 10),
+            stackView.heightAnchor.constraint(equalTo: heightAnchor),
+            stackView.topAnchor.constraint(equalTo: topAnchor)
+        ])
     }
 }
 
