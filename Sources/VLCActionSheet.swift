@@ -191,7 +191,7 @@ class VLCActionSheet: UIViewController {
         cancelButton.setTitleColor(.white, for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
-        cancelButton.backgroundColor = .vlcOrangeTint()
+        cancelButton.backgroundColor = UIColor(red:1.00, green:0.59, blue:0.13, alpha:1.0)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         return cancelButton
     }()
@@ -201,7 +201,7 @@ class VLCActionSheet: UIViewController {
         headerView.title.text = "Select a casting device"
         headerView.title.textColor = .white
         headerView.title.textAlignment = .center
-        headerView.backgroundColor = .vlcOrangeTint()
+        headerView.backgroundColor = UIColor(red:1.00, green:0.59, blue:0.13, alpha:1.0)
         headerView.translatesAutoresizingMaskIntoConstraints = false
         return headerView
     }()
@@ -354,7 +354,7 @@ class VLCActionSheet: UIViewController {
         collectionView.frame.origin.y += collectionView.frame.origin.y
         headerView.frame.origin.y += collectionView.frame.origin.y
 
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .curveEaseOut, animations: {
             self.collectionView.frame = realCollectionViewFrame
             self.headerView.frame = realHeaderViewFrame
         }, completion: nil)
