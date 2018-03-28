@@ -177,7 +177,6 @@ class VLCActionSheet: UIViewController {
         let collectionView = UICollectionView(frame: UIScreen.main.bounds, collectionViewLayout: collectionViewLayout)
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
@@ -212,6 +211,19 @@ class VLCActionSheet: UIViewController {
         bottomBackgroundView.backgroundColor = UIColor(red:1.00, green:0.59, blue:0.13, alpha:1.0)
         bottomBackgroundView.translatesAutoresizingMaskIntoConstraints = false
         return bottomBackgroundView
+    }()
+
+    // Cache only this constraint to update the height on rotation
+    lazy var lesserCollectionViewHeightConstraint: NSLayoutConstraint = {
+        let lesserCollectionViewHeightConstraint = NSLayoutConstraint(item: collectionView,
+                                                        attribute: .height,
+                                                        relatedBy: .lessThanOrEqual,
+                                                        toItem: nil,
+                                                        attribute: .height,
+                                                        multiplier: 1,
+                                                        constant: view.bounds.height / 2)
+        lesserCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 1000)
+        return lesserCollectionViewHeightConstraint
     }()
 
     // MARK: Initializer
@@ -256,32 +268,22 @@ class VLCActionSheet: UIViewController {
     }
 
     private func setupCollectionViewConstraints() {
-        let lesserHeightConstraint = NSLayoutConstraint(item: collectionView,
-                                                  attribute: NSLayoutAttribute.height,
-                                                  relatedBy: NSLayoutRelation.lessThanOrEqual,
-                                                  toItem: nil,
-                                                  attribute: NSLayoutAttribute.height,
-                                                  multiplier: 1,
-                                                  constant: view.bounds.height / 2)
-
-        lesserHeightConstraint.priority = UILayoutPriority(rawValue: 1000)
-
-        let greaterHeightConstraint = NSLayoutConstraint(item: collectionView,
-                                                        attribute: NSLayoutAttribute.height,
-                                                        relatedBy: NSLayoutRelation.greaterThanOrEqual,
+        let greaterCollectionViewHeightConstraint = NSLayoutConstraint(item: collectionView,
+                                                        attribute: .height,
+                                                        relatedBy: .greaterThanOrEqual,
                                                         toItem: nil,
-                                                        attribute: NSLayoutAttribute.height,
+                                                        attribute: .height,
                                                         multiplier: 1,
                                                         constant: CGFloat(data.count) * cellHeight)
 
-        greaterHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+        greaterCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 999)
 
         NSLayoutConstraint.activate([
-            lesserHeightConstraint,
-            greaterHeightConstraint,
+            lesserCollectionViewHeightConstraint,
+            greaterCollectionViewHeightConstraint,
             collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor),
             collectionView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         ])
     }
 
@@ -344,6 +346,19 @@ class VLCActionSheet: UIViewController {
             self.collectionView.frame = realCollectionViewFrame
             self.headerView.frame = realHeaderViewFrame
         }, completion: nil)
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        coordinator.animate(alongsideTransition: { (context) in
+            self.lesserCollectionViewHeightConstraint.constant = size.height / 2
+        })
+    }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
     }
 
     @objc func addAction(closure action: @escaping (_ item: Any) -> Void) {
