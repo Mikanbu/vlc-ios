@@ -195,6 +195,13 @@ class VLCActionSheet: UIViewController {
         return headerView
     }()
 
+    lazy var bottomBackgroundView: UIView = {
+        let bottomBackgroundView = UIView()
+        bottomBackgroundView.backgroundColor = UIColor(red:1.00, green:0.59, blue:0.13, alpha:1.0)
+        bottomBackgroundView.translatesAutoresizingMaskIntoConstraints = false
+        return bottomBackgroundView
+    }()
+
     // MARK: Initializer
     @objc init(_ data: Array<Any>) {
         self.data = data
@@ -220,10 +227,9 @@ class VLCActionSheet: UIViewController {
 
     private func setupCancelButtonConstraints() {
         cancelButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
-        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
         cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        cancelButton.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
     }
 
     private func setuplHeaderViewConstraints() {
@@ -261,19 +267,34 @@ class VLCActionSheet: UIViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     }
 
+    private func setupBottomBackgroundView() {
+        bottomBackgroundView.topAnchor.constraint(equalTo: cancelButton.topAnchor).isActive = true
+        bottomBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        bottomBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+
+    @available(iOS 11.0, *)
+    override func viewSafeAreaInsetsDidChange() {
+        bottomBackgroundView.heightAnchor.constraint(equalToConstant: cellHeight + view.safeAreaInsets.bottom).isActive = true
+    }
+
     // MARK: UIViewController
     override func viewDidLoad() {
         super.viewDidLoad()
+
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
-        view.addSubview(cancelButton)
         view.addSubview(headerView)
+        view.addSubview(bottomBackgroundView)
+        view.addSubview(cancelButton)
 
         backgroundView.frame = UIScreen.main.bounds
 
         setupCollectionViewConstraints()
         setupCancelButtonConstraints()
         setuplHeaderViewConstraints()
+        setupBottomBackgroundView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
