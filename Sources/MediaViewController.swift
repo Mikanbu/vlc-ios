@@ -125,6 +125,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Sort", comment: ""), style: .plain, target: self, action: #selector(sort))
     }
 
+    // MARK: Renderer
     private func setupRendererDiscovererManager() {
         let manager = VLCRendererDiscovererManager.sharedInstance
 
@@ -135,11 +136,6 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
         if (manager.start()) {
             print("RendererDiscovererManager Started")
-            if (manager.discoverers.count != 0) {
-                print("Found renderer discoverers")
-            } else {
-                navigationItem.rightBarButtonItem = nil
-            }
         } else {
             print("Failed to start RendererDiscovererManager")
         }
