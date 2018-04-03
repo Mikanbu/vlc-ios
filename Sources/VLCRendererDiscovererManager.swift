@@ -70,13 +70,18 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
     }
 }
 
+extension Notification.Name {
+    static let rendererDiscovererItemAdded = NSNotification.Name("rendererDiscovererItemAdded")
+    static let rendererDiscovererItemRemoved = NSNotification.Name("rendererDiscovererItemRemoved")
+}
+
 // MARK: VLCRendererDiscovererDelegate
 extension VLCRendererDiscovererManager {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        print("RendererDiscovererManager: New item added")
+        NotificationCenter.default.post(name: .rendererDiscovererItemAdded, object: item)
     }
 
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        print("RendererDiscovererManager: item removed")
+        NotificationCenter.default.post(name: .rendererDiscovererItemRemoved, object: item)
     }
 }
