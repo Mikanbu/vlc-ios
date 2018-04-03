@@ -94,7 +94,7 @@ class VLCActionSheetCell: UICollectionViewCell {
             stackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: 10),
             stackView.heightAnchor.constraint(equalTo: heightAnchor),
             stackView.topAnchor.constraint(equalTo: topAnchor)
-        ])
+            ])
     }
 }
 
@@ -134,7 +134,7 @@ class VLCActionSheetSectionHeader: UIView {
             separator.widthAnchor.constraint(equalTo: widthAnchor),
             separator.heightAnchor.constraint(equalToConstant: 0.5),
             separator.topAnchor.constraint(equalTo: bottomAnchor)
-        ])
+            ])
     }
 
     private func setupView() {
@@ -144,7 +144,7 @@ class VLCActionSheetSectionHeader: UIView {
             title.centerYAnchor.constraint(equalTo: centerYAnchor),
             title.centerXAnchor.constraint(equalTo: centerXAnchor),
             title.topAnchor.constraint(equalTo: topAnchor)
-        ])
+            ])
     }
 }
 
@@ -216,12 +216,12 @@ class VLCActionSheet: UIViewController {
     // Cache only this constraint to update the height on rotation
     lazy var lesserCollectionViewHeightConstraint: NSLayoutConstraint = {
         let lesserCollectionViewHeightConstraint = NSLayoutConstraint(item: collectionView,
-                                                        attribute: .height,
-                                                        relatedBy: .lessThanOrEqual,
-                                                        toItem: nil,
-                                                        attribute: .height,
-                                                        multiplier: 1,
-                                                        constant: view.bounds.height / 2)
+                                                                      attribute: .height,
+                                                                      relatedBy: .lessThanOrEqual,
+                                                                      toItem: nil,
+                                                                      attribute: .height,
+                                                                      multiplier: 1,
+                                                                      constant: view.bounds.height / 2)
         lesserCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 1000)
         return lesserCollectionViewHeightConstraint
     }()
@@ -256,8 +256,8 @@ class VLCActionSheet: UIViewController {
         UIView.transition(with: backgroundView, duration: 0.01, options: .transitionCrossDissolve, animations: {
             [weak self] in
             self?.backgroundView.isHidden = true
-        }, completion: { finished in
-            super.presentingViewController?.dismiss(animated: true, completion: nil)
+            }, completion: { finished in
+                super.presentingViewController?.dismiss(animated: true, completion: nil)
         })
     }
 
@@ -267,7 +267,7 @@ class VLCActionSheet: UIViewController {
             cancelButton.widthAnchor.constraint(equalTo: view.widthAnchor),
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             cancelButton.heightAnchor.constraint(equalToConstant: cellHeight)
-        ])
+            ])
     }
 
     private func setuplHeaderViewConstraints() {
@@ -276,17 +276,17 @@ class VLCActionSheet: UIViewController {
             headerView.heightAnchor.constraint(equalToConstant: cellHeight),
             headerView.widthAnchor.constraint(equalTo: view.widthAnchor),
             headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        ])
+            ])
     }
 
     private func setupCollectionViewConstraints() {
         let greaterCollectionViewHeightConstraint = NSLayoutConstraint(item: collectionView,
-                                                        attribute: .height,
-                                                        relatedBy: .greaterThanOrEqual,
-                                                        toItem: nil,
-                                                        attribute: .height,
-                                                        multiplier: 1,
-                                                        constant: CGFloat(data.count) * cellHeight)
+                                                                       attribute: .height,
+                                                                       relatedBy: .greaterThanOrEqual,
+                                                                       toItem: nil,
+                                                                       attribute: .height,
+                                                                       multiplier: 1,
+                                                                       constant: CGFloat(data.count) * cellHeight)
 
         greaterCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 999)
 
@@ -296,7 +296,7 @@ class VLCActionSheet: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor),
             collectionView.widthAnchor.constraint(equalTo: view.widthAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        ])
+            ])
     }
 
     private func setupBottomBackgroundView() {
@@ -306,7 +306,7 @@ class VLCActionSheet: UIViewController {
             bottomBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bottomBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             bottomBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+            ])
     }
 
     @available(iOS 11.0, *)
@@ -348,7 +348,7 @@ class VLCActionSheet: UIViewController {
         UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: {
             [weak self] in
             self?.backgroundView.isHidden = false
-        }, completion: nil)
+            }, completion: nil)
 
         let realCollectionViewFrame = collectionView.frame
         let realHeaderViewFrame = headerView.frame
@@ -360,7 +360,7 @@ class VLCActionSheet: UIViewController {
             [weak self] in
             self?.collectionView.frame = realCollectionViewFrame
             self?.headerView.frame = realHeaderViewFrame
-        }, completion: nil)
+            }, completion: nil)
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
