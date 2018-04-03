@@ -22,6 +22,15 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     private var mediaDatasourceAndDelegate: MediaDataSourceAndDelegate?
     private var searchController: UISearchController?
     private let searchDataSource = VLCLibrarySearchDisplayDataSource()
+
+    private lazy var renderersBarButtonItem: UIBarButtonItem = {
+        let renderersBarButtonItem = UIBarButtonItem(image: UIImage(named: "renderer"),
+                                                     style: .plain,
+                                                     target: self,
+                                                     action: #selector(displayRenderers))
+        return renderersBarButtonItem
+    }()
+
     public weak var delegate: VLCMediaViewControllerDelegate?
 
     @available(iOS 11.0, *)
@@ -53,6 +62,16 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
         setupSearchController()
         setupNavigationBar()
         _ = (MLMediaLibrary.sharedMediaLibrary() as! MLMediaLibrary).libraryDidAppear()
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupRendererDiscovererManager()
+    }
+
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        VLCRendererDiscovererManager.sharedInstance.stop()
     }
 
     @objc func themeDidChange() {
@@ -104,6 +123,71 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Sort", comment: ""), style: .plain, target: self, action: #selector(sort))
+    }
+
+    private func setupRendererDiscovererManager() {
+        let manager = VLCRendererDiscovererManager.sharedInstance
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRendererNotification(notification:)),
+                                               name: .rendererDiscovererItemAdded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRendererNotification(notification:)),
+                                               name: .rendererDiscovererItemRemoved, object: nil)
+
+        if (manager.start()) {
+            print("RendererDiscovererManager Started")
+            if (manager.discoverers.count != 0) {
+                print("Found renderer discoverers")
+            } else {
+                navigationItem.rightBarButtonItem = nil
+            }
+        } else {
+            print("Failed to start RendererDiscovererManager")
+        }
+    }
+
+    @objc private func handleRendererNotification(notification: Notification) {
+        print("notification received |ω°•) with \(String(describing: notification.object))")
+
+        guard let rendererItem = notification.object as? VLCRendererItem else {
+            print("Something is wrong with the notification object!)")
+            return
+        }
+
+        switch notification.name {
+        case .rendererDiscovererItemAdded:
+            print("notification: item added")
+            // Add renderers button to the navigation bar on the first added notification
+            if (navigationItem.rightBarButtonItem != renderersBarButtonItem) {
+                navigationItem.rightBarButtonItem = renderersBarButtonItem
+            }
+
+        case .rendererDiscovererItemRemoved:
+            // Selected renderer has been removed
+            if (VLCPlaybackController.sharedInstance().renderer == rendererItem) {
+                print("the selected renderer is gone!")
+                VLCPlaybackController.sharedInstance().renderer = nil
+            }
+            print("notification: item removed")
+        default:
+            print("unknown notification")
+        }
+    }
+
+    @objc func displayRenderers() {
+        let manager = VLCRendererDiscovererManager.sharedInstance
+        let sheet = VLCActionSheet(data: manager.getAllRenderers())
+
+        sheet.modalPresentationStyle = .custom
+        sheet.addAction { (item) in
+            let rendererItem = item as? VLCRendererItem
+
+            if (VLCPlaybackController.sharedInstance().renderer != rendererItem) {
+                VLCPlaybackController.sharedInstance().renderer = rendererItem
+            } else {
+                VLCPlaybackController.sharedInstance().renderer = nil
+            }
+        }
+        present(sheet, animated: false, completion: nil)
     }
 
     @objc func sort() {
