@@ -238,7 +238,7 @@ class VLCActionSheet: UIViewController {
     }()
 
     // MARK: Initializer
-    @objc init(_ data: Array<Any>) {
+    @objc init(data data: Array<Any>) {
         self.data = data
         super.init(nibName: nil, bundle: nil)
     }
