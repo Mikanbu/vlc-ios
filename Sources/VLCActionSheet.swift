@@ -158,7 +158,7 @@ class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
 
-    weak var dataSource: VLCActionSheetDataSource?
+    @objc weak var dataSource: VLCActionSheetDataSource?
 
     private var action: ((_ item: Any) -> Void)?
 
