@@ -38,7 +38,7 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate {
         return false
     }
 
-    @objc func start() -> Bool {
+    @discardableResult @objc func start() -> Bool {
         // Gather potential renderer discoverers
         guard let tmpDiscoverers: [VLCRendererDiscovererDescription] = VLCRendererDiscoverer.list() else {
             return false
