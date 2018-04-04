@@ -128,11 +128,15 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     // MARK: Renderer
     private func setupRendererDiscovererManager() {
         let manager = VLCRendererDiscovererManager.sharedInstance
-
-        NotificationCenter.default.addObserver(self, selector: #selector(handleRendererNotification(notification:)),
-                                               name: .rendererDiscovererItemAdded, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleRendererNotification(notification:)),
-                                               name: .rendererDiscovererItemRemoved, object: nil)
+        let defaultCenter = NotificationCenter.default
+        defaultCenter.addObserver(self,
+                                  selector: #selector(handleRendererNotification(notification:)),
+                                  name: .rendererDiscovererItemAdded,
+                                  object: nil)
+        defaultCenter.addObserver(self,
+                                  selector: #selector(handleRendererNotification(notification:)),
+                                  name: .rendererDiscovererItemRemoved,
+                                  object: nil)
 
         if (manager.start()) {
             print("RendererDiscovererManager Started")
