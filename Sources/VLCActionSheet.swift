@@ -153,7 +153,7 @@ class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
 
-    @objc var data: Array<Any>!
+    @objc var data: [Any]!
 
     private var action: ((_ item: Any) -> Void)?
 
@@ -238,7 +238,7 @@ class VLCActionSheet: UIViewController {
     }()
 
     // MARK: Initializer
-    @objc init(data: Array<Any>) {
+    @objc init(data: [Any]) {
         self.data = data
         super.init(nibName: nil, bundle: nil)
     }

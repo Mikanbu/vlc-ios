@@ -9,12 +9,12 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
+class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate {
 
-    @objc static let sharedInstance = VLCRendererDiscovererManager();
+    @objc static let sharedInstance = VLCRendererDiscovererManager()
 
     // Array of RendererDiscoverers(Chromecast, UPnP, ...)
-    @objc dynamic var discoverers: Array<VLCRendererDiscoverer> = [VLCRendererDiscoverer]()
+    @objc dynamic var discoverers: [VLCRendererDiscoverer] = [VLCRendererDiscoverer]()
 
     private override init() {
         super.init()
@@ -31,7 +31,7 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
 
     private func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
         for discoverer in discoverers {
-            if (discoverer.name == description.name) {
+            if discoverer.name == description.name {
                 return true
             }
         }
@@ -40,14 +40,14 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate  {
 
     @objc func start() -> Bool {
         // Gather potential renderer discoverers
-        guard let tmpDiscoverers: Array<VLCRendererDiscovererDescription> = VLCRendererDiscoverer.list() else {
+        guard let tmpDiscoverers: [VLCRendererDiscovererDescription] = VLCRendererDiscoverer.list() else {
             return false
         }
         for discoverer in tmpDiscoverers {
 
-            if (!isDuplicateDiscoverer(with: discoverer)) {
+            if !isDuplicateDiscoverer(with: discoverer) {
                 if let rendererDiscoverer = VLCRendererDiscoverer(name: discoverer.name) {
-                    if (rendererDiscoverer.start()) {
+                    if rendererDiscoverer.start() {
                         rendererDiscoverer.delegate = self
                         discoverers.append(rendererDiscoverer)
                     } else {
