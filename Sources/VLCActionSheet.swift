@@ -148,12 +148,17 @@ class VLCActionSheetSectionHeader: UIView {
     }
 }
 
+@objc protocol VLCActionSheetDataSource: class {
+    @objc func numberOfRows() -> Int
+    @objc func itemAtIndexPath(_ indexPath: IndexPath) -> Any?
+}
+
 // MARK: VLCActionSheet
 class VLCActionSheet: UIViewController {
 
     private let cellHeight: CGFloat = 50
 
-    @objc var data: [Any]!
+    weak var dataSource: VLCActionSheetDataSource?
 
     private var action: ((_ item: Any) -> Void)?
 
@@ -237,20 +242,6 @@ class VLCActionSheet: UIViewController {
         return bottomBackgroundViewHeightConstraint
     }()
 
-    // MARK: Initializer
-    @objc init(data: [Any]) {
-        self.data = data
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("Oh noes, no NSCoding")
-    }
-
-    override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-
     // MARK: Private methods
     @objc private func removeActionSheet() {
         UIView.transition(with: backgroundView, duration: 0.01, options: .transitionCrossDissolve, animations: {
@@ -280,13 +271,18 @@ class VLCActionSheet: UIViewController {
     }
 
     private func setupCollectionViewConstraints() {
+        guard let dataSource = dataSource else {
+            print("VLCActionSheet: DataSource not setted correctly!")
+            return
+        }
+
         let greaterCollectionViewHeightConstraint = NSLayoutConstraint(item: collectionView,
                                                                        attribute: .height,
                                                                        relatedBy: .greaterThanOrEqual,
                                                                        toItem: nil,
                                                                        attribute: .height,
                                                                        multiplier: 1,
-                                                                       constant: CGFloat(data.count) * cellHeight)
+                                                                       constant: CGFloat(dataSource.numberOfRows()) * cellHeight)
 
         greaterCollectionViewHeightConstraint.priority = UILayoutPriority(rawValue: 999)
 
@@ -390,21 +386,26 @@ extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
 // MARK: UICollectionViewDelegate
 extension VLCActionSheet: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        action?(data[indexPath.row])
-        removeActionSheet()
+        if let renderer = dataSource?.itemAtIndexPath(indexPath) {
+            action?(renderer)
+            removeActionSheet()
+        }
     }
 }
 
 // MARK: UICollectionViewDataSource
 extension VLCActionSheet: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.count
+        if let dataSource = dataSource {
+            return dataSource.numberOfRows()
+        }
+        return 0
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier, for: indexPath) as! VLCActionSheetCell
 
-        if let renderer = data[indexPath.row] as? VLCRendererItem {
+        if let renderer = dataSource?.itemAtIndexPath(indexPath) as? VLCRendererItem {
             cell.name.text = renderer.name
             cell.icon.image = UIImage(named: "rendererBlack")
         } else {

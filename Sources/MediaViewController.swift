@@ -170,9 +170,8 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     }
 
     @objc func displayRenderers() {
-        let manager = VLCRendererDiscovererManager.sharedInstance
-        let sheet = VLCActionSheet(data: manager.getAllRenderers())
-
+        let sheet = VLCActionSheet()
+        sheet.dataSource = self
         sheet.modalPresentationStyle = .custom
         sheet.addAction { (item) in
             let rendererItem = item as? VLCRendererItem
@@ -212,5 +211,14 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     public func didDismissSearchController(_ searchController: UISearchController) {
         collectionView?.dataSource = mediaDatasourceAndDelegate
     }
+}
 
+extension VLCMediaViewController: VLCActionSheetDataSource {
+    func numberOfRows() -> Int {
+        return VLCRendererDiscovererManager.sharedInstance.getAllRenderers().count
+    }
+
+    func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
+        return VLCRendererDiscovererManager.sharedInstance.getAllRenderers()[indexPath.row]
+    }
 }
