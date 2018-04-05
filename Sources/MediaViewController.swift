@@ -61,17 +61,17 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
         setupCollectionView()
         setupSearchController()
         setupNavigationBar()
+        setupRendererDiscovererManager()
         _ = (MLMediaLibrary.sharedMediaLibrary() as! MLMediaLibrary).libraryDidAppear()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupRendererDiscovererManager()
+        VLCRendererDiscovererManager.sharedInstance.start()
     }
 
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        VLCRendererDiscovererManager.sharedInstance.stop()
     }
 
     @objc func themeDidChange() {
@@ -127,7 +127,6 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     // MARK: Renderer
     private func setupRendererDiscovererManager() {
-        let manager = VLCRendererDiscovererManager.sharedInstance
         let defaultCenter = NotificationCenter.default
         defaultCenter.addObserver(self,
                                   selector: #selector(handleRendererNotification(notification:)),
@@ -137,12 +136,6 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
                                   selector: #selector(handleRendererNotification(notification:)),
                                   name: .rendererDiscovererItemRemoved,
                                   object: nil)
-
-        if (manager.start()) {
-            print("RendererDiscovererManager Started")
-        } else {
-            print("Failed to start RendererDiscovererManager")
-        }
     }
 
     @objc private func handleRendererNotification(notification: Notification) {
