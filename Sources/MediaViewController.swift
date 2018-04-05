@@ -155,10 +155,15 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
             }
 
         case .rendererDiscovererItemRemoved:
-            // Selected renderer has been removed
             if (VLCPlaybackController.sharedInstance().renderer == rendererItem) {
+                // Selected renderer has been removed
                 print("the selected renderer is gone!")
                 VLCPlaybackController.sharedInstance().renderer = nil
+            }
+
+            if (VLCRendererDiscovererManager.sharedInstance.getAllRenderers().count == 0) {
+                // No more renderers found
+                navigationItem.rightBarButtonItem = nil
             }
             print("notification: item removed")
         default:
