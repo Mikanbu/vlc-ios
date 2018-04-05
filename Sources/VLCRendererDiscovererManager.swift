@@ -44,7 +44,6 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate {
             return false
         }
         for discoverer in tmpDiscoverers {
-
             if !isDuplicateDiscoverer(with: discoverer) {
                 if let rendererDiscoverer = VLCRendererDiscoverer(name: discoverer.name) {
                     if rendererDiscoverer.start() {
@@ -77,7 +76,7 @@ public extension Notification.Name {
 
 @objc extension NSNotification {
     static let rendererDiscovererItemAdded = NSNotification.Name.rendererDiscovererItemAdded
-    static let rendererDiscovererItemRemoved = NSNotification.Name.rendererDiscovererItemAdded
+    static let rendererDiscovererItemRemoved = NSNotification.Name.rendererDiscovererItemRemoved
 }
 
 // MARK: VLCRendererDiscovererDelegate
