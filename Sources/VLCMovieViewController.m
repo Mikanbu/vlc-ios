@@ -35,6 +35,7 @@
 #import "VLCTrackSelectorView.h"
 #import "VLCMetadata.h"
 #import "UIDevice+VLC.h"
+#import "VLC_iOS-Swift.h"
 
 #define FORWARD_SWIPE_DURATION 30
 #define BACKWARD_SWIPE_DURATION 10
@@ -53,7 +54,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
   VLCPanTypeProjection
 };
 
-@interface VLCMovieViewController () <UIGestureRecognizerDelegate, VLCMultiSelectionViewDelegate, VLCEqualizerViewUIDelegate>
+@interface VLCMovieViewController () <UIGestureRecognizerDelegate, VLCMultiSelectionViewDelegate, VLCEqualizerViewUIDelegate, VLCActionSheetDataSource>
 {
     BOOL _controlsHidden;
     BOOL _videoFiltersHidden;
@@ -95,6 +96,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     UITapGestureRecognizer *_tapToSeekRecognizer;
 
     UIButton *_doneButton;
+    UIButton *_rendererButton;
 
     VLCTrackSelectorView *_trackSelectorContainer;
 
@@ -235,7 +237,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     _saveLocation = CGPointMake(-1.f, -1.f);
 
     [self setupConstraints];
-
+    [self setupRendererDiscovererManager];
 }
 
 - (void)setupGestureRecognizers
@@ -435,6 +437,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     }
 
     [self enableNormalVideoGestures:!_mediaHasProjection];
+    [self startRendererDiscovererManager];
 }
 
 - (void)viewDidLayoutSubviews
@@ -504,6 +507,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
     [[NSUserDefaults standardUserDefaults] setBool:_displayRemainingTime forKey:kVLCShowRemainingTime];
+    [[VLCRendererDiscovererManager sharedInstance] stop];
 }
 
 - (BOOL)canBecomeFirstResponder
@@ -695,10 +699,13 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
         _artistNameLabel.hidden = NO;
         _albumNameLabel.hidden = NO;
         _trackNameLabel.hidden = NO;
+        _rendererButton.hidden = NO;
+        _rendererButton.alpha = 0.0;
     }
 
     void (^animationBlock)() = ^() {
         self.navigationController.navigationBar.alpha = alpha;
+        _rendererButton.alpha = alpha;
         _controllerPanel.alpha = alpha;
         _videoFilterView.alpha = alpha;
         _playbackSpeedView.alpha = alpha;
@@ -719,6 +726,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
         _videoFilterView.hidden = _videoFiltersHidden;
         _playbackSpeedView.hidden = _playbackSpeedViewHidden;
         self.navigationController.navigationBar.hidden = _controlsHidden;
+        _rendererButton.hidden = _controlsHidden;
         _trackSelectorContainer.hidden = YES;
         _equalizerView.hidden = YES;
         if (_sleepTimerContainer)
@@ -1643,6 +1651,114 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 - (void)handleExternalScreenDidDisconnect:(NSNotification *)notification
 {
     [self hideFromExternalDisplay];
+}
+
+#pragma mark - Renderers
+
+- (void)setupRendererDiscovererManager
+{
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+
+    [defaultCenter addObserver:self
+                      selector:@selector(handleRendererNotification:)
+                          name:NSNotification.rendererDiscovererItemAdded
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(handleRendererNotification:)
+                          name:NSNotification.rendererDiscovererItemRemoved
+                        object:nil];
+}
+
+- (void)startRendererDiscovererManager
+{
+    VLCRendererDiscovererManager *manager = [VLCRendererDiscovererManager sharedInstance];
+
+    if ([manager start]) {
+        NSLog(@"started: ┬─┬◡ﾉ(° -°ﾉ)");
+        [self setupRendererButton];
+    } else {
+        NSLog(@"failed: (╯°□°）╯︵ ┻━┻");
+    }
+}
+
+- (void)handleRendererNotification:(NSNotification *)notification
+{
+    if ([notification.name isEqualToString:NSNotification.rendererDiscovererItemAdded]) {
+        NSLog(@"MovieViewController: added renderer item");
+        if (_rendererButton == nil) {
+            [self setupRendererButton];
+        }
+    } else if ([notification.name isEqualToString:NSNotification.rendererDiscovererItemRemoved]) {
+        NSLog(@"MovieViewController: removed renderer item");
+        VLCRendererItem *item = notification.object;
+        // Current renderer has been removed!
+        // doesn't really fork :9
+        // Error case disconnecting wifi when casting
+        // Issue since VLCMediaViewController is already setting _vpc.renderer to nil
+        // maybe removeObservers of VLCMediaViewController?
+        if (_vpc.renderer == item || _vpc.renderer == nil) {
+            // enters everytime since we're setting it to nil
+            [_vpc mediaPlayerSetRenderer:nil];
+        }
+        if ([[VLCRendererDiscovererManager.sharedInstance getAllRenderers] count] == 0) {
+            _rendererButton.hidden = YES;
+            _rendererButton = nil;
+        }
+    }
+}
+
+- (void)displayRenderers:(id)sender
+{
+    VLCActionSheet *actionSheet = [[VLCActionSheet alloc] init];
+
+    actionSheet.dataSource = self;
+    actionSheet.modalPresentationStyle = UIModalPresentationCustom;
+    [actionSheet addActionWithClosure:^(VLCRendererItem * _Nonnull item) {
+        // Handle set and unset of a renderer
+        // TODO: need visual feedback: such as icon and here need to change output
+//        VLCRendererItem *tmpItem = (_vpc.renderer != item) ? item : nil;
+        VLCRendererItem *tmpItem;
+
+        if (_vpc.renderer != item) {
+            tmpItem = item;
+            // add center background image saying we're currently casting
+            // show loading
+        } else {
+            // to reset the renderer and go back to local playback
+            tmpItem = nil;
+        }
+        [_vpc mediaPlayerSetRenderer:tmpItem];
+    }];
+    [self presentViewController:actionSheet animated:NO completion:nil];
+}
+
+- (void)setupRendererButton
+{
+    _rendererButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_rendererButton setImage:[UIImage imageNamed:@"renderer"] forState:UIControlStateNormal];
+    _rendererButton.frame = CGRectMake(0, 0, 35, 35);
+    [_rendererButton addTarget:self action:@selector(displayRenderers:) forControlEvents:UIControlEventTouchUpInside];
+    _rendererButton.translatesAutoresizingMaskIntoConstraints = NO;
+    _rendererButton.hidden = YES;
+    [self.view addSubview:_rendererButton];
+
+    [NSLayoutConstraint activateConstraints:@[
+                                              [_rendererButton.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:80.0],
+                                              [_rendererButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-10.0],
+                                              [_rendererButton.heightAnchor constraintEqualToAnchor:_rendererButton.heightAnchor multiplier:1.0]
+                                              ]];
+}
+
+#pragma mark - VLCActionSheetDataSource
+
+- (NSInteger)numberOfRows
+{
+    return [[[VLCRendererDiscovererManager sharedInstance] getAllRenderers] count];
+}
+
+- (id)itemAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [[VLCRendererDiscovererManager sharedInstance] getAllRenderers][indexPath.row];
 }
 
 @end
