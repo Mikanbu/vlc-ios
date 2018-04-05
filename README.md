@@ -1,4 +1,8 @@
-# VLC for iOS & tvOS
+<h3 align="center">
+  <a href="https://github.com/Mikanbu/vlc-ios/blob/readme/share/banner_v0.1.png">
+  <img src="https://github.com/Mikanbu/vlc-ios/blob/readme/share/banner_v0.1.png?raw=true" alt="VLC-iOS banner" width="600">
+  </a>
+</h3>
 
 This repository has the source code of VLC for iOS and tvOS application.
 
