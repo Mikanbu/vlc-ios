@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://github.com/Mikanbu/vlc-ios/blob/readme/share/banner_v0.1.png">
-  <img src="https://github.com/Mikanbu/vlc-ios/blob/readme/share/banner_v0.1.png?raw=true" alt="VLC-iOS banner" width="600">
+  <img src="https://github.com/Mikanbu/vlc-ios/blob/readme/share/banner_v0.1.png?raw=true" alt="VLC-iOS banner">
   </a>
 </h3>
 
