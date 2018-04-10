@@ -9,17 +9,35 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate {
+class VLCRendererDiscovererManager: NSObject {
 
-    @objc static let sharedInstance = VLCRendererDiscovererManager()
+    @objc static let sharedInstance = VLCRendererDiscovererManager(presentingViewController: nil)
 
     // Array of RendererDiscoverers(Chromecast, UPnP, ...)
     @objc dynamic var discoverers: [VLCRendererDiscoverer] = [VLCRendererDiscoverer]()
 
-    private override init() {
+    @objc lazy var actionSheet: VLCActionSheet = {
+        let actionSheet = VLCActionSheet()
+        actionSheet.dataSource = self
+        actionSheet.modalPresentationStyle = .custom
+        actionSheet.addAction { [weak self] (item) in
+            if let rendererItem = item as? VLCRendererItem {
+                self?.setRendererItem(rendererItem: rendererItem)
+            }
+        }
+        return actionSheet
+    }()
+
+    @objc var presentingViewController: UIViewController?
+
+    @objc var renderersButtons: [UIButton] = [UIButton]()
+
+    private init(presentingViewController: UIViewController?) {
+        self.presentingViewController = presentingViewController
         super.init()
     }
 
+    // Returns renderers of *all* discoverers
     @objc func getAllRenderers() -> [VLCRendererItem] {
         var renderers = [VLCRendererItem]()
 
@@ -67,25 +85,78 @@ class VLCRendererDiscovererManager: NSObject, VLCRendererDiscovererDelegate {
         }
         discoverers.removeAll()
     }
-}
 
-public extension Notification.Name {
-    public static let rendererDiscovererItemAdded = NSNotification.Name("rendererDiscovererItemAdded")
-    public static let rendererDiscovererItemRemoved = NSNotification.Name("rendererDiscovererItemRemoved")
-}
+    // MARK: VLCActionSheet
+    @objc fileprivate func displayActionSheet() {
+        if let presentingViewController = presentingViewController {
+            presentingViewController.present(actionSheet, animated: false, completion: nil)
+        } else {
+            print("VLCRendererDiscovererManager: Cannot display actionSheet, no viewController setted")
+        }
+    }
 
-@objc extension NSNotification {
-    static let rendererDiscovererItemAdded = NSNotification.Name.rendererDiscovererItemAdded
-    static let rendererDiscovererItemRemoved = NSNotification.Name.rendererDiscovererItemRemoved
+    fileprivate func setRendererItem(rendererItem: VLCRendererItem) {
+        let vpcRenderer = VLCPlaybackController.sharedInstance().renderer
+        VLCPlaybackController.sharedInstance().renderer = (vpcRenderer != rendererItem) ? rendererItem : nil
+    }
+
+    @objc func addSelectionHandler(selectionHandler: ((_ rendererItem: VLCRendererItem) -> Void)?) {
+        actionSheet.addAction { [weak self] (item) in
+            if let rendererItem = item as? VLCRendererItem {
+                self?.setRendererItem(rendererItem: rendererItem)
+                if let handler = selectionHandler {
+                    handler(rendererItem)
+                }
+            }
+        }
+    }
+
+
+    /// Add the given button to VLCRendererDiscovererManager.
+    /// The button state will be handled by the manager.
+    ///
+    /// - Returns: New `UIButton`
+    @objc func setupRendererButton() -> UIButton {
+        let button = UIButton()
+        button.setImage(UIImage(named: "renderer"), for: .normal)
+        button.addTarget(self, action: #selector(displayActionSheet), for: .touchUpInside)
+        renderersButtons.append(button)
+        return button
+    }
 }
 
 // MARK: VLCRendererDiscovererDelegate
-extension VLCRendererDiscovererManager {
+extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        NotificationCenter.default.post(name: .rendererDiscovererItemAdded, object: item)
+        for button in renderersButtons {
+            if (button.isHidden == true) {
+                button.isHidden = false
+            }
+        }
     }
 
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        NotificationCenter.default.post(name: .rendererDiscovererItemRemoved, object: item)
+        if let playbackController = VLCPlaybackController.sharedInstance() {
+            if (playbackController.renderer == item) {
+                // Current renderer has been removed, falling back to local playback
+                playbackController.mediaPlayerSetRenderer(nil)
+            }
+        }
+        // No more renderers to show
+        if (getAllRenderers().count == 0) {
+            for button in renderersButtons {
+                button.isHidden = true
+            }
+        }
+    }
+}
+
+extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
+    func numberOfRows() -> Int {
+        return getAllRenderers().count
+    }
+
+    func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
+        return getAllRenderers()[indexPath.row]
     }
 }

@@ -22,14 +22,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     private var mediaDatasourceAndDelegate: MediaDataSourceAndDelegate?
     private var searchController: UISearchController?
     private let searchDataSource = VLCLibrarySearchDisplayDataSource()
-
-    private lazy var renderersBarButtonItem: UIBarButtonItem = {
-        let renderersBarButtonItem = UIBarButtonItem(image: UIImage(named: "renderer"),
-                                                     style: .plain,
-                                                     target: self,
-                                                     action: #selector(displayRenderers))
-        return renderersBarButtonItem
-    }()
+    private var renderersButton: UIButton
 
     public weak var delegate: VLCMediaViewControllerDelegate?
 
@@ -48,6 +41,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public override init(collectionViewLayout layout: UICollectionViewLayout) {
         self.services = Services()
+        self.renderersButton = VLCRendererDiscovererManager.sharedInstance.setupRendererButton()
         super.init(collectionViewLayout: layout)
     }
 
@@ -67,7 +61,9 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        VLCRendererDiscovererManager.sharedInstance.start()
+        let manager = VLCRendererDiscovererManager.sharedInstance
+        manager.start()
+        manager.presentingViewController = self
     }
 
     public override func viewDidDisappear(_ animated: Bool) {
@@ -127,64 +123,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     // MARK: Renderer
     private func setupRendererDiscovererManager() {
-        let defaultCenter = NotificationCenter.default
-        defaultCenter.addObserver(self,
-                                  selector: #selector(handleRendererNotification(notification:)),
-                                  name: .rendererDiscovererItemAdded,
-                                  object: nil)
-        defaultCenter.addObserver(self,
-                                  selector: #selector(handleRendererNotification(notification:)),
-                                  name: .rendererDiscovererItemRemoved,
-                                  object: nil)
-    }
-
-    @objc private func handleRendererNotification(notification: Notification) {
-        print("notification received |ω°•) with \(String(describing: notification.object))")
-
-        guard let rendererItem = notification.object as? VLCRendererItem else {
-            print("Something is wrong with the notification object!)")
-            return
-        }
-
-        switch notification.name {
-        case .rendererDiscovererItemAdded:
-            print("notification: item added")
-            // Add renderers button to the navigation bar on the first added notification
-            if (navigationItem.rightBarButtonItem != renderersBarButtonItem) {
-                navigationItem.rightBarButtonItem = renderersBarButtonItem
-            }
-
-        case .rendererDiscovererItemRemoved:
-            if (VLCPlaybackController.sharedInstance().renderer == rendererItem) {
-                // Selected renderer has been removed
-                print("the selected renderer is gone!")
-                VLCPlaybackController.sharedInstance().renderer = nil
-            }
-
-            if (VLCRendererDiscovererManager.sharedInstance.getAllRenderers().count == 0) {
-                // No more renderers found
-                navigationItem.rightBarButtonItem = nil
-            }
-            print("notification: item removed")
-        default:
-            print("unknown notification")
-        }
-    }
-
-    @objc func displayRenderers() {
-        let sheet = VLCActionSheet()
-        sheet.dataSource = self
-        sheet.modalPresentationStyle = .custom
-        sheet.addAction { (item) in
-            let rendererItem = item as? VLCRendererItem
-
-            if (VLCPlaybackController.sharedInstance().renderer != rendererItem) {
-                VLCPlaybackController.sharedInstance().renderer = rendererItem
-            } else {
-                VLCPlaybackController.sharedInstance().renderer = nil
-            }
-        }
-        present(sheet, animated: false, completion: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: renderersButton)
     }
 
     @objc func sort() {
@@ -212,15 +151,5 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public func didDismissSearchController(_ searchController: UISearchController) {
         collectionView?.dataSource = mediaDatasourceAndDelegate
-    }
-}
-
-extension VLCMediaViewController: VLCActionSheetDataSource {
-    func numberOfRows() -> Int {
-        return VLCRendererDiscovererManager.sharedInstance.getAllRenderers().count
-    }
-
-    func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
-        return VLCRendererDiscovererManager.sharedInstance.getAllRenderers()[indexPath.row]
     }
 }

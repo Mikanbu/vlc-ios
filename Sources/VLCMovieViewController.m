@@ -54,7 +54,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
   VLCPanTypeProjection
 };
 
-@interface VLCMovieViewController () <UIGestureRecognizerDelegate, VLCMultiSelectionViewDelegate, VLCEqualizerViewUIDelegate, VLCActionSheetDataSource>
+@interface VLCMovieViewController () <UIGestureRecognizerDelegate, VLCMultiSelectionViewDelegate, VLCEqualizerViewUIDelegate>
 {
     BOOL _controlsHidden;
     BOOL _videoFiltersHidden;
@@ -96,7 +96,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     UITapGestureRecognizer *_tapToSeekRecognizer;
 
     UIButton *_doneButton;
-    UIButton *_rendererButton;
 
     VLCTrackSelectorView *_trackSelectorContainer;
 
@@ -115,6 +114,9 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     CGFloat _fov;
     CGPoint _saveLocation;
     CGSize _screenSizePixel;
+
+    UIStackView *_stackView;
+    UIButton *_renderersButton;
 }
 @property (nonatomic, strong) VLCMovieViewControlPanelView *controllerPanel;
 @property (nonatomic, strong) UIPopoverController *masterPopoverController;
@@ -356,7 +358,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 
 - (void)setupNavigationbar
 {
-    //Needs to be a UIButton since we need it to work with constraints
     _doneButton = [[UIButton alloc] initWithFrame:CGRectZero];
     [_doneButton addTarget:self action:@selector(closePlayback:) forControlEvents:UIControlEventTouchUpInside];
     [_doneButton setTitle:NSLocalizedString(@"BUTTON_DONE", nil) forState:UIControlStateNormal];
@@ -366,21 +367,30 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.timeNavigationTitleView = [[[NSBundle mainBundle] loadNibNamed:@"VLCTimeNavigationTitleView" owner:self options:nil] objectAtIndex:0];
     self.timeNavigationTitleView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    [self.navigationController.navigationBar addSubview:self.timeNavigationTitleView];
-    [self.navigationController.navigationBar addSubview:_doneButton];
+    _renderersButton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
+
+    _stackView = [[UIStackView alloc] init];
+    _stackView.translatesAutoresizingMaskIntoConstraints = NO;
+    _stackView.spacing = 8;
+    _stackView.axis = UILayoutConstraintAxisHorizontal;
+    _stackView.alignment = UIStackViewAlignmentCenter;
+    [_stackView addArrangedSubview:_doneButton];
+    [_stackView addArrangedSubview:_timeNavigationTitleView];
+    [_stackView addArrangedSubview:_renderersButton];
+    [self.navigationController.navigationBar addSubview:_stackView];
 
     NSObject *guide = self.navigationController.navigationBar;
     if (@available(iOS 11.0, *)) {
         guide = self.navigationController.navigationBar.safeAreaLayoutGuide;
     }
-    [self.navigationController.view addConstraints: @[
-                                                      [NSLayoutConstraint constraintWithItem:_doneButton attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeLeft multiplier:1 constant:8],
-                                                      [NSLayoutConstraint constraintWithItem:_doneButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
-                                                      [NSLayoutConstraint constraintWithItem:self.timeNavigationTitleView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:_doneButton attribute:NSLayoutAttributeRight multiplier:1 constant:0],
-                                                      [NSLayoutConstraint constraintWithItem:self.timeNavigationTitleView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeRight multiplier:1 constant:0],
-                                                      [NSLayoutConstraint constraintWithItem:self.timeNavigationTitleView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeTop multiplier:1 constant:0],
-                                                      [NSLayoutConstraint constraintWithItem:self.timeNavigationTitleView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0],
-                                                      ]];
+
+    [NSLayoutConstraint activateConstraints:@[
+                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeLeft multiplier:1 constant:8],
+                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeRight multiplier:1 constant:-8],
+                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeTop multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0],
+                                              ]];
 }
 
 - (void)resetVideoFiltersSliders
@@ -414,6 +424,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     //Disabling video gestures, media not init in the player yet.
     [self enableNormalVideoGestures:NO];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDefaults) name:NSUserDefaultsDidChangeNotification object:nil];
+    [VLCRendererDiscovererManager sharedInstance].presentingViewController = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -699,13 +710,10 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
         _artistNameLabel.hidden = NO;
         _albumNameLabel.hidden = NO;
         _trackNameLabel.hidden = NO;
-        _rendererButton.hidden = NO;
-        _rendererButton.alpha = 0.0;
     }
 
     void (^animationBlock)() = ^() {
         self.navigationController.navigationBar.alpha = alpha;
-        _rendererButton.alpha = alpha;
         _controllerPanel.alpha = alpha;
         _videoFilterView.alpha = alpha;
         _playbackSpeedView.alpha = alpha;
@@ -726,7 +734,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
         _videoFilterView.hidden = _videoFiltersHidden;
         _playbackSpeedView.hidden = _playbackSpeedViewHidden;
         self.navigationController.navigationBar.hidden = _controlsHidden;
-        _rendererButton.hidden = _controlsHidden;
         _trackSelectorContainer.hidden = YES;
         _equalizerView.hidden = YES;
         if (_sleepTimerContainer)
@@ -1657,16 +1664,9 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 
 - (void)setupRendererDiscovererManager
 {
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-
-    [defaultCenter addObserver:self
-                      selector:@selector(handleRendererNotification:)
-                          name:NSNotification.rendererDiscovererItemAdded
-                        object:nil];
-    [defaultCenter addObserver:self
-                      selector:@selector(handleRendererNotification:)
-                          name:NSNotification.rendererDiscovererItemRemoved
-                        object:nil];
+    [VLCRendererDiscovererManager.sharedInstance addSelectionHandlerWithSelectionHandler:^(VLCRendererItem * _Nonnull item) {
+        [_vpc mediaPlayerSetRenderer:item];
+    }];
 }
 
 - (void)startRendererDiscovererManager
@@ -1675,90 +1675,9 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 
     if ([manager start]) {
         NSLog(@"started: ┬─┬◡ﾉ(° -°ﾉ)");
-        [self setupRendererButton];
     } else {
         NSLog(@"failed: (╯°□°）╯︵ ┻━┻");
     }
-}
-
-- (void)handleRendererNotification:(NSNotification *)notification
-{
-    if ([notification.name isEqualToString:NSNotification.rendererDiscovererItemAdded]) {
-        NSLog(@"MovieViewController: added renderer item");
-        if (_rendererButton == nil) {
-            [self setupRendererButton];
-        }
-    } else if ([notification.name isEqualToString:NSNotification.rendererDiscovererItemRemoved]) {
-        NSLog(@"MovieViewController: removed renderer item");
-        VLCRendererItem *item = notification.object;
-        // Current renderer has been removed!
-        // doesn't really fork :9
-        // Error case disconnecting wifi when casting
-        // Issue since VLCMediaViewController is already setting _vpc.renderer to nil
-        // maybe removeObservers of VLCMediaViewController?
-        if (_vpc.renderer == item || _vpc.renderer == nil) {
-            // enters everytime since we're setting it to nil
-            [_vpc mediaPlayerSetRenderer:nil];
-        }
-        if ([[VLCRendererDiscovererManager.sharedInstance getAllRenderers] count] == 0) {
-            _rendererButton.hidden = YES;
-            _rendererButton = nil;
-        }
-    }
-}
-
-- (void)displayRenderers:(id)sender
-{
-    VLCActionSheet *actionSheet = [[VLCActionSheet alloc] init];
-
-    actionSheet.dataSource = self;
-    actionSheet.modalPresentationStyle = UIModalPresentationCustom;
-    [actionSheet addActionWithClosure:^(VLCRendererItem * _Nonnull item) {
-        // Handle set and unset of a renderer
-        // TODO: need visual feedback: such as icon and here need to change output
-//        VLCRendererItem *tmpItem = (_vpc.renderer != item) ? item : nil;
-        VLCRendererItem *tmpItem;
-
-        if (_vpc.renderer != item) {
-            tmpItem = item;
-            // add center background image saying we're currently casting
-            // show loading
-        } else {
-            // to reset the renderer and go back to local playback
-            tmpItem = nil;
-        }
-        [_vpc mediaPlayerSetRenderer:tmpItem];
-    }];
-    [self presentViewController:actionSheet animated:NO completion:nil];
-}
-
-- (void)setupRendererButton
-{
-    _rendererButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_rendererButton setImage:[UIImage imageNamed:@"renderer"] forState:UIControlStateNormal];
-    _rendererButton.frame = CGRectMake(0, 0, 35, 35);
-    [_rendererButton addTarget:self action:@selector(displayRenderers:) forControlEvents:UIControlEventTouchUpInside];
-    _rendererButton.translatesAutoresizingMaskIntoConstraints = NO;
-    _rendererButton.hidden = YES;
-    [self.view addSubview:_rendererButton];
-
-    [NSLayoutConstraint activateConstraints:@[
-                                              [_rendererButton.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:80.0],
-                                              [_rendererButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-10.0],
-                                              [_rendererButton.heightAnchor constraintEqualToAnchor:_rendererButton.heightAnchor multiplier:1.0]
-                                              ]];
-}
-
-#pragma mark - VLCActionSheetDataSource
-
-- (NSInteger)numberOfRows
-{
-    return [[[VLCRendererDiscovererManager sharedInstance] getAllRenderers] count];
-}
-
-- (id)itemAtIndexPath:(NSIndexPath *)indexPath
-{
-    return [[VLCRendererDiscovererManager sharedInstance] getAllRenderers][indexPath.row];
 }
 
 @end

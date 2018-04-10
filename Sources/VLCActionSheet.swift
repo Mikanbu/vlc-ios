@@ -160,7 +160,7 @@ class VLCActionSheet: UIViewController {
 
     @objc weak var dataSource: VLCActionSheetDataSource?
 
-    private var action: ((_ item: Any) -> Void)?
+    var action: ((_ item: Any) -> Void)?
 
     // background black layer
     lazy var backgroundView: UIView = {
