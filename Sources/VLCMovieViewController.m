@@ -115,7 +115,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     CGPoint _saveLocation;
     CGSize _screenSizePixel;
 
-    UIStackView *_stackView;
+    UIStackView *_navigationBarStackView;
     UIButton *_renderersButton;
 }
 @property (nonatomic, strong) VLCMovieViewControlPanelView *controllerPanel;
@@ -369,15 +369,16 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 
     _renderersButton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
 
-    _stackView = [[UIStackView alloc] init];
-    _stackView.translatesAutoresizingMaskIntoConstraints = NO;
-    _stackView.spacing = 8;
-    _stackView.axis = UILayoutConstraintAxisHorizontal;
-    _stackView.alignment = UIStackViewAlignmentCenter;
-    [_stackView addArrangedSubview:_doneButton];
-    [_stackView addArrangedSubview:_timeNavigationTitleView];
-    [_stackView addArrangedSubview:_renderersButton];
-    [self.navigationController.navigationBar addSubview:_stackView];
+    _navigationBarStackView = [[UIStackView alloc] init];
+    _navigationBarStackView.translatesAutoresizingMaskIntoConstraints = NO;
+    _navigationBarStackView.spacing = 8;
+    _navigationBarStackView.axis = UILayoutConstraintAxisHorizontal;
+    _navigationBarStackView.alignment = UIStackViewAlignmentCenter;
+    [_navigationBarStackView addArrangedSubview:_doneButton];
+    [_navigationBarStackView addArrangedSubview:_timeNavigationTitleView];
+    [_navigationBarStackView addArrangedSubview:_renderersButton];
+
+    [self.navigationController.navigationBar addSubview:_navigationBarStackView];
 
     NSObject *guide = self.navigationController.navigationBar;
     if (@available(iOS 11.0, *)) {
@@ -385,11 +386,12 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     }
 
     [NSLayoutConstraint activateConstraints:@[
-                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
-                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeLeft multiplier:1 constant:8],
-                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeRight multiplier:1 constant:-8],
-                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeTop multiplier:1 constant:0],
-                                              [NSLayoutConstraint constraintWithItem:_stackView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_navigationBarStackView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_navigationBarStackView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeLeft multiplier:1 constant:8],
+                                              [NSLayoutConstraint constraintWithItem:_navigationBarStackView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:guide attribute:NSLayoutAttributeRight multiplier:1 constant:-8],
+                                              [NSLayoutConstraint constraintWithItem:_navigationBarStackView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeTop multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_navigationBarStackView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.navigationController.navigationBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0],
+                                              [NSLayoutConstraint constraintWithItem:_timeNavigationTitleView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:_navigationBarStackView attribute:NSLayoutAttributeHeight multiplier:1 constant:0]
                                               ]];
 }
 
