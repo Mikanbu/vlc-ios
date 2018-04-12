@@ -151,6 +151,8 @@ class VLCActionSheetSectionHeader: UIView {
 @objc protocol VLCActionSheetDataSource: class {
     @objc func numberOfRows() -> Int
     @objc func itemAtIndexPath(_ indexPath: IndexPath) -> Any?
+    @objc func actionSheet(collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+    @objc func actionSheet(collectionView: UICollectionView, didSelectItem item: Any, At indexPath: IndexPath)
 }
 
 // MARK: VLCActionSheet
@@ -341,8 +343,7 @@ class VLCActionSheet: UIViewController {
         collectionView.isHidden = false
         headerView.isHidden = false
 
-        UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: {
-            [weak self] in
+        UIView.transition(with: backgroundView, duration: 0.2, options: .transitionCrossDissolve, animations: { [weak self] in
             self?.backgroundView.isHidden = false
             }, completion: nil)
 
@@ -386,8 +387,9 @@ extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
 // MARK: UICollectionViewDelegate
 extension VLCActionSheet: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let renderer = dataSource?.itemAtIndexPath(indexPath) {
-            action?(renderer)
+        if let dataSource = dataSource, let item = dataSource.itemAtIndexPath(indexPath) {
+            dataSource.actionSheet(collectionView: collectionView, didSelectItem: item, At: indexPath)
+            action?(item)
             removeActionSheet()
         }
     }
@@ -403,14 +405,9 @@ extension VLCActionSheet: UICollectionViewDataSource {
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier, for: indexPath) as! VLCActionSheetCell
-
-        if let renderer = dataSource?.itemAtIndexPath(indexPath) as? VLCRendererItem {
-            cell.name.text = renderer.name
-            cell.icon.image = UIImage(named: "rendererBlack")
-        } else {
-            cell.name.text = "(╯°□°）╯︵ ┻━┻"
+        if let dataSource = dataSource {
+            return dataSource.actionSheet(collectionView: collectionView, cellForItemAt: indexPath)
         }
-        return cell
+        return UICollectionViewCell()
     }
 }

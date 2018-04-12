@@ -97,7 +97,19 @@ class VLCRendererDiscovererManager: NSObject {
 
     fileprivate func setRendererItem(rendererItem: VLCRendererItem) {
         let vpcRenderer = VLCPlaybackController.sharedInstance().renderer
-        VLCPlaybackController.sharedInstance().renderer = (vpcRenderer != rendererItem) ? rendererItem : nil
+
+        if (vpcRenderer != rendererItem) {
+            VLCPlaybackController.sharedInstance().renderer = rendererItem
+            for button in renderersButtons {
+                button.isSelected = true
+            }
+        } else {
+            // Same renderer selected, removing selection
+            VLCPlaybackController.sharedInstance().renderer = nil
+            for button in renderersButtons {
+                button.isSelected = false
+            }
+        }
     }
 
     @objc func addSelectionHandler(selectionHandler: ((_ rendererItem: VLCRendererItem) -> Void)?) {
@@ -118,7 +130,9 @@ class VLCRendererDiscovererManager: NSObject {
     /// - Returns: New `UIButton`
     @objc func setupRendererButton() -> UIButton {
         let button = UIButton()
+        button.isHidden = true
         button.setImage(UIImage(named: "renderer"), for: .normal)
+        button.setImage(UIImage(named: "rendererFull"), for: .selected)
         button.addTarget(self, action: #selector(displayActionSheet), for: .touchUpInside)
         renderersButtons.append(button)
         return button
@@ -157,6 +171,35 @@ extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
     }
 
     func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
-        return getAllRenderers()[indexPath.row]
+        let renderers = getAllRenderers()
+        if (indexPath.row < renderers.count) {
+            return renderers[indexPath.row]
+        }
+        return nil
+    }
+
+    func actionSheet(collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier,
+                                                            for: indexPath) as? VLCActionSheetCell else {
+                return UICollectionViewCell()
+        }
+        let renderers = getAllRenderers()
+        if (indexPath.row < renderers.count) {
+            cell.name.text = renderers[indexPath.row].name
+            cell.icon.image = UIImage(named: "rendererBlack")
+            cell.icon.highlightedImage = UIImage(named: "rendererBlackFull")
+        } else {
+            cell.name.text = "(╯°□°）╯︵ ┻━┻"
+        }
+        return cell
+    }
+
+    func actionSheet(collectionView: UICollectionView, didSelectItem item: Any, At indexPath: IndexPath) {
+        guard let renderer = item as? VLCRendererItem,
+            let cell = collectionView.cellForItem(at: indexPath) as? VLCActionSheetCell else {
+                return
+        }
+        // Handles the case when the same renderer is selected
+        cell.icon.isHighlighted = (renderer == VLCPlaybackController.sharedInstance().renderer) ? false : true
     }
 }
