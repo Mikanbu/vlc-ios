@@ -194,7 +194,7 @@ class VLCActionSheet: UIViewController {
 
     lazy var cancelButton: UIButton = {
         let cancelButton = UIButton()
-        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: ""), for: .normal)
         cancelButton.setTitleColor(.white, for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         cancelButton.addTarget(self, action: #selector(self.removeActionSheet), for: .touchDown)
