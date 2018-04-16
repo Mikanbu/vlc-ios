@@ -1673,7 +1673,8 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
     _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
 
     [VLCRendererDiscovererManager.sharedInstance addSelectionHandlerWithSelectionHandler:^(VLCRendererItem * _Nonnull item) {
-        [_vpc mediaPlayerSetRenderer:item];
+        VLCRendererItem *tmpItem = (_vpc.renderer != nil) ? item : nil;
+        [_vpc mediaPlayerSetRenderer:tmpItem];
     }];
 }
 
