@@ -367,8 +367,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.timeNavigationTitleView = [[[NSBundle mainBundle] loadNibNamed:@"VLCTimeNavigationTitleView" owner:self options:nil] objectAtIndex:0];
     self.timeNavigationTitleView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    // Create a renderer button for VLCMovieViewController
-    _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
     if (_vpc.renderer != nil) {
         [_rendererButtton setSelected:YES];
     }
@@ -1671,6 +1669,9 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 
 - (void)setupRendererDiscovererManager
 {
+    // Create a renderer button for VLCMovieViewController
+    _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
+
     [VLCRendererDiscovererManager.sharedInstance addSelectionHandlerWithSelectionHandler:^(VLCRendererItem * _Nonnull item) {
         [_vpc mediaPlayerSetRenderer:item];
     }];
