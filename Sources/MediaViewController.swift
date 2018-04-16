@@ -22,7 +22,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
     private var mediaDatasourceAndDelegate: MediaDataSourceAndDelegate?
     private var searchController: UISearchController?
     private let searchDataSource = VLCLibrarySearchDisplayDataSource()
-    private var renderersButton: UIButton
+    private var rendererButtton: UIButton
 
     public weak var delegate: VLCMediaViewControllerDelegate?
 
@@ -41,7 +41,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public override init(collectionViewLayout layout: UICollectionViewLayout) {
         self.services = Services()
-        self.renderersButton = VLCRendererDiscovererManager.sharedInstance.setupRendererButton()
+        self.rendererButtton = VLCRendererDiscovererManager.sharedInstance.setupRendererButton()
         super.init(collectionViewLayout: layout)
     }
 
@@ -123,7 +123,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     // MARK: Renderer
     private func setupRendererDiscovererManager() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: renderersButton)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rendererButtton)
     }
 
     @objc func sort() {

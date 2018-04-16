@@ -116,7 +116,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     CGSize _screenSizePixel;
 
     UIStackView *_navigationBarStackView;
-    UIButton *_renderersButton;
+    UIButton *_rendererButtton;
 }
 @property (nonatomic, strong) VLCMovieViewControlPanelView *controllerPanel;
 @property (nonatomic, strong) UIPopoverController *masterPopoverController;
@@ -367,7 +367,8 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.timeNavigationTitleView = [[[NSBundle mainBundle] loadNibNamed:@"VLCTimeNavigationTitleView" owner:self options:nil] objectAtIndex:0];
     self.timeNavigationTitleView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    _renderersButton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
+    // Create a renderer button for VLCMovieViewController
+    _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
 
     _navigationBarStackView = [[UIStackView alloc] init];
     _navigationBarStackView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -376,7 +377,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     _navigationBarStackView.alignment = UIStackViewAlignmentCenter;
     [_navigationBarStackView addArrangedSubview:_doneButton];
     [_navigationBarStackView addArrangedSubview:_timeNavigationTitleView];
-    [_navigationBarStackView addArrangedSubview:_renderersButton];
+    [_navigationBarStackView addArrangedSubview:_rendererButtton];
 
     [self.navigationController.navigationBar addSubview:_navigationBarStackView];
 
@@ -647,7 +648,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
                                                                      _multiSelectionView.repeatButton,
                                                                      _multiSelectionView.shuffleButton,
                                                                      _controllerPanel.volumeView,
-                                                                     _renderersButton]];
+                                                                     _rendererButtton]];
 
     [[UIDevice currentDevice] isiPhoneX] ? [items addObject:_tapToToggleiPhoneXRatioRecognizer]
                                          : [items addObject:_tapToSeekRecognizer];

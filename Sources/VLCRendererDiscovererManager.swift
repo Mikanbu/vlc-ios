@@ -30,7 +30,7 @@ class VLCRendererDiscovererManager: NSObject {
 
     @objc var presentingViewController: UIViewController?
 
-    @objc var renderersButtons: [UIButton] = [UIButton]()
+    @objc var rendererButttons: [UIButton] = [UIButton]()
 
     private init(presentingViewController: UIViewController?) {
         self.presentingViewController = presentingViewController
@@ -100,13 +100,13 @@ class VLCRendererDiscovererManager: NSObject {
 
         if (vpcRenderer != rendererItem) {
             VLCPlaybackController.sharedInstance().renderer = rendererItem
-            for button in renderersButtons {
+            for button in rendererButttons {
                 button.isSelected = true
             }
         } else {
             // Same renderer selected, removing selection
             VLCPlaybackController.sharedInstance().renderer = nil
-            for button in renderersButtons {
+            for button in rendererButttons {
                 button.isSelected = false
             }
         }
@@ -134,7 +134,7 @@ class VLCRendererDiscovererManager: NSObject {
         button.setImage(UIImage(named: "renderer"), for: .normal)
         button.setImage(UIImage(named: "rendererFull"), for: .selected)
         button.addTarget(self, action: #selector(displayActionSheet), for: .touchUpInside)
-        renderersButtons.append(button)
+        rendererButttons.append(button)
         return button
     }
 }
@@ -142,7 +142,7 @@ class VLCRendererDiscovererManager: NSObject {
 // MARK: VLCRendererDiscovererDelegate
 extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        for button in renderersButtons {
+        for button in rendererButttons {
             if (button.isHidden == true) {
                 button.isHidden = false
             }
@@ -160,7 +160,7 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
                     playbackController.mediaPlayerSetRenderer(nil)
                 }
                 // Reset buttons state
-                for button in renderersButtons {
+                for button in rendererButttons {
                     button.isSelected = false
                 }
             }
@@ -169,7 +169,7 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
 
         // No more renderers to show
         if (getAllRenderers().count == 0) {
-            for button in renderersButtons {
+            for button in rendererButttons {
                 button.isHidden = true
             }
         }
