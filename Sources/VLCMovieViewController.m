@@ -189,8 +189,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
                    name:VLCPlaybackControllerPlaybackDidStop
                  object:nil];
 
-    _playingExternallyTitle.text = NSLocalizedString(@"PLAYING_EXTERNALLY_TITLE", nil);
-    _playingExternallyDescription.text = NSLocalizedString(@"PLAYING_EXTERNALLY_DESC", nil);
     if ([[UIDevice currentDevice] VLCHasExternalDisplay])
         [self showOnExternalDisplay];
 
@@ -431,6 +429,9 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     [self enableNormalVideoGestures:NO];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDefaults) name:NSUserDefaultsDidChangeNotification object:nil];
     [VLCRendererDiscovererManager sharedInstance].presentingViewController = self;
+    if (_vpc.renderer && _playingExternallyView.hidden) {
+        [self playingExternallyViewWithRendererName:_vpc.renderer.name];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -1644,6 +1645,9 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
     self.playingExternallyView.hidden = NO;
     self.externalWindow.screen = screen;
     self.externalWindow.hidden = NO;
+
+    _playingExternallyTitle.text = NSLocalizedString(@"PLAYING_EXTERNALLY_TITLE", nil);
+    _playingExternallyDescription.text = NSLocalizedString(@"PLAYING_EXTERNALLY_DESC", nil);
 }
 
 - (void)hideFromExternalDisplay
@@ -1669,13 +1673,29 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 
 #pragma mark - Renderers
 
+- (void)playingExternallyViewWithRendererName:(NSString *)name
+{
+    // TODO: Have a better/prettier transition between local playback frame and playingExternallyView
+    _playingExternallyView.hidden = NO;
+    _playingExternallyTitle.text = NSLocalizedString(@"PLAYING_EXTERNALLY_TITLE_CHROMECAST", nil);
+    _playingExternallyTitle.text = @"Chromecast connected";
+    _playingExternallyDescription.text = name;
+}
+
 - (void)setupRendererDiscovererManager
 {
     // Create a renderer button for VLCMovieViewController
     _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
 
     [VLCRendererDiscovererManager.sharedInstance addSelectionHandlerWithSelectionHandler:^(VLCRendererItem * _Nonnull item) {
-        VLCRendererItem *tmpItem = (_vpc.renderer != nil) ? item : nil;
+        VLCRendererItem *tmpItem;
+        if (_vpc.renderer != nil) {
+            tmpItem = item;
+            [self playingExternallyViewWithRendererName:tmpItem.name];
+        } else {
+            tmpItem = nil;
+            _playingExternallyView.hidden = YES;
+        }
         [_vpc mediaPlayerSetRenderer:tmpItem];
     }];
 }

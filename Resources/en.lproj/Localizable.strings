@@ -25,6 +25,7 @@
 "ONE_SPU_TRACK" = "One subtitles track";
 
 "PLAYING_EXTERNALLY_TITLE" = "TV Connected";
+"PLAYING_EXTERNALLY_TITLE_CHROMECAST" = "Chromecast Connected";
 "PLAYING_EXTERNALLY_DESC" = "This video is playing on the TV";
 
 "VFILTER_HUE" = "Hue";
