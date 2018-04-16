@@ -1201,7 +1201,7 @@ typedef NS_ENUM(NSUInteger, VLCAspectRatio) {
 {
     _preBackgroundWrapperView = _videoOutputViewWrapper;
 
-    if (_mediaPlayer.audioTrackIndexes.count > 0)
+    if (!_renderer && _mediaPlayer.audioTrackIndexes.count > 0)
         [self setVideoTrackEnabled:false];
 }
 
