@@ -646,7 +646,8 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
                                                                      _multiSelectionView.chapterSelectorButton,
                                                                      _multiSelectionView.repeatButton,
                                                                      _multiSelectionView.shuffleButton,
-                                                                     _controllerPanel.volumeView]];
+                                                                     _controllerPanel.volumeView,
+                                                                     _renderersButton]];
 
     [[UIDevice currentDevice] isiPhoneX] ? [items addObject:_tapToToggleiPhoneXRatioRecognizer]
                                          : [items addObject:_tapToSeekRecognizer];
