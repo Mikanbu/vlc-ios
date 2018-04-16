@@ -369,6 +369,9 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 
     // Create a renderer button for VLCMovieViewController
     _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
+    if (_vpc.renderer != nil) {
+        [_rendererButtton setSelected:YES];
+    }
 
     _navigationBarStackView = [[UIStackView alloc] init];
     _navigationBarStackView.translatesAutoresizingMaskIntoConstraints = NO;
