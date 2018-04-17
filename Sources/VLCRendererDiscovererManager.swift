@@ -184,6 +184,11 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
 
 // MARK: VLCActionSheetDelegate
 extension VLCRendererDiscovererManager: VLCActionSheetDelegate {
+
+    func headerViewTitle() -> String? {
+        return NSLocalizedString("HEADER_TITLE_RENDERER", comment: "nil")
+    }
+
     func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
         let renderers = getAllRenderers()
         if (indexPath.row < renderers.count) {

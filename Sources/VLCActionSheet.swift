@@ -154,6 +154,7 @@ class VLCActionSheetSectionHeader: UIView {
 }
 
 @objc protocol VLCActionSheetDelegate: class {
+    @objc optional func headerViewTitle() -> String?
     @objc func itemAtIndexPath(_ indexPath: IndexPath) -> Any?
     @objc func actionSheet(collectionView: UICollectionView, didSelectItem item: Any, At indexPath: IndexPath)
 }
@@ -209,7 +210,7 @@ class VLCActionSheet: UIViewController {
 
     lazy var headerView: VLCActionSheetSectionHeader = {
         let headerView = VLCActionSheetSectionHeader()
-        headerView.title.text = "Select a casting device"
+        headerView.title.text = delegate?.headerViewTitle?() ?? "Default header title"
         headerView.title.textColor = .white
         headerView.title.textAlignment = .center
         headerView.backgroundColor = UIColor(red:1.00, green:0.59, blue:0.13, alpha:1.0)
