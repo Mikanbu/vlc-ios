@@ -395,8 +395,8 @@ extension VLCActionSheet: UICollectionViewDelegate {
         if let delegate = delegate, let item = delegate.itemAtIndexPath(indexPath) {
             delegate.actionSheet(collectionView: collectionView, didSelectItem: item, At: indexPath)
             action?(item)
-            removeActionSheet()
         }
+        removeActionSheet()
     }
 }
 
