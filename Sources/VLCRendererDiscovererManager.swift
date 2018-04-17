@@ -18,6 +18,7 @@ class VLCRendererDiscovererManager: NSObject {
 
     @objc lazy var actionSheet: VLCActionSheet = {
         let actionSheet = VLCActionSheet()
+        actionSheet.delegate = self
         actionSheet.dataSource = self
         actionSheet.modalPresentationStyle = .custom
         actionSheet.addAction { [weak self] (item) in
@@ -179,37 +180,14 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     }
 }
 
-// MARK: VLCActionSheetDataSource
-extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
-    func numberOfRows() -> Int {
-        return getAllRenderers().count
-    }
-
+// MARK: VLCActionSheetDelegate
+extension VLCRendererDiscovererManager: VLCActionSheetDelegate {
     func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
         let renderers = getAllRenderers()
         if (indexPath.row < renderers.count) {
             return renderers[indexPath.row]
         }
         return nil
-    }
-
-    func actionSheet(collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier,
-                                                            for: indexPath) as? VLCActionSheetCell else {
-                return UICollectionViewCell()
-        }
-        let renderers = getAllRenderers()
-        if (indexPath.row < renderers.count) {
-            cell.name.text = renderers[indexPath.row].name
-            cell.icon.image = UIImage(named: "rendererBlack")
-            if (renderers[indexPath.row] == VLCPlaybackController.sharedInstance().renderer) {
-                cell.icon.image = UIImage(named: "rendererBlackFull")
-            }
-
-        } else {
-            cell.name.text = "(╯°□°）╯︵ ┻━┻"
-        }
-        return cell
     }
 
     func actionSheet(collectionView: UICollectionView, didSelectItem item: Any, At indexPath: IndexPath) {
@@ -225,5 +203,30 @@ extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
             collectionView.reloadData()
             cell.icon.image = UIImage(named: "rendererBlackFull")
         }
+    }
+}
+
+// MARK: VLCActionSheetDataSource
+extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
+    func numberOfRows() -> Int {
+        return getAllRenderers().count
+    }
+
+    func actionSheet(collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCActionSheetCell.identifier,
+                                                            for: indexPath) as? VLCActionSheetCell else {
+                return UICollectionViewCell()
+        }
+        let renderers = getAllRenderers()
+        if (indexPath.row < renderers.count) {
+            cell.name.text = renderers[indexPath.row].name
+            cell.icon.image = UIImage(named: "rendererBlack")
+            if (renderers[indexPath.row] == VLCPlaybackController.sharedInstance().renderer) {
+                cell.icon.image = UIImage(named: "rendererBlackFull")
+            }
+        } else {
+            cell.name.text = "(╯°□°）╯︵ ┻━┻"
+        }
+        return cell
     }
 }

@@ -150,8 +150,11 @@ class VLCActionSheetSectionHeader: UIView {
 
 @objc protocol VLCActionSheetDataSource: class {
     @objc func numberOfRows() -> Int
-    @objc func itemAtIndexPath(_ indexPath: IndexPath) -> Any?
     @objc func actionSheet(collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+}
+
+@objc protocol VLCActionSheetDelegate: class {
+    @objc func itemAtIndexPath(_ indexPath: IndexPath) -> Any?
     @objc func actionSheet(collectionView: UICollectionView, didSelectItem item: Any, At indexPath: IndexPath)
 }
 
@@ -161,6 +164,7 @@ class VLCActionSheet: UIViewController {
     private let cellHeight: CGFloat = 50
 
     @objc weak var dataSource: VLCActionSheetDataSource?
+    @objc weak var delegate: VLCActionSheetDelegate?
 
     var action: ((_ item: Any) -> Void)?
 
@@ -387,8 +391,8 @@ extension VLCActionSheet: UICollectionViewDelegateFlowLayout {
 // MARK: UICollectionViewDelegate
 extension VLCActionSheet: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let dataSource = dataSource, let item = dataSource.itemAtIndexPath(indexPath) {
-            dataSource.actionSheet(collectionView: collectionView, didSelectItem: item, At: indexPath)
+        if let delegate = delegate, let item = delegate.itemAtIndexPath(indexPath) {
+            delegate.actionSheet(collectionView: collectionView, didSelectItem: item, At: indexPath)
             action?(item)
             removeActionSheet()
         }
