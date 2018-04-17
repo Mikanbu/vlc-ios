@@ -33,7 +33,7 @@ class VLCRendererDiscovererManager: NSObject {
 
     @objc var rendererButttons: [UIButton] = [UIButton]()
 
-    private init(presentingViewController: UIViewController?) {
+    fileprivate init(presentingViewController: UIViewController?) {
         self.presentingViewController = presentingViewController
         super.init()
     }
@@ -48,7 +48,7 @@ class VLCRendererDiscovererManager: NSObject {
         return renderers
     }
 
-    private func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
+    fileprivate func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
         for discoverer in discoverers {
             if discoverer.name == description.name {
                 return true
@@ -123,7 +123,6 @@ class VLCRendererDiscovererManager: NSObject {
             }
         }
     }
-
 
     /// Add the given button to VLCRendererDiscovererManager.
     /// The button state will be handled by the manager.
