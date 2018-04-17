@@ -231,6 +231,7 @@ extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
                 cell.icon.image = UIImage(named: "rendererBlackFull")
             }
         } else {
+            assertionFailure("VLCRendererDiscovererManager: cellForItemAt: IndexPath out of range")
             cell.name.text = "(╯°□°）╯︵ ┻━┻"
         }
         return cell
