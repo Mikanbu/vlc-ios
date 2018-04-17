@@ -135,6 +135,8 @@ class VLCRendererDiscovererManager: NSObject {
         button.setImage(UIImage(named: "renderer"), for: .normal)
         button.setImage(UIImage(named: "rendererFull"), for: .selected)
         button.addTarget(self, action: #selector(displayActionSheet), for: .touchUpInside)
+        button.accessibilityLabel = NSLocalizedString("BUTTON_RENDERER", comment: "")
+        button.accessibilityHint = NSLocalizedString("BUTTON_RENDERER_HINT", comment: "")
         rendererButttons.append(button)
         return button
     }
