@@ -406,6 +406,7 @@ extension VLCActionSheet: UICollectionViewDataSource {
         if let dataSource = dataSource {
             return dataSource.numberOfRows()
         }
+        assertionFailure("VLCActionSheet: No data source")
         return 0
     }
 
@@ -413,6 +414,7 @@ extension VLCActionSheet: UICollectionViewDataSource {
         if let dataSource = dataSource {
             return dataSource.actionSheet(collectionView: collectionView, cellForItemAt: indexPath)
         }
+        assertionFailure("VLCActionSheet: No data source")
         return UICollectionViewCell()
     }
 }
