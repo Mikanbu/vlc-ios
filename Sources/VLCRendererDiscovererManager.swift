@@ -91,7 +91,7 @@ class VLCRendererDiscovererManager: NSObject {
     @objc fileprivate func displayActionSheet() {
         if let presentingViewController = presentingViewController {
             // If only one renderer, choose it automatically
-            if (getAllRenderers().count == 1) {
+            if getAllRenderers().count == 1 {
                 let indexPath = IndexPath(row: 0, section: 0)
                 if let rendererItem = getAllRenderers().first {
                     actionSheet.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredVertically)
@@ -113,7 +113,7 @@ class VLCRendererDiscovererManager: NSObject {
     fileprivate func setRendererItem(rendererItem: VLCRendererItem) {
         let vpcRenderer = VLCPlaybackController.sharedInstance().renderer
 
-        if (vpcRenderer != rendererItem) {
+        if vpcRenderer != rendererItem {
             VLCPlaybackController.sharedInstance().renderer = rendererItem
             for button in rendererButttons {
                 button.isSelected = true
@@ -144,7 +144,7 @@ class VLCRendererDiscovererManager: NSObject {
     /// - Returns: New `UIButton`
     @objc func setupRendererButton() -> UIButton {
         let button = UIButton()
-        button.isHidden = getAllRenderers().count == 0 ? true : false
+        button.isHidden = getAllRenderers().isEmpty ? true : false
         button.setImage(UIImage(named: "renderer"), for: .normal)
         button.setImage(UIImage(named: "rendererFull"), for: .selected)
         button.addTarget(self, action: #selector(displayActionSheet), for: .touchUpInside)
@@ -159,7 +159,7 @@ class VLCRendererDiscovererManager: NSObject {
 extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         for button in rendererButttons {
-            if (button.isHidden == true) {
+            if button.isHidden {
                 button.isHidden = false
             }
         }
@@ -169,9 +169,9 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         if let playbackController = VLCPlaybackController.sharedInstance() {
             // Current renderer has been removed
-            if (playbackController.renderer == item) {
+            if playbackController.renderer == item {
                 playbackController.renderer = nil
-                if (playbackController.isPlaying) {
+                if playbackController.isPlaying {
                     // If playing, fall back to local playback
                     if let movieViewController = presentingViewController as? VLCMovieViewController {
                         movieViewController.playingExternallyView.isHidden = true
@@ -187,7 +187,7 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
         }
 
         // No more renderers to show
-        if (getAllRenderers().count == 0) {
+        if getAllRenderers().isEmpty {
             for button in rendererButttons {
                 button.isHidden = true
             }
@@ -204,7 +204,7 @@ extension VLCRendererDiscovererManager: VLCActionSheetDelegate {
 
     func itemAtIndexPath(_ indexPath: IndexPath) -> Any? {
         let renderers = getAllRenderers()
-        if (indexPath.row < renderers.count) {
+        if indexPath.row < renderers.count {
             return renderers[indexPath.row]
         }
         return nil
@@ -216,7 +216,7 @@ extension VLCRendererDiscovererManager: VLCActionSheetDelegate {
                 return
         }
         // Handles the case when the same renderer is selected
-        if (renderer == VLCPlaybackController.sharedInstance().renderer) {
+        if renderer == VLCPlaybackController.sharedInstance().renderer {
             cell.icon.image = UIImage(named: "rendererBlack")
         } else {
             // Reset all cells
@@ -238,10 +238,10 @@ extension VLCRendererDiscovererManager: VLCActionSheetDataSource {
                 return UICollectionViewCell()
         }
         let renderers = getAllRenderers()
-        if (indexPath.row < renderers.count) {
+        if indexPath.row < renderers.count {
             cell.name.text = renderers[indexPath.row].name
             cell.icon.image = UIImage(named: "rendererBlack")
-            if (renderers[indexPath.row] == VLCPlaybackController.sharedInstance().renderer) {
+            if renderers[indexPath.row] == VLCPlaybackController.sharedInstance().renderer {
                 cell.icon.image = UIImage(named: "rendererBlackFull")
             }
         } else {
