@@ -1682,21 +1682,24 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
     _playingExternallyDescription.text = name;
 }
 
+- (void)setupCastWithCurrentRenderer
+{
+    VLCRendererItem *renderer = _vpc.renderer;
+
+    if (renderer != nil) {
+        [self playingExternallyViewWithRendererName:renderer.name];
+    } else {
+        _playingExternallyView.hidden = YES;
+    }
+    [_vpc mediaPlayerSetRenderer:renderer];
+}
+
 - (void)setupRendererDiscovererManager
 {
     // Create a renderer button for VLCMovieViewController
     _rendererButtton = [VLCRendererDiscovererManager.sharedInstance setupRendererButton];
-
     [VLCRendererDiscovererManager.sharedInstance addSelectionHandlerWithSelectionHandler:^(VLCRendererItem * _Nonnull item) {
-        VLCRendererItem *tmpItem;
-        if (_vpc.renderer != nil) {
-            tmpItem = item;
-            [self playingExternallyViewWithRendererName:tmpItem.name];
-        } else {
-            tmpItem = nil;
-            _playingExternallyView.hidden = YES;
-        }
-        [_vpc mediaPlayerSetRenderer:tmpItem];
+        [self setupCastWithCurrentRenderer];
     }];
 }
 

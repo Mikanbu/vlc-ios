@@ -90,7 +90,21 @@ class VLCRendererDiscovererManager: NSObject {
     // MARK: VLCActionSheet
     @objc fileprivate func displayActionSheet() {
         if let presentingViewController = presentingViewController {
-            presentingViewController.present(actionSheet, animated: false, completion: nil)
+            // If only one renderer, choose it automatically
+            if (getAllRenderers().count == 1) {
+                let indexPath = IndexPath(row: 0, section: 0)
+                if let rendererItem = getAllRenderers().first {
+                    actionSheet.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredVertically)
+                    actionSheet(collectionView: actionSheet.collectionView, didSelectItem: rendererItem, At: indexPath)
+                    setRendererItem(rendererItem: rendererItem)
+
+                    if let movieViewController = presentingViewController as? VLCMovieViewController {
+                        movieViewController.setupCastWithCurrentRenderer()
+                    }
+                }
+            } else {
+                presentingViewController.present(actionSheet, animated: false, completion: nil)
+            }
         } else {
             print("VLCRendererDiscovererManager: Cannot display actionSheet, no viewController setted")
         }
