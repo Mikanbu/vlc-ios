@@ -219,7 +219,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     _trackSelectorContainer.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:_trackSelectorContainer];
 
-    _equalizerView = [[VLCEqualizerView alloc] initWithFrame:CGRectMake(0, 0, 450., 240.)];
+    _equalizerView = [[VLCEqualizerView alloc] initWithFrame:CGRectMake(0, 0, 450, 270)];
     _equalizerView.delegate = [VLCPlaybackController sharedInstance];
     _equalizerView.UIdelegate = self;
     _equalizerView.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;

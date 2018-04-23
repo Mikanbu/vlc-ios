@@ -32,6 +32,8 @@
     VLCSlider *_12K_slider;
     VLCSlider *_14K_slider;
     VLCSlider *_16K_slider;
+
+    UISwitch *_equalizerState;
 }
 
 @end
@@ -262,7 +264,50 @@
     _tableView.opaque = NO;
     _tableView.backgroundColor = [UIColor clearColor];
     [self addSubview:_tableView];
+
+    _equalizerState = [[UISwitch alloc] init];
+    [_equalizerState setOn:NO];
+    [_equalizerState addTarget:self action:@selector(updateEqualizerState) forControlEvents:UIControlEventTouchUpInside];
+    _equalizerState.frame = CGRectMake(0, 0, 25, 25);
+    _equalizerState.backgroundColor = UIColor.magentaColor;
+    [self addSubview:_equalizerState];
+
+    [self updateEqualizerViewElements:NO];
+
     return self;
+}
+
+- (NSArray *)sliders
+{
+    NSArray *sliders = @[_preAmp_slider,
+                          _60_slider,
+                          _170_slider,
+                          _310_slider,
+                          _600_slider,
+                          _1K_slider,
+                          _3K_slider,
+                          _6K_slider,
+                          _12K_slider,
+                          _14K_slider,
+                          _16K_slider];
+    return [sliders copy];
+}
+
+- (void)updateEqualizerViewElements:(BOOL)enabled
+{
+    NSArray *sliders = [self sliders];
+    for (VLCSlider *slider in sliders) {
+        slider.enabled = enabled;
+    }
+    _tableView.userInteractionEnabled = enabled;
+}
+
+- (void)updateEqualizerState
+{
+    BOOL isEnabled = _equalizerState.isOn;
+    [self updateEqualizerViewElements:isEnabled];
+    if (self.delegate)
+        [self.delegate enableEqualizer:isEnabled];
 }
 
 - (IBAction)sliderChangedValue:(VLCSlider *)sender

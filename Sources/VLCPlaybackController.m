@@ -121,6 +121,7 @@ typedef NS_ENUM(NSUInteger, VLCAspectRatio) {
         _playbackSessionManagementLock = [[NSLock alloc] init];
         _shuffleMode = NO;
         _shuffleStack = [[NSMutableArray alloc] init];
+        _mediaPlayer.equalizerEnabled = NO;
     }
     return self;
 }
@@ -1028,6 +1029,11 @@ typedef NS_ENUM(NSUInteger, VLCAspectRatio) {
 - (CGFloat)preAmplification
 {
     return [_mediaPlayer preAmplification];
+}
+
+- (void)enableEqualizer:(BOOL)enabled
+{
+    _mediaPlayer.equalizerEnabled = enabled;
 }
 
 #pragma mark - AVAudioSession Notification Observers

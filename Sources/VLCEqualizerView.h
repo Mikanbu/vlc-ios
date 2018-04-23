@@ -21,6 +21,7 @@
 - (CGFloat)amplificationOfBand:(unsigned)index;
 - (NSArray *)equalizerProfiles;
 - (void)resetEqualizerFromProfile:(unsigned)profile;
+- (void)enableEqualizer:(BOOL)enabled;
 
 @end
 
