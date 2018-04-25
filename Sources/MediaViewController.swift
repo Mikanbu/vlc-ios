@@ -50,7 +50,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public override init(collectionViewLayout layout: UICollectionViewLayout) {
         self.services = Services()
-        self.rendererButton = VLCRendererDiscovererManager.sharedInstance.setupRendererButton()
+        self.rendererButton = services.rendererDiscovererManager.setupRendererButton()
         super.init(collectionViewLayout: layout)
     }
 
@@ -70,7 +70,7 @@ public class VLCMediaViewController: UICollectionViewController, UISearchResults
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let manager = VLCRendererDiscovererManager.sharedInstance
+        let manager = services.rendererDiscovererManager
         manager.start()
         manager.presentingViewController = self
     }
