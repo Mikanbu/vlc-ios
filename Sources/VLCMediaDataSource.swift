@@ -128,7 +128,7 @@ struct VLCMediaType {
         return array(for:subcategory)
     }
 
-    internal func removeObject(at index: Int, subcategory: VLCMediaSubcategory) {
+    func removeObject(at index: Int, subcategory: VLCMediaSubcategory) {
         guard index >= 0 else {
             preconditionFailure("a negative value ? I don't think so!")
         }
@@ -139,7 +139,7 @@ struct VLCMediaType {
         preconditionFailure("index is taller than count")
     }
 
-    internal func insert(_ item: MLFile, at index: Int, subcategory: VLCMediaSubcategory) {
+    func insert(_ item: MLFile, at index: Int, subcategory: VLCMediaSubcategory) {
         guard index >= 0 else {
             preconditionFailure("a negative value ? I don't think so!")
         }
