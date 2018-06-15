@@ -16,6 +16,175 @@ import Foundation
 
     override init() {
         super.init()
+        getAllVideos()
+        getAllAudio()
+    }
+
+    @objc
+    func numberOfFiles(subcategory: VLCMediaSubcategory) -> Int {
+        return array(for: subcategory).count
+    }
+
+    private func array(for subcategory: VLCMediaSubcategory ) -> [Any] {
+        switch subcategory {
+        case .unknown:
+            preconditionFailure("No")
+        case .movies:
+            return movies
+        case .episodes:
+            return episodes
+        case .artists:
+            return artists
+        case .albums:
+            return albums
+        case .tracks:
+            return foundAudio
+        case .genres:
+            return genres
+        case .audioPlaylists:
+            return audioPlaylist
+        case .videoPlaylists:
+            return videoPlaylist
+        case .allVideos:
+            return foundVideos
+        }
+    }
+
+    func indicatorInfo(for subcategory: VLCMediaSubcategory) -> IndicatorInfo {
+        switch subcategory {
+        case .unknown:
+            preconditionFailure("No")
+        case .movies:
+            return IndicatorInfo(title: NSLocalizedString("MOVIES", comment: ""))
+        case .episodes:
+            return IndicatorInfo(title: NSLocalizedString("EPISODES", comment: ""))
+        case .artists:
+            return IndicatorInfo(title: NSLocalizedString("ARTISTS", comment: ""))
+        case .albums:
+             return IndicatorInfo(title: NSLocalizedString("ALBUMS", comment: ""))
+        case .tracks:
+            return IndicatorInfo(title: NSLocalizedString("SONGS", comment: ""))
+        case .genres:
+            return IndicatorInfo(title: NSLocalizedString("GENRES", comment: ""))
+        case .audioPlaylists:
+            return IndicatorInfo(title: NSLocalizedString("AUDIO_PLAYLISTS", comment: ""))
+        case .videoPlaylists:
+            return IndicatorInfo(title: NSLocalizedString("VIDEO_PLAYLISTS", comment: ""))
+        case .allVideos:
+            return IndicatorInfo(title: NSLocalizedString("VIDEOS", comment: ""))
+        }
+
+    }
+
+    @objc func object(at index: Int, subcategory: VLCMediaSubcategory) -> Any {
+
+        guard index >= 0 else {
+            preconditionFailure("a negative value ? I don't think so!")
+        }
+
+        let categoryArray = array(for: subcategory)
+        if index < categoryArray.count {
+            return categoryArray[Int(index)]
+        }
+        preconditionFailure("index is taller than count")
+    }
+
+    func allObjects(for subcategory: VLCMediaSubcategory) -> [Any] {
+        return array(for:subcategory)
+    }
+
+    func removeObject(at index: Int, subcategory: VLCMediaSubcategory) {
+        guard index >= 0 else {
+            preconditionFailure("a negative value ? I don't think so!")
+        }
+        var categoryArray = array(for: subcategory)
+        if index < categoryArray.count {
+            categoryArray.remove(at: index)
+        }
+        preconditionFailure("index is taller than count")
+    }
+
+    func insert(_ item: MLFile, at index: Int, subcategory: VLCMediaSubcategory) {
+        guard index >= 0 else {
+            preconditionFailure("a negative value ? I don't think so!")
+        }
+        var categoryArray = array(for: subcategory)
+        if index < categoryArray.count {
+            categoryArray.insert(item, at: index)
+        }
+        categoryArray.append(item)
+    }
+
+    private func getAllVideos() {
+        let files = MLFile.allFiles() as! [MLFile]
+        foundVideos = files.filter {
+            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
+                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
+                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
+        }
+        moviesFromVideos()
+        episodesFromVideos()
+        videoPlaylistsFromVideos()
+    }
+
+    private func getAllAudio() {
+        let files = MLFile.allFiles() as! [MLFile]
+        foundAudio = files.filter { $0.isSupportedAudioFile() }
+
+        artistsFromAudio()
+        albumsFromAudio()
+        audioPlaylistsFromAudio()
+        genresFromAudio()
+    }
+
+    private func artistsFromAudio() {
+        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
+        let tracksWithArtist = albumtracks.filter { $0.artist != nil && $0.artist != "" }
+        artists = tracksWithArtist.map { $0.artist }
+    }
+
+    private func genresFromAudio() {
+        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
+        let tracksWithArtist = albumtracks.filter { $0.genre != nil && $0.genre != "" }
+        genres = tracksWithArtist.map { $0.genre }
+    }
+
+    private func episodesFromVideos() {
+        episodes = MLShowEpisode.allEpisodes() as! [MLShowEpisode]
+    }
+
+    private func albumsFromAudio() {
+        albums = MLAlbum.allAlbums() as! [MLAlbum]
+    }
+
+    private func audioPlaylistsFromAudio() {
+        let labels = MLLabel.allLabels() as! [MLLabel]
+        audioPlaylist = labels.filter {
+            let audioFiles = $0.files.filter {
+                if let file = $0 as? MLFile {
+                    return file.isSupportedAudioFile()
+                }
+                return false
+            }
+            return !audioFiles.isEmpty
+        }
+    }
+
+    private func videoPlaylistsFromVideos() {
+        let labels = MLLabel.allLabels() as! [MLLabel]
+        audioPlaylist = labels.filter {
+            let audioFiles = $0.files.filter {
+                if let file = $0 as? MLFile {
+                    return file.isShowEpisode() || file.isMovie() || file.isClip()
+                }
+                return false
+            }
+            return !audioFiles.isEmpty
+        }
+    }
+
+    private func moviesFromVideos() {
+        movies = foundVideos.filter { $0.isMovie() }
     }
 }
 //Todo: Move discoverer code here 
