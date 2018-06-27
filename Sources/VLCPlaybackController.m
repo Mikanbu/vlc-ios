@@ -878,12 +878,56 @@ typedef NS_ENUM(NSUInteger, VLCAspectRatio) {
     return [[UIDevice currentDevice] VLCHasExternalDisplay] ? [UIScreen screens][1] : [UIScreen mainScreen];
 }
 
+- (id)firstTrackWithInformationWithType:(NSString *)type key:(NSString *)key
+{
+    NSArray *tracksInfo = _mediaPlayer.media.tracksInformation;
+
+    for (NSDictionary *track in tracksInfo) {
+        if ([track[VLCMediaTracksInformationType] isEqualToString:type]) {
+            return track[key];
+        }
+    }
+    return nil;
+}
+
+- (CGSize)handleSwapVideoSizeForOrientationWithVideoSize:(CGSize)videoSize
+{
+    CGSize newVideoSize;
+
+    id rawVideoOrientation = [self firstTrackWithInformationWithType:VLCMediaTracksInformationTypeVideo
+                                                                 key:VLCMediaTracksInformationVideoOrientation];
+
+    if (rawVideoOrientation) {
+        VLCMediaOrientation videoOrientation = [rawVideoOrientation integerValue];
+        BOOL videoSwapped = videoOrientation == VLCMediaOrientationLeftBottom || videoOrientation == VLCMediaOrientationRightTop;
+
+        if (videoSwapped) {
+            newVideoSize.width = videoSize.height;
+            newVideoSize.height = videoSize.width;
+            return newVideoSize;
+        }
+    }
+    return videoSize;
+}
+
+- (CGFloat)handleVideoWidthSourceAspectRatio:(CGFloat)videoWidth
+{
+    id rawSarNum = [self firstTrackWithInformationWithType:VLCMediaTracksInformationTypeVideo
+                                                       key:VLCMediaTracksInformationSourceAspectRatio];
+    id rawSarDen = [self firstTrackWithInformationWithType:VLCMediaTracksInformationTypeVideo
+                                                       key:VLCMediaTracksInformationSourceAspectRatioDenominator];
+
+    return (rawSarNum && rawSarDen) ? videoWidth * [rawSarNum integerValue] / [rawSarDen integerValue] : videoWidth;
+}
+
 - (void)switchToFillToScreen
 {
     UIScreen *screen = [self currentScreen];
     CGSize screenSize = screen.bounds.size;
 
-    CGSize videoSize = _mediaPlayer.videoSize;
+    CGSize videoSize = [self handleSwapVideoSizeForOrientationWithVideoSize:_mediaPlayer.videoSize];
+
+    videoSize.width = [self handleVideoWidthSourceAspectRatio:videoSize.width];
 
     CGFloat ar = videoSize.width / (float)videoSize.height;
     CGFloat dar = screenSize.width / (float)screenSize.height;
