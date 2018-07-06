@@ -37,9 +37,10 @@ struct VLCMediaType {
 }
 
 @objc class VLCMediaDataSource: NSObject {
+    let medialibrary = VLCMediaLibraryManager()
 
-    var foundVideos = [MLFile]()
-    var foundAudio = [MLFile]()
+    var foundVideos = [VLCMLMedia]()
+    var foundAudio = [VLCMLMedia]()
 
     var movies = [MLFile]()
     var episodes = [MLShowEpisode]()
@@ -151,25 +152,27 @@ struct VLCMediaType {
     }
 
     private func getAllVideos() {
-        let files = MLFile.allFiles() as! [MLFile]
-        foundVideos = files.filter {
-            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
-                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
-                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
-        }
-        moviesFromVideos()
-        episodesFromVideos()
-        videoPlaylistsFromVideos()
+//        let files = MLFile.allFiles() as! [MLFile]
+//        foundVideos = files.filter {
+//            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
+//                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
+//                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
+//        }
+//        moviesFromVideos()
+//        episodesFromVideos()
+//        videoPlaylistsFromVideos()
+        foundVideos = medialibrary.media(ofType: .video)
     }
 
     private func getAllAudio() {
-        let files = MLFile.allFiles() as! [MLFile]
-        foundAudio = files.filter { $0.isSupportedAudioFile() }
-
-        artistsFromAudio()
-        albumsFromAudio()
-        audioPlaylistsFromAudio()
-        genresFromAudio()
+//        let files = MLFile.allFiles() as! [MLFile]
+//        foundAudio = files.filter { $0.isSupportedAudioFile() }
+//
+//        artistsFromAudio()
+//        albumsFromAudio()
+//        audioPlaylistsFromAudio()
+//        genresFromAudio()
+        foundAudio = medialibrary.media(ofType: .audio)
     }
 
     private func artistsFromAudio() {
@@ -218,9 +221,9 @@ struct VLCMediaType {
         }
     }
 
-    private func moviesFromVideos() {
-        movies = foundVideos.filter { $0.isMovie() }
-    }
+//    private func moviesFromVideos() {
+//        movies = foundVideos.filter { $0.isMovie() }
+//    }
 }
 
 // Todo: implement the remove
