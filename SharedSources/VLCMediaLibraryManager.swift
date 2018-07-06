@@ -12,7 +12,9 @@
 
 class VLCMediaLibraryManager: NSObject {
 
-    private static let dbPath: String = "/medialibrary.db"
+    private static let databaseName: String = "medialibrary.db"
+    private var databasePath: String!
+    private var thumbnailPath: String!
 
     lazy var medialibrary: VLCMediaLibrary = {
         let medialibrary = VLCMediaLibrary()
@@ -31,8 +33,12 @@ class VLCMediaLibraryManager: NSObject {
             preconditionFailure("VLCMediaLibraryManager: Unable to init medialibrary.")
         }
 
-        let medialibraryStatus = medialibrary.setupMediaLibrary(databasePath: documentPath + VLCMediaLibraryManager.dbPath,
-                                                                thumbnailPath: documentPath)
+        // the paths of the database & thumbnail are for now setted to the documentDirectory
+        databasePath = documentPath + "/" + VLCMediaLibraryManager.databaseName
+        thumbnailPath = documentPath
+
+        let medialibraryStatus = medialibrary.setupMediaLibrary(databasePath: databasePath,
+                                                                thumbnailPath: thumbnailPath)
 
         switch medialibraryStatus {
         case .success: break
