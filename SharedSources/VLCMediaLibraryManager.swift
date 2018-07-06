@@ -16,7 +16,7 @@ class VLCMediaLibraryManager: NSObject {
     private var databasePath: String!
     private var thumbnailPath: String!
 
-    lazy var medialibrary: VLCMediaLibrary = {
+    private lazy var medialibrary: VLCMediaLibrary = {
         let medialibrary = VLCMediaLibrary()
         medialibrary.delegate = self
         medialibrary.deviceListerDelegate = self
@@ -28,6 +28,7 @@ class VLCMediaLibraryManager: NSObject {
         setupMediaLibrary()
     }
 
+    // MARK: Private
     private func setupMediaLibrary() {
         guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else {
             preconditionFailure("VLCMediaLibraryManager: Unable to init medialibrary.")
