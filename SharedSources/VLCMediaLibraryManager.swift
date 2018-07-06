@@ -95,10 +95,45 @@ class VLCMediaLibraryManager: NSObject {
     }
 }
 
+// MARK: VLCMediaLibraryDelegate
 extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didAddMedia media: [VLCMLMedia]) {
+        print("VLCMediaLibraryDelegate: Did add media: \(media), with count: \(media.count)")
+        print("VLCMediaLibraryDelegate: video count: \(medialibrary.videoFiles(with: .default, desc: false).count)")
+        print("VLCMediaLibraryDelegate: audio count: \(medialibrary.audioFiles(with: .default, desc: false).count)")
+    }
 
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didStartDiscovery entryPoint: String) {
+        print("VLCMediaLibraryDelegate: Did start discovery")
+    }
+
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didCompleteDiscovery entryPoint: String) {
+        print("VLCMediaLibraryDelegate: Did complete discovery")
+    }
+
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didProgressDiscovery entryPoint: String) {
+        print("VLCMediaLibraryDelegate: Did progress discovery")
+    }
+
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didUpdateParsingStatsWithPercent percent: UInt32) {
+        print("VLCMediaLibraryDelegate: Did update parsing with percent: \(percent)")
+    }
 }
 
+// MARK: VLCMLDeviceListerDelegate
 extension VLCMediaLibraryManager: VLCMLDeviceListerDelegate {
 
+    func medialibrary(_ medialibrary: VLCMediaLibrary, devicePluggedWithUUID uuid: String, withMountPoint mountPoint: String) -> Bool {
+        print("onDevicePlugged: \(uuid), mountPoint: \(mountPoint)")
+        return false
+    }
+
+    func medialibrary(_ medialibrary: VLCMediaLibrary, deviceUnPluggedWithUUID uuid: String) {
+        print("onDeviceUnplugged: \(uuid)")
+    }
+
+    func medialibrary(_ medialibrary: VLCMediaLibrary, isDeviceKnownWithUUID uuid: String) -> Bool {
+        print("is device known: \(uuid)")
+        return false
+    }
 }
