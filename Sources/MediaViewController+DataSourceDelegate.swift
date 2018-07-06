@@ -26,8 +26,13 @@ extension VLCMediaViewController: UICollectionViewDelegateFlowLayout {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let playlistCell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCPlaylistCollectionViewCell.cellIdentifier(), for: indexPath) as? VLCPlaylistCollectionViewCell {
-            if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
-                playlistCell.mediaObject = mediaObject
+
+            if let media = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? VLCMLMedia {
+                playlistCell.media = media
+                if media.mainFile() == nil {
+                    print("(-ω-、)")
+                    playlistCell.media = nil
+                }
             }
             return playlistCell
         }
