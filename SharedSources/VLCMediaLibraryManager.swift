@@ -44,7 +44,14 @@ class VLCMediaLibraryManager: NSObject {
                                                                 thumbnailPath: thumbnailPath)
 
         switch medialibraryStatus {
-        case .success: break
+        case .success:
+            guard medialibrary.start() else {
+                assertionFailure("VLCMediaLibraryManager: Medialibrary failed to start.")
+                return
+            }
+            medialibrary.reload()
+            medialibrary.discover(onEntryPoint: "file://" + documentPath)
+            break
         case .alreadyInitialized:
             assertionFailure("VLCMediaLibraryManager: Medialibrary already initialized.")
             break
