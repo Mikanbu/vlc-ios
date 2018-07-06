@@ -2,8 +2,8 @@
  * VLCMediaLibraryManager.swift
  * VLC for iOS
  *****************************************************************************
- * Copyright (c) 2018 VideoLAN. All rights reserved.
- * $Id$
+ * Copyright © 2018 VideoLAN. All rights reserved.
+ * Copyright © 2018 Videolabs
  *
  * Authors: Soomin Lee <bubu # mikan.io>
  *
