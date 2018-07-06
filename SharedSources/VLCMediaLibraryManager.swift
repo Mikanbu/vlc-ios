@@ -63,6 +63,36 @@ class VLCMediaLibraryManager: NSObject {
             break
         }
     }
+
+    // Returns an array of VLCMLMedia
+//    private func media(for type: VLCMLMediaType, subtype: VLCMLMediaSubType = .unknown) -> [VLCMLMedia] {
+//        switch type {
+//        case .unknown:
+//            break
+//        case .audio:
+//            break
+//        case .video:
+//            break
+//        }
+//        return []
+//    }
+//    private func getAllVideos() {
+//        print(medialibrary.videoFiles(with: .default, desc: false))
+//    }
+
+    // MARK: Internal
+
+    /// Returns number of *ALL* files(audio and video) present in the medialibrary database
+    func numberOfFiles() -> Int {
+        var media = medialibrary.audioFiles(with: .filename, desc: false)
+
+        media += medialibrary.videoFiles(with: .filename, desc: false)
+        return media.count
+    }
+
+    func addMedia(withMrl mrl: URL) {
+        medialibrary.addMedia(withMrl: mrl)
+    }
 }
 
 extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
