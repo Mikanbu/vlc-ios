@@ -37,7 +37,7 @@ import Foundation
         return array(for: subcategory).count
     }
 
-    private func array(for subcategory: VLCMediaSubcategory ) -> [Any] {
+    private func array(for subcategory: VLCMediaSubcategory) -> [Any] {
         switch subcategory {
         case .unknown:
             preconditionFailure("No")
