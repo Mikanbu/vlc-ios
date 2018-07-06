@@ -10,11 +10,17 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
+@objc protocol VLCMediaLibraryManagerDelegate {
+    @objc optional func mediaAdded(_ media: VLCMLMedia)
+}
+
 class VLCMediaLibraryManager: NSObject {
 
     private static let databaseName: String = "medialibrary.db"
     private var databasePath: String!
     private var thumbnailPath: String!
+
+    @objc weak var delegate: VLCMediaLibraryManagerDelegate?
 
     private lazy var medialibrary: VLCMediaLibrary = {
         let medialibrary = VLCMediaLibrary()
