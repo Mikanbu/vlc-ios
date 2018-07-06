@@ -96,6 +96,15 @@ class VLCMediaLibraryManager: NSObject {
         return media.count
     }
 
+
+    /// Returns *ALL* file found for a specified VLCMLMediaType
+    ///
+    /// - Parameter type: Type of the media
+    /// - Returns: Array of VLCMLMedia
+    func media(ofType type: VLCMLMediaType) -> [VLCMLMedia] {
+        return type == .video ? medialibrary.videoFiles(with: .filename, desc: false) : medialibrary.audioFiles(with: .filename, desc: false)
+    }
+
     func addMedia(withMrl mrl: URL) {
         medialibrary.addMedia(withMrl: mrl)
     }
