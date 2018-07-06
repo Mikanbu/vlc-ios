@@ -162,6 +162,6 @@ class VLCMediaViewController: UICollectionViewController, UISearchResultsUpdatin
     }
 
     func indicatorInfo(for pagerTabStripController: PagerTabStripViewController) -> IndicatorInfo {
-        return  services.mediaDataSource.indicatorInfo(for:mediaType.subcategory)
+        return services.mediaDataSource.indicatorInfo(for:mediaType.subcategory)
     }
 }
