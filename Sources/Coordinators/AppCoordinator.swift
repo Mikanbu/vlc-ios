@@ -14,6 +14,7 @@ import Foundation
 @objc(VLCService)
 class Services: NSObject {
     @objc let mediaDataSource = VLCMediaDataSource()
+    @objc let medialibrary = VLCMediaLibraryManager()
     @objc let rendererDiscovererManager = VLCRendererDiscovererManager(presentingViewController: nil)
 }
 
