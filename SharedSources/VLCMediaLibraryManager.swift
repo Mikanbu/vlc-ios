@@ -36,14 +36,14 @@ class VLCMediaLibraryManager: NSObject {
 
     // MARK: Private
     private func setupMediaLibrary() {
-        guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else {
-            preconditionFailure("VLCMediaLibraryManager: Unable to init medialibrary.")
+        guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first,
+            let dbPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first else {
+                preconditionFailure("VLCMediaLibraryManager: Unable to init medialibrary.")
         }
 
         medialibrary.setVerbosity(.info)
 
-        // the paths of the database & thumbnail are for now setted to the documentDirectory
-        databasePath = documentPath + "/" + VLCMediaLibraryManager.databaseName
+        databasePath = dbPath + "/" + VLCMediaLibraryManager.databaseName
         thumbnailPath = documentPath
 
         let medialibraryStatus = medialibrary.setupMediaLibrary(databasePath: databasePath,
