@@ -18,8 +18,8 @@ import Foundation
     var foundVideos = [VLCMLMedia]()
     var foundAudio = [VLCMLMedia]()
 
-    var movies = [MLFile]()
-    var episodes = [MLShowEpisode]()
+    var movies = [VLCMLMedia]()
+    var episodes = [VLCMLMedia]()
     var artists = [String]()
     var albums = [MLAlbum]()
     var genres = [String]()
@@ -133,44 +133,20 @@ import Foundation
         categoryArray.append(item)
     }
 
-    private func getAllVideos() {
-//        let files = MLFile.allFiles() as! [MLFile]
-//        foundVideos = files.filter {
-//            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
-//        }
-//        moviesFromVideos()
-//        episodesFromVideos()
-//        videoPlaylistsFromVideos()
-        foundVideos = medialibrary.media(ofType: .video)
+    private func getAllAudio() {
+        foundAudio = medialibrary.media(ofType: .audio)
+        artistsFromAudio()
+        albumsFromAudio()
+        audioPlaylistsFromAudio()
+        genresFromAudio()
     }
 
-    private func getAllAudio() {
-//        let files = MLFile.allFiles() as! [MLFile]
-//        foundAudio = files.filter { $0.isSupportedAudioFile() }
-//
-//        artistsFromAudio()
-//        albumsFromAudio()
-//        audioPlaylistsFromAudio()
-//        genresFromAudio()
-        foundAudio = medialibrary.media(ofType: .audio)
-    }
+    // MARK: Audio methods
 
     private func artistsFromAudio() {
         let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
         let tracksWithArtist = albumtracks.filter { $0.artist != nil && $0.artist != "" }
         artists = tracksWithArtist.map { $0.artist }
-    }
-
-    private func genresFromAudio() {
-        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
-        let tracksWithArtist = albumtracks.filter { $0.genre != nil && $0.genre != "" }
-        genres = tracksWithArtist.map { $0.genre }
-    }
-
-    private func episodesFromVideos() {
-        episodes = MLShowEpisode.allEpisodes() as! [MLShowEpisode]
     }
 
     private func albumsFromAudio() {
@@ -190,6 +166,29 @@ import Foundation
         }
     }
 
+    private func genresFromAudio() {
+        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
+        let tracksWithArtist = albumtracks.filter { $0.genre != nil && $0.genre != "" }
+        genres = tracksWithArtist.map { $0.genre }
+    }
+
+    // MARK: Video methods
+
+    private func getAllVideos() {
+        foundVideos = medialibrary.media(ofType: .video)
+        moviesFromVideos()
+        episodesFromVideos()
+//        videoPlaylistsFromVideos()
+    }
+
+    private func moviesFromVideos() {
+        movies = foundVideos.filter { $0.subtype() == .movie }
+    }
+
+    private func episodesFromVideos() {
+        episodes = foundVideos.filter { $0.subtype() == .showEpisode }
+    }
+
     private func videoPlaylistsFromVideos() {
         let labels = MLLabel.allLabels() as! [MLLabel]
         audioPlaylist = labels.filter {
@@ -202,10 +201,6 @@ import Foundation
             return !audioFiles.isEmpty
         }
     }
-
-//    private func moviesFromVideos() {
-//        movies = foundVideos.filter { $0.isMovie() }
-//    }
 }
 //Todo: Move discoverer code here 
 
