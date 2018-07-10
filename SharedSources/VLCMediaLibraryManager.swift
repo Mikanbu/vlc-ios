@@ -89,6 +89,79 @@ class VLCMediaLibraryManager: NSObject {
     }
 }
 
+// MARK: MediaDataSource - Audio methods
+
+extension VLCMediaLibraryManager {
+    private func getAllAudio() {
+//        foundAudio = medialibrary.media(ofType: .audio)
+//        artistsFromAudio()
+//        albumsFromAudio()
+//        audioPlaylistsFromAudio()
+//        genresFromAudio()
+    }
+
+    private func getArtists() {
+//        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
+//        let tracksWithArtist = albumtracks.filter { $0.artist != nil && $0.artist != "" }
+//        artists = tracksWithArtist.map { $0.artist }
+    }
+
+    private func getAlbums() {
+//        albums = MLAlbum.allAlbums() as! [MLAlbum]
+    }
+
+    private func getAudioPlaylists() {
+//        let labels = MLLabel.allLabels() as! [MLLabel]
+//        audioPlaylist = labels.filter {
+//            let audioFiles = $0.files.filter {
+//                if let file = $0 as? MLFile {
+//                    return file.isSupportedAudioFile()
+//                }
+//                return false
+//            }
+//            return !audioFiles.isEmpty
+//        }
+    }
+
+    private func genresFromAudio() {
+//        let albumtracks = MLAlbumTrack.allTracks() as! [MLAlbumTrack]
+//        let tracksWithArtist = albumtracks.filter { $0.genre != nil && $0.genre != "" }
+//        genres = tracksWithArtist.map { $0.genre }
+    }
+}
+
+// MARK: MediaDataSource - Video methods
+
+extension VLCMediaLibraryManager {
+    private func getAllVideos() {
+//        foundVideos = medialibrary.media(ofType: .video)
+//        moviesFromVideos()
+//        episodesFromVideos()
+        //        videoPlaylistsFromVideos()
+    }
+
+    private func getMovies() {
+//        movies = foundVideos.filter { $0.subtype() == .movie }
+    }
+
+    private func getShowEpisodes() {
+//        episodes = foundVideos.filter { $0.subtype() == .showEpisode }
+    }
+
+    private func getVideoPlaylists() {
+//        let labels = MLLabel.allLabels() as! [MLLabel]
+//        audioPlaylist = labels.filter {
+//            let audioFiles = $0.files.filter {
+//                if let file = $0 as? MLFile {
+//                    return file.isShowEpisode() || file.isMovie() || file.isClip()
+//                }
+//                return false
+//            }
+//            return !audioFiles.isEmpty
+//        }
+    }
+}
+
 // MARK: VLCMediaLibraryDelegate
 extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
     func medialibrary(_ medialibrary: VLCMediaLibrary, didAddMedia media: [VLCMLMedia]) {
