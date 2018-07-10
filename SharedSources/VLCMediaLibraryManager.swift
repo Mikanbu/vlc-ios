@@ -89,6 +89,104 @@ class VLCMediaLibraryManager: NSObject {
     }
 }
 
+// MARK: MediaDataSource - Other methods
+
+extension VLCMediaLibraryManager {
+//    @objc func numberOfFiles(subcategory: VLCMediaSubcategory) -> Int {
+//        return array(for: subcategory).countSources/MediaViewController.swift
+//    }
+//
+//    private func array(for subcategory: VLCMediaSubcategory) -> [Any] {
+//        switch subcategory {
+//        case .unknown:
+//            preconditionFailure("No")
+//        case .movies:
+//            return movies
+//        case .episodes:
+//            return episodes
+//        case .artists:
+//            return artists
+//        case .albums:
+//            return albums
+//        case .tracks:
+//            return foundAudio
+//        case .genres:
+//            return genres
+//        case .audioPlaylists:
+//            return audioPlaylist
+//        case .videoPlaylists:
+//            return videoPlaylist
+//        case .allVideos:
+//            return foundVideos
+//        }
+//    }
+//
+//    func indicatorInfo(for subcategory: VLCMediaSubcategory) -> IndicatorInfo {
+//        switch subcategory {
+//        case .unknown:
+//            preconditionFailure("No")
+//        case .movies:
+//            return IndicatorInfo(title: NSLocalizedString("MOVIES", comment: ""))
+//        case .episodes:
+//            return IndicatorInfo(title: NSLocalizedString("EPISODES", comment: ""))
+//        case .artists:
+//            return IndicatorInfo(title: NSLocalizedString("ARTISTS", comment: ""))
+//        case .albums:
+//            return IndicatorInfo(title: NSLocalizedString("ALBUMS", comment: ""))
+//        case .tracks:
+//            return IndicatorInfo(title: NSLocalizedString("SONGS", comment: ""))
+//        case .genres:
+//            return IndicatorInfo(title: NSLocalizedString("GENRES", comment: ""))
+//        case .audioPlaylists:
+//            return IndicatorInfo(title: NSLocalizedString("AUDIO_PLAYLISTS", comment: ""))
+//        case .videoPlaylists:
+//            return IndicatorInfo(title: NSLocalizedString("VIDEO_PLAYLISTS", comment: ""))
+//        case .allVideos:
+//            return IndicatorInfo(title: NSLocalizedString("VIDEOS", comment: ""))
+//        }
+//
+//    }
+//
+//    @objc func object(at index: Int, subcategory: VLCMediaSubcategory) -> Any {
+//
+//        guard index >= 0 else {
+//            preconditionFailure("a negative value ? I don't think so!")
+//        }
+//
+//        let categoryArray = array(for: subcategory)
+//        if index < categoryArray.count {
+//            return categoryArray[Int(index)]
+//        }
+//        preconditionFailure("index is taller than count")
+//    }
+//
+//    func allObjects(for subcategory: VLCMediaSubcategory) -> [Any] {
+//        return array(for:subcategory)
+//    }
+//
+//    func removeObject(at index: Int, subcategory: VLCMediaSubcategory) {
+//        guard index >= 0 else {
+//            preconditionFailure("a negative value ? I don't think so!")
+//        }
+//        var categoryArray = array(for: subcategory)
+//        if index < categoryArray.count {
+//            categoryArray.remove(at: index)
+//        }
+//        preconditionFailure("index is taller than count")
+//    }
+//
+//    func insert(_ item: MLFile, at index: Int, subcategory: VLCMediaSubcategory) {
+//        guard index >= 0 else {
+//            preconditionFailure("a negative value ? I don't think so!")
+//        }
+//        var categoryArray = array(for: subcategory)
+//        if index < categoryArray.count {
+//            categoryArray.insert(item, at: index)
+//        }
+//        categoryArray.append(item)
+//    }
+}
+
 // MARK: MediaDataSource - Audio methods
 
 extension VLCMediaLibraryManager {
