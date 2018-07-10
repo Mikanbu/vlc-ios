@@ -10,17 +10,11 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-@objc protocol VLCMediaLibraryManagerDelegate {
-    @objc optional func mediaAdded(_ media: VLCMLMedia)
-}
-
 class VLCMediaLibraryManager: NSObject {
 
     private static let databaseName: String = "medialibrary.db"
     private var databasePath: String!
     private var thumbnailPath: String!
-
-    @objc weak var delegate: VLCMediaLibraryManagerDelegate?
 
     private lazy var medialibrary: VLCMediaLibrary = {
         let medialibrary = VLCMediaLibrary()
@@ -65,26 +59,11 @@ class VLCMediaLibraryManager: NSObject {
             preconditionFailure("VLCMediaLibraryManager: Failed to setup medialibrary.")
             break
         case .dbReset:
+            // should still start and discover but warn the user that the db has been wipped
             assertionFailure("VLCMediaLibraryManager: The database was resetted, please re-configure.")
             break
         }
     }
-
-    // Returns an array of VLCMLMedia
-//    private func media(for type: VLCMLMediaType, subtype: VLCMLMediaSubType = .unknown) -> [VLCMLMedia] {
-//        switch type {
-//        case .unknown:
-//            break
-//        case .audio:
-//            break
-//        case .video:
-//            break
-//        }
-//        return []
-//    }
-//    private func getAllVideos() {
-//        print(medialibrary.videoFiles(with: .default, desc: false))
-//    }
 
     // MARK: Internal
 
