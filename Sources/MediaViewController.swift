@@ -57,8 +57,11 @@ class VLCMediaViewController<T>: UICollectionViewController, UICollectionViewDel
     }
 
     @objc func reloadData() {
-        collectionView?.reloadData()
-        updateUIForContent()
+        DispatchQueue.main.async {
+            [weak self] in
+            self?.collectionView?.reloadData()
+            self?.updateUIForContent()
+        }
     }
 
     @available(*, unavailable)

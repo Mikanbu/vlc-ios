@@ -30,6 +30,12 @@ import Foundation
         super.init()
         getAllVideos()
         getAllAudio()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: .VLCAllVideosDidChangeNotification, object: nil)
+    }
+
+    @objc func reloadData() {
+        getAllVideos()
+        getAllAudio()
     }
 
     @objc

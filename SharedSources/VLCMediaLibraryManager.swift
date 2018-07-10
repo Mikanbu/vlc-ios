@@ -95,6 +95,7 @@ extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
         print("VLCMediaLibraryDelegate: Did add media: \(media), with count: \(media.count)")
         print("VLCMediaLibraryDelegate: video count: \(medialibrary.videoFiles(with: .default, desc: false).count)")
         print("VLCMediaLibraryDelegate: audio count: \(medialibrary.audioFiles(with: .default, desc: false).count)")
+        NotificationCenter.default.post(name: .VLCAllVideosDidChangeNotification, object: media)
     }
 
     func medialibrary(_ medialibrary: VLCMediaLibrary, didStartDiscovery entryPoint: String) {
