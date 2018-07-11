@@ -63,8 +63,12 @@ class VLCMediaSubcategoryViewController: BaseButtonBarPagerTabStripViewControlle
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
+
+        let fixedSpace: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        fixedSpace.width = 21.0
+
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("SORT", comment: ""), style: .plain, target: self, action: #selector(sort))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rendererButton)
+        navigationItem.rightBarButtonItems = [editButtonItem, fixedSpace, UIBarButtonItem(customView: rendererButton)]
     }
 
     @objc func sort() {
@@ -101,5 +105,22 @@ class VLCMediaSubcategoryViewController: BaseButtonBarPagerTabStripViewControlle
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return PresentationTheme.current.colors.statusBarStyle
+    }
+
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+
+        if let currentView = viewControllers[currentIndex] as? VLCMediaViewController {
+
+            let layoutToBe = editing ? currentView.editCollectionViewLayout : UICollectionViewFlowLayout()
+            currentView.collectionView?.setCollectionViewLayout(layoutToBe, animated: false, completion: {
+                finished in
+                guard finished else {
+                    assertionFailure("VLCMediaSubcategoryViewController: Edit layout transition failed.")
+                    return
+                }
+                currentView.reloadData()
+            })
+        }
     }
 }
