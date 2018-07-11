@@ -39,6 +39,13 @@ class VLCMediaViewController: UICollectionViewController, UISearchResultsUpdatin
         return emptyView
     }()
 
+    var editCollectionViewLayout: UICollectionViewFlowLayout = {
+        let editCollectionViewLayout = UICollectionViewFlowLayout()
+        editCollectionViewLayout.minimumLineSpacing = 1
+        editCollectionViewLayout.minimumInteritemSpacing = 0
+        return editCollectionViewLayout
+    }()
+
     @available(*, unavailable)
     init() {
         fatalError()
@@ -96,6 +103,7 @@ class VLCMediaViewController: UICollectionViewController, UISearchResultsUpdatin
     func setupCollectionView() {
         let playlistnib = UINib(nibName: "VLCPlaylistCollectionViewCell", bundle: nil)
         collectionView?.register(playlistnib, forCellWithReuseIdentifier: VLCPlaylistCollectionViewCell.cellIdentifier())
+        collectionView?.register(VLCActionSheetCell.self, forCellWithReuseIdentifier: VLCActionSheetCell.identifier)
         collectionView?.backgroundColor = PresentationTheme.current.colors.background
         collectionView?.alwaysBounceVertical = true
         collectionView?.dataSource = self
