@@ -25,24 +25,43 @@ extension VLCMediaViewController: UICollectionViewDelegateFlowLayout {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let playlistCell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCPlaylistCollectionViewCell.cellIdentifier(), for: indexPath) as? VLCPlaylistCollectionViewCell {
-            if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
-                playlistCell.mediaObject = mediaObject
+        if collectionView.collectionViewLayout == editCollectionViewLayout {
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCMediaViewEditCell.identifier,
+                                                             for: indexPath) as? VLCMediaViewEditCell {
+                cell.title.text = "( ｀ー´)ノ"
+                cell.subInfo.text = "(-ω-、)"
+                cell.size.text = "|ω°•)"
+                cell.thumbnail.image = UIImage(named: "vlc-xmas")
+                return cell
             }
-            return playlistCell
+        } else {
+            if let playlistCell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCPlaylistCollectionViewCell.cellIdentifier(), for: indexPath) as? VLCPlaylistCollectionViewCell {
+                if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
+                    playlistCell.mediaObject = mediaObject
+                }
+                return playlistCell
+            }
         }
         return UICollectionViewCell()
     }
 
     // MARK: - UICollectionViewDelegate
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
+        if collectionView.collectionViewLayout == editCollectionViewLayout {
+
+        } else if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
             delegate?.mediaViewControllerDidSelectMediaObject(self, mediaObject: mediaObject)
         }
     }
 
     // MARK: - UICollectionViewDelegateFlowLayout
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        if collectionViewLayout == editCollectionViewLayout {
+            let insetToRemove = collectionView.contentInset.left + collectionView.contentInset.right + (cellPadding * 2)
+
+            return CGSize(width: collectionView.frame.width - insetToRemove, height: 56)
+        }
 
         let numberOfCells: CGFloat = collectionView.traitCollection.horizontalSizeClass == .regular ? 3.0 : 2.0
         let aspectRatio: CGFloat = 10.0 / 16.0
