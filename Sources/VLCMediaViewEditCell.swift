@@ -11,25 +11,32 @@
 
 // https://www.figma.com/file/ByhPBHr4gTmUwo4bsVcanWIN/VLC180510?node-id=0%3A2
 
+struct VLCCheckView {
+    var isEnabled: Bool {
+        didSet {
+            view.backgroundColor = isEnabled ? .orange : .clear
+        }
+    }
+    var view: UIView
+}
+
 class VLCMediaViewEditCell: UICollectionViewCell {
 
     static let identifier = String(describing: VLCMediaViewEditCell.self)
 
     static let height: CGFloat = 56
 
-    let stateView: UIView = {
-        // 20 x 20 circle
-        // maybe a struct to have a state bool?
-        let stateView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-        stateView.layer.cornerRadius = stateView.frame.width / 2
-        stateView.clipsToBounds = true
-        stateView.translatesAutoresizingMaskIntoConstraints = false
-        stateView.backgroundColor = .green
-        return stateView
+    var checkView: VLCCheckView = {
+        var view = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.clipsToBounds = true
+        view.layer.cornerRadius = view.frame.width / 2
+        view.layer.borderColor = UIColor.gray.cgColor
+        view.layer.borderWidth = 1
+        return VLCCheckView(isEnabled: false, view: view)
     }()
 
     let thumbnail: UIImageView = {
-        // 56 x 56 rounded corner ~ 2 - 3
         let thumbnail = UIImageView()
         thumbnail.translatesAutoresizingMaskIntoConstraints = false
         thumbnail.contentMode = .scaleAspectFit
@@ -96,7 +103,7 @@ class VLCMediaViewEditCell: UICollectionViewCell {
         mediaInfoStackView.addArrangedSubview(subInfo)
         mediaInfoStackView.addArrangedSubview(size)
 
-        mainStackView.addArrangedSubview(stateView)
+        mainStackView.addArrangedSubview(checkView.view)
         mainStackView.addArrangedSubview(thumbnail)
         mainStackView.addArrangedSubview(mediaInfoStackView)
 
@@ -108,8 +115,8 @@ class VLCMediaViewEditCell: UICollectionViewCell {
             guide = safeAreaLayoutGuide
         }
         NSLayoutConstraint.activate([
-            stateView.heightAnchor.constraint(equalToConstant: 20),
-            stateView.widthAnchor.constraint(equalTo: stateView.heightAnchor),
+            checkView.view.heightAnchor.constraint(equalToConstant: 20),
+            checkView.view.widthAnchor.constraint(equalTo: checkView.view.heightAnchor),
 
             thumbnail.heightAnchor.constraint(equalToConstant: VLCMediaViewEditCell.height),
             thumbnail.widthAnchor.constraint(equalTo: thumbnail.heightAnchor),

@@ -48,7 +48,9 @@ extension VLCMediaViewController: UICollectionViewDelegateFlowLayout {
     // MARK: - UICollectionViewDelegate
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView.collectionViewLayout == editCollectionViewLayout {
-
+            if let cell = collectionView.cellForItem(at: indexPath) as? VLCMediaViewEditCell {
+                cell.checkView.isEnabled = !cell.checkView.isEnabled
+            }
         } else if let mediaObject = services.mediaDataSource.object(at: indexPath.row, subcategory: mediaType.subcategory) as? NSManagedObject {
             delegate?.mediaViewControllerDidSelectMediaObject(self, mediaObject: mediaObject)
         }
