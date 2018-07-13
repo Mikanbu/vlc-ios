@@ -59,8 +59,7 @@ extension VLCMediaViewController: UICollectionViewDelegateFlowLayout {
 
         if collectionViewLayout == editCollectionViewLayout {
             let insetToRemove = collectionView.contentInset.left + collectionView.contentInset.right + (cellPadding * 2)
-
-            return CGSize(width: collectionView.frame.width - insetToRemove, height: 56)
+            return CGSize(width: collectionView.frame.width - insetToRemove, height: VLCMediaViewEditCell.height)
         }
 
         let numberOfCells: CGFloat = collectionView.traitCollection.horizontalSizeClass == .regular ? 3.0 : 2.0

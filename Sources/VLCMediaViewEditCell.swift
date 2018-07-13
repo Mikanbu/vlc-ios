@@ -15,6 +15,8 @@ class VLCMediaViewEditCell: UICollectionViewCell {
 
     static let identifier = String(describing: VLCMediaViewEditCell.self)
 
+    static let height: CGFloat = 56
+
     let stateView: UIView = {
         // 20 x 20 circle
         // maybe a struct to have a state bool?
@@ -109,7 +111,7 @@ class VLCMediaViewEditCell: UICollectionViewCell {
             stateView.heightAnchor.constraint(equalToConstant: 20),
             stateView.widthAnchor.constraint(equalTo: stateView.heightAnchor),
 
-            thumbnail.heightAnchor.constraint(equalToConstant: 56),
+            thumbnail.heightAnchor.constraint(equalToConstant: VLCMediaViewEditCell.height),
             thumbnail.widthAnchor.constraint(equalTo: thumbnail.heightAnchor),
 
             mainStackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20),
