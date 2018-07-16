@@ -14,7 +14,7 @@ import UIKit
 
 class VLCVideoSubcategoryViewController: VLCMediaSubcategoryViewController {
     override func viewControllers(for pagerTabStripController: PagerTabStripViewController) -> [UIViewController] {
-        let movies = VLCMediaViewController<MLFile>(services: services, subcategory: VLCMediaSubcategories.movies)
+        let movies = VLCMediaViewController<VLCMLMedia>(services: services, subcategory: VLCMediaSubcategories.movies)
         movies.delegate = mediaDelegate
         let episodes = VLCMediaViewController<MLShowEpisode>(services: services, subcategory: VLCMediaSubcategories.episodes)
         episodes.delegate = mediaDelegate
