@@ -306,7 +306,7 @@ extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
         //trigger notification here?
         // fuse with mediaDS then no delegate needed, or no need to observe the notification there
         // did you update your cached data?
-        NotificationCenter.default.post(name: .VLCAllVideosDidChangeNotification, object: media)
+        NotificationCenter.default.post(name: .VLCVideosDidChangeNotification, object: media)
     }
 
     func medialibrary(_ medialibrary: VLCMediaLibrary, didStartDiscovery entryPoint: String) {
