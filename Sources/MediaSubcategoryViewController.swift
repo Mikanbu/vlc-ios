@@ -45,10 +45,12 @@ class VLCMediaSubcategoryViewController: BaseButtonBarPagerTabStripViewControlle
     var services: Services
     weak var mediaDelegate: VLCMediaViewControllerDelegate?
     private var rendererButton: UIButton
+    var subcategories: VLCMediaSubcategories
 
     init(services: Services) {
         self.services = services
         rendererButton = services.rendererDiscovererManager.setupRendererButton()
+        subcategories = VLCMediaSubcategories(services: services)
         super.init(nibName: nil, bundle: nil)
     }
 
