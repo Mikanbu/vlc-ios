@@ -15,6 +15,7 @@ import Foundation
 
 protocol VLCMediaCategoryViewControllerDelegate: class {
     func mediaViewControllerDidSelectMediaObject(_ mediaViewController: UIViewController, mediaObject: NSManagedObject)
+    func mediaViewControllerDidSelectMedia(_ mediaViewController: VLCMediaViewController, media: VLCMLMedia)
 }
 
 class VLCMediaCategoryViewController<T>: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchResultsUpdating, UISearchControllerDelegate, IndicatorInfoProvider {
