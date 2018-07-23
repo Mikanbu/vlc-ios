@@ -52,25 +52,32 @@ class VLCMediaSubcategory<T>: NSObject {
         self.includesFunc = includesFunc
         self.appendFunc = appendFunc
     }
+
+    func updateFiles(_ newFiles: [T]) {
+        files = newFiles
+    }
 }
 
 struct VLCMediaSubcategories {
-    static var movies = VLCMediaSubcategory<VLCMLMedia>(
-        files: {
-//            (MLFile.allFiles() as! [MLFile]).filter {
-//            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
-//            }s
 
-        //medialibrary.media(ofType: .video)
-            VLCMediaLibraryManager.media(ofType: .video)
+    let services: Services
+
+    init(services: Services) {
+        self.services = services
+    }
+
+    lazy var movies = VLCMediaSubcategory<VLCMLMedia>(
+        files: {
+            let test = services.medialibraryManager.media(ofType: .video)
+            print("files count: \(test.count)")
+            return test
         }(),
         indicatorInfoName: NSLocalizedString("MOVIES", comment: ""),
         notificationName: .VLCVideosDidChangeNotification,
         includesFunc: { (dataUnit: VLCDataUnit) in
             if case .file(let f) = dataUnit {
 //                return f.isMovie()
+                return true
             }
             return false
         },
