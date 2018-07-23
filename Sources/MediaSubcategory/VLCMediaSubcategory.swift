@@ -54,23 +54,18 @@ class VLCMediaSubcategoryModel<T>: NSObject {
     }
 }
 
-struct VLCMediaSubcategories {
-    static var movies = VLCMediaSubcategory<VLCMLMedia>(
-        files: {
-//            (MLFile.allFiles() as! [MLFile]).filter {
-//            ($0 as MLFile).isKind(ofType: kMLFileTypeMovie) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeTVShowEpisode) ||
-//                ($0 as MLFile).isKind(ofType: kMLFileTypeClip)
-//            }s
+class VLCMediaSubcategories {
 
-        //medialibrary.media(ofType: .video)
-            VLCMediaLibraryManager.media(ofType: .video)
+    lazy var movies = VLCMediaSubcategoryModel<VLCMLMedia>(
+        files: {
+            return []
         }(),
         indicatorInfoName: NSLocalizedString("MOVIES", comment: ""),
         notificationName: .VLCVideosDidChangeNotification,
         includesFunc: { (dataUnit: VLCDataUnit) in
             if case .file(let f) = dataUnit {
 //                return f.isMovie()
+                return true
             }
             return false
         },

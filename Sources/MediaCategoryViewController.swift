@@ -58,8 +58,14 @@ class VLCMediaCategoryViewController<T>: UICollectionViewController, UICollectio
     }
 
     @objc func reloadData() {
-        collectionView?.reloadData()
-        updateUIForContent()
+        DispatchQueue.main.async {
+            [weak self] in
+            let media = self?.services.medialibraryManager.media(ofType: .video)
+            self?.subcategory.files = media as! [T]
+
+            self?.collectionView?.reloadData()
+            self?.updateUIForContent()
+        }
     }
 
     @available(*, unavailable)
