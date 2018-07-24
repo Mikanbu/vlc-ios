@@ -10,9 +10,9 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-class VLCMovieCategoryViewController: VLCMediaCategoryViewController<MLFile> {
-    init(_ services: Services) {
-        super.init(services: services, category: VLCMediaSubcategories.movies)
+class VLCMovieCategoryViewController: VLCMediaCategoryViewController<VLCMLMedia> {
+    init(_ services: Services, category: VLCMediaSubcategoryModel<VLCMLMedia>) {
+        super.init(services: services, category: category)
     }
 }
 
