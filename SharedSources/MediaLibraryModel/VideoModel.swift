@@ -22,10 +22,6 @@ class VideoModel: MediaLibraryBaseModel {
         medialibrary.addObserver(self)
     }
 
-    @objc func dataChanged() {
-        print("VideoModel: Notification: DataChanged")
-    }
-
     func isIncluded(_ item: VLCMLMedia) {
     }
 
