@@ -14,9 +14,9 @@ class VideoModel: MediaLibraryBaseModel {
 
     var files = [VLCMLMedia]()
 
-    var indicatorName: String = NSLocalizedString("MOVIES", comment: "")
+    var view: MediaLibraryModelView?
 
-    var notificaitonName: Notification.Name = .VLCVideosDidChangeNotification
+    var indicatorName: String = NSLocalizedString("MOVIES", comment: "")
 
     required init(medialibrary: VLCMediaLibraryManager) {
         medialibrary.addObserver(self)
@@ -35,7 +35,6 @@ extension VideoModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddVideo video: [VLCMLMedia]) {
         print("VideoModel: didAddVideo: \(video.count)")
         video.forEach({ append($0) })
-        // yikes
-        NotificationCenter.default.post(name: notificaitonName, object: nil)
+        view?.dataChanged()
     }
 }

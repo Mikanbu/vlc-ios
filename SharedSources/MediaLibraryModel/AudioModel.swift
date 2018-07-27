@@ -14,9 +14,9 @@ class AudioModel: MediaLibraryBaseModel {
 
     var files = [VLCMLMedia]()
 
-    var indicatorName: String = NSLocalizedString("SONGS", comment: "")
+    var view: MediaLibraryModelView?
 
-    var notificaitonName: Notification.Name = .VLCAudioDidChangeNotification
+    var indicatorName: String = NSLocalizedString("SONGS", comment: "")
 
     required init(medialibrary: VLCMediaLibraryManager) {
         medialibrary.addObserver(self)
@@ -37,7 +37,6 @@ extension AudioModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAudio audio: [VLCMLMedia]) {
         print("AudioModel: didAddAudio: \(audio.count)")
         audio.forEach({ append($0) })
-        // yikes
-        NotificationCenter.default.post(name: notificaitonName, object: nil)
+        view?.dataChanged()
     }
 }

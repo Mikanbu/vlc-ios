@@ -14,9 +14,9 @@ class ShowEpisodeModel: MediaLibraryBaseModel {
 
     var files = [VLCMLMedia]()
 
-    var indicatorName: String = NSLocalizedString("EPISODES", comment: "")
+    var view: MediaLibraryModelView?
 
-    var notificaitonName: Notification.Name = .VLCEpisodesDidChangeNotification
+    var indicatorName: String = NSLocalizedString("EPISODES", comment: "")
 
     required init(medialibrary: VLCMediaLibraryManager) {
         medialibrary.addObserver(self)
@@ -35,7 +35,6 @@ extension ShowEpisodeModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddShowEpisode showEpisode: [VLCMLMedia]) {
         print("ShowEpisode: didAddShowEpisode: \(showEpisode.count)")
         showEpisode.forEach({ append($0) })
-        // yikes
-        NotificationCenter.default.post(name: notificaitonName, object: nil)
+        view?.dataChanged()
     }
 }
