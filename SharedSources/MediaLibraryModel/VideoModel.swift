@@ -36,6 +36,6 @@ extension VideoModel: MediaLibraryObserver {
         print("VideoModel: didAddVideo: \(video.count)")
         video.forEach({ append($0) })
         // yikes
-        NotificationCenter.default.post(name: .VLCVideosDidChangeNotification, object: nil)
+        NotificationCenter.default.post(name: notificaitonName, object: nil)
     }
 }
