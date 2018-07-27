@@ -16,6 +16,16 @@
 
     @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
                       didAddVideo video: [VLCMLMedia])
+
+    @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
+                                     didAddShowEpisode showEpisode: [VLCMLMedia])
+
+    // Audio
+    @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
+                                     didAddAudio audio: [VLCMLMedia])
+
+    @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
+                                     didAddAlbumTrack audio: [VLCMLMedia])
 }
 
 class VLCMediaLibraryManager: NSObject {
@@ -202,11 +212,24 @@ extension VLCMediaLibraryManager: VLCMediaLibraryDelegate {
         print("VLCMediaLibraryDelegate: Did add media: \(media), with count: \(media.count)")
         print("VLCMediaLibraryDelegate: video count: \(medialibrary.videoFiles(with: .default, desc: false).count)")
         print("VLCMediaLibraryDelegate: audio count: \(medialibrary.audioFiles(with: .default, desc: false).count)")
-//        NotificationCenter.default.post(name: .VLCVideosDidChangeNotification, object: media)
+
+        media.forEach({
+            if $0.type() == .unknown {
+                print("VLCMediaLibraryDelegate: unknown media! Σ('◉⌓◉’)")
+            }
+        })
+
+        let video = media.filter {( $0.type() == .video )}
+        let audio = media.filter {( $0.type() == .audio )}
+        let showEpisode = media.filter {( $0.subtype() == .showEpisode )}
+        let albumTrack = media.filter {( $0.subtype() == .albumTrack )}
+
+        // how to update show episode?
         for observer in observers {
-            // should be sorted out and send specific notification
-            // right now sending all type of media to the model
-            observer.value.observer?.medialibrary!(self, didAddVideo: media)
+            observer.value.observer?.medialibrary?(self, didAddVideo: video)
+            observer.value.observer?.medialibrary?(self, didAddAudio: audio)
+            observer.value.observer?.medialibrary?(self, didAddShowEpisode: showEpisode)
+            observer.value.observer?.medialibrary?(self, didAddAlbumTrack: albumTrack)
         }
     }
 
