@@ -14,9 +14,9 @@ class ArtistModel: MediaLibraryBaseModel {
 
     var files = [VLCMLArtist]()
 
-    var indicatorName: String = NSLocalizedString("ARTISTS", comment: "")
+    var view: MediaLibraryModelView?
 
-    var notificaitonName: Notification.Name = .VLCArtistsDidChangeNotification
+    var indicatorName: String = NSLocalizedString("ARTISTS", comment: "")
 
     required init(medialibrary: VLCMediaLibraryManager) {
         medialibrary.addObserver(self)
@@ -36,7 +36,6 @@ extension ArtistModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddArtist artist: [VLCMLArtist]) {
         print("ArtistModel: didAddArtists: \(artist.count)")
         artist.forEach({ append($0) })
-        // yikes
-        NotificationCenter.default.post(name: notificaitonName, object: nil)
+        view?.dataChanged()
     }
 }
