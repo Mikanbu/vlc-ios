@@ -12,9 +12,9 @@
 class AlbumModel: MediaLibraryBaseModel {
     typealias MLType = VLCMLAlbum
 
-    var files = [VLCMLAlbum]()
+    var updateView: (() -> Void)?
 
-    var view: MediaLibraryModelView?
+    var files = [VLCMLAlbum]()
 
     var indicatorName: String = NSLocalizedString("ALBUMS", comment: "")
 
@@ -37,6 +37,6 @@ extension AlbumModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAlbum album: [VLCMLAlbum]) {
         print("AlbumModel: didAddAlbum: \(album.count)")
         album.forEach({ append($0) })
-        view?.dataChanged()
+        updateView?()
     }
 }

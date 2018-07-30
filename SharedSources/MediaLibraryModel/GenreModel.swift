@@ -12,9 +12,9 @@
 class GenreModel: MediaLibraryBaseModel {
     typealias MLType = VLCMLGenre
 
-    var files = [VLCMLGenre]()
+    var updateView: (() -> Void)?
 
-    var view: MediaLibraryModelView?
+    var files = [VLCMLGenre]()
 
     var indicatorName: String = NSLocalizedString("GENRE", comment: "")
 
@@ -37,6 +37,6 @@ extension GenreModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddGenre genre: [VLCMLGenre]) {
         print("GenreModel: didAddGenre: \(genre.count)")
         genre.forEach({ append($0) })
-        view?.dataChanged()
+        updateView?()
     }
 }
