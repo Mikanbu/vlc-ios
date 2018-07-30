@@ -12,9 +12,9 @@
 class VideoModel: MediaLibraryBaseModel {
     typealias MLType = VLCMLMedia
 
-    var files = [VLCMLMedia]()
+    var updateView: (() -> Void)?
 
-    var view: MediaLibraryModelView?
+    var files = [VLCMLMedia]()
 
     var indicatorName: String = NSLocalizedString("MOVIES", comment: "")
 
@@ -35,6 +35,6 @@ extension VideoModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddVideo video: [VLCMLMedia]) {
         print("VideoModel: didAddVideo: \(video.count)")
         video.forEach({ append($0) })
-        view?.dataChanged()
+        updateView?()
     }
 }
