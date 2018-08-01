@@ -69,31 +69,3 @@ extension MLBaseModel {
         fatalError()
     }
 }
-
-//class AnyMediaLibraryModel<MediaType: VLCMLObject>: MediaLibraryBaseModel {
-////where MediaType: VLCMLObject {
-//    var files = [MediaType]()
-//
-//    var updateView: (() -> Void)?
-//
-//    var indicatorName = "AnyMediaLibraryModel"
-//
-//    private var _append: ((MediaType) -> Void)!
-//    private var _isIncluded: ((MediaType) -> Void)!
-//
-//    required init(medialibrary: VLCMediaLibraryManager) { }
-//
-//    init<Type: MediaLibraryBaseModel>(model: Type)  where Type.MLType == MediaType {
-////    init(model: MediaType) {
-//        _append = model.append
-//        _isIncluded = model.isIncluded
-//    }
-//
-//    func append(_ item: MediaType) {
-//        _append(item)
-//    }
-//
-//    func isIncluded(_ item: MediaType) {
-//        _isIncluded(item)
-//    }
-//}
