@@ -9,10 +9,6 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-protocol MediaLibraryModelView {
-    func dataChanged()
-}
-
 protocol MediaLibraryBaseModel {
 //    associatedtype MLType where MLType: VLCMLObject
 //
