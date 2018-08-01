@@ -35,6 +35,16 @@ class VideoModel: MLBaseModel {
     }
 }
 
+// MARK: - Sort
+
+extension VideoModel {
+
+    func sort(by criteria: VLCMLSortingCriteria) {
+        files = medialibrary.media(ofType: .video, sortingCriteria: criteria, desc: false)
+        updateView?()
+    }
+}
+
 extension VideoModel: MediaLibraryObserver {
     func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddVideo video: [VLCMLMedia]) {
         print("VideoModel: didAddVideo: \(video.count)")
