@@ -13,7 +13,7 @@ protocol MediaLibraryModelView {
     func dataChanged()
 }
 
-protocol MediaLibraryBaseModel: class {
+protocol MediaLibraryBaseModel {
 //    associatedtype MLType where MLType: VLCMLObject
 //
 //    init(medialibrary: VLCMediaLibraryManager)
@@ -29,20 +29,20 @@ protocol MediaLibraryBaseModel: class {
 
     init(medialibrary: VLCMediaLibraryManager)
 
-    var anyfiles: [AnyObject] { get }
+    var anyfiles: [VLCMLObject] { get }
 
     var updateView: (() -> Void)? { get set }
 
     var indicatorName: String { get }
 
-    func append(_ item: AnyObject)
-    func isIncluded(_ item: AnyObject)
+    func append(_ item: VLCMLObject)
+    func isIncluded(_ item: VLCMLObject)
 }
 
 
 
 protocol MLBaseModel: MediaLibraryBaseModel {
-    associatedtype MLType
+    associatedtype MLType where MLType: VLCMLObject
 
     init(medialibrary: VLCMediaLibraryManager)
 
@@ -57,16 +57,15 @@ protocol MLBaseModel: MediaLibraryBaseModel {
 }
 
 extension MLBaseModel {
-
-    var anyfiles: [AnyObject] {
-        return files as [AnyObject]
+    var anyfiles: [VLCMLObject] {
+        return files as [VLCMLObject]
     }
 
-    func append(_ item: AnyObject) {
+    func append(_ item: VLCMLObject) {
         fatalError()
     }
 
-    func isIncluded(_ item: AnyObject) {
+    func isIncluded(_ item: VLCMLObject) {
         fatalError()
     }
 }
