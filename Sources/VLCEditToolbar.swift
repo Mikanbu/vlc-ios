@@ -55,6 +55,19 @@ class VLCEditToolbar: UIView {
         return deleteButton
     }()
 
+    var renameButton: UIButton = {
+        let renameButton = UIButton()
+        renameButton.addTarget(self,
+                               action: #selector(renameSelection),
+                               for: .touchUpInside)
+        renameButton.imageView?.image = UIImage(named: "rename")
+        renameButton.tintColor = PresentationTheme.current.colors.orangeUI
+        renameButton.translatesAutoresizingMaskIntoConstraints = false
+        renameButton.backgroundColor = .blue
+        return renameButton
+    }()
+
+
 //    var deleteBarButtonItem: UIBarButtonItem = {
 //        // target should be vc
 //        let deleteBarButtonItem = UIBarButtonItem(image: UIImage(named: "delete"),
@@ -112,6 +125,8 @@ class VLCEditToolbar: UIView {
     private func setupViews() {
         mainStackView.addArrangedSubview(createFolderButton)
         mainStackView.addArrangedSubview(deleteButton)
+        mainStackView.addArrangedSubview(renameButton)
+
         addSubview(mainStackView)
         var guide: LayoutAnchorContainer = self
 
@@ -132,7 +147,12 @@ class VLCEditToolbar: UIView {
 
             deleteButton.widthAnchor.constraint(equalToConstant: 25),
             deleteButton.heightAnchor.constraint(equalToConstant: 25),
-            deleteButton.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor),
+//            deleteButton.trailingAnchor.constraint(equalTo: renameButton.leadingAnchor),
+
+            renameButton.widthAnchor.constraint(equalToConstant: 25),
+            renameButton.heightAnchor.constraint(equalToConstant: 25),
+            renameButton.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor),
+
 
             mainStackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20),
             mainStackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -20),
