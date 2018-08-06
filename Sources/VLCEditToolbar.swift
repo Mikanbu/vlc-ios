@@ -9,10 +9,17 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
+protocol VLCEditToolbarDelegate: class {
+    func delete()
+    func createPlaylist()
+    func rename()
+}
+
 // Decided to use a UIView instead of UIToolbar because we have more freedom
 class VLCEditToolbar: UIView {
 
     private let fixedSpaceWidth: CGFloat = 150
+    weak var delegate: VLCEditToolbarDelegate?
 
     var mainStackView: UIStackView = {
         let mainStackView = UIStackView()
@@ -74,12 +81,19 @@ class VLCEditToolbar: UIView {
 //        return folderBarButtonItem
 //    }()
 
-    @objc func deleteSelection() {
-        print("delete!")
-    }
-
     @objc func createFolder() {
         print("create folder!")
+        delegate?.createPlaylist()
+    }
+
+    @objc func deleteSelection() {
+        print("delete!")
+        delegate?.delete()
+    }
+
+    @objc func renameSelection() {
+        print("rename!")
+        delegate?.rename()
     }
 
     override init(frame: CGRect) {
