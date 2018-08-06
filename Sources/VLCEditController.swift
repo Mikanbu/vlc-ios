@@ -13,6 +13,7 @@
 // delegate to handle selection
 protocol VLCEditControllerDataSource {
     func updateData(data: [AnyObject])
+    func toolbarNeedsUpdate(editing: Bool)
 }
 
 class VLCEditController: NSObject {
@@ -42,6 +43,10 @@ class VLCEditController: NSObject {
 extension VLCEditController: VLCEditControllerDataSource {
     func updateData(data: [AnyObject]) {
         dataSet = data
+    }
+
+    func toolbarNeedsUpdate(editing: Bool) {
+        editToolbar.isHidden = !editing
     }
 }
 

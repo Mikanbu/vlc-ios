@@ -155,6 +155,7 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
         if editing {
             editController.updateData(data: category.anyfiles)
         }
+        editController.toolbarNeedsUpdate(editing: editing)
 
         let layoutToBe = editing ? editCollectionViewLayout : UICollectionViewFlowLayout()
         collectionView?.setCollectionViewLayout(layoutToBe, animated: false, completion: {
