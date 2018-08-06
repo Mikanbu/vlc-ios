@@ -28,6 +28,7 @@ class VLCEditController: NSObject {
         let editToolbar = VLCEditToolbar(frame: CGRect(x: 0, y: 550,
                                                        width: collectionView.frame.width, height: 50))
         editToolbar.isHidden = true
+        editToolbar.delegate = self
         return editToolbar
     }()
 
@@ -48,6 +49,20 @@ extension VLCEditController: VLCEditControllerDataSource {
 
     func toolbarNeedsUpdate(editing: Bool) {
         editToolbar.isHidden = !editing
+    }
+}
+
+extension VLCEditController: VLCEditToolbarDelegate {
+    func createPlaylist() {
+
+    }
+
+    func delete() {
+
+    }
+
+    func rename() {
+
     }
 }
 
