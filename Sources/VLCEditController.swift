@@ -74,10 +74,13 @@ extension VLCEditController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VLCMediaViewEditCell.identifier,
                                                          for: indexPath) as? VLCMediaViewEditCell {
-            cell.titleLabel.text = "( ｀ー´)ノ"
-            cell.subInfoLabel.text = "(-ω-、)"
-            cell.sizeLabel.text = "|ω°•)"
-            cell.thumbnailImageView.image = UIImage(named: "vlc-xmas")
+
+            // should call a view model method <-
+            if let media = dataSet[indexPath.row] as? VLCMLMedia {
+                cell.titleLabel.text = media.title
+                cell.subInfoLabel.text = media.formatDuration(ofMedia: media)
+                cell.sizeLabel.text = media.formatSize(ofMedia: media)
+            }
             return cell
         }
         return UICollectionViewCell()
