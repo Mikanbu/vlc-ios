@@ -19,7 +19,7 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
     private var searchController: UISearchController?
     private let searchDataSource = VLCLibrarySearchDisplayDataSource()
     var category: MediaLibraryBaseModel
-    private lazy var editController = VLCEditController(collectionView: self.collectionView!)
+    private lazy var editController = VLCEditController(collectionView: self.collectionView!, category: self.category)
 
 //    @available(iOS 11.0, *)
 //    lazy var dragAndDropManager: VLCDragAndDropManager = { () -> VLCDragAndDropManager<T> in
@@ -152,9 +152,6 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
         collectionView?.dataSource = editing ? editController : self
         collectionView?.delegate = editing ? editController : self
 
-        if editing {
-            editController.updateData(data: category.anyfiles)
-        }
         editController.toolbarNeedsUpdate(editing: editing)
 
         let layoutToBe = editing ? editCollectionViewLayout : UICollectionViewFlowLayout()

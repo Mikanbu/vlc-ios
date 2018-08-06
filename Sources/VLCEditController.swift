@@ -9,17 +9,13 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-// datasource to fill the cells
-// delegate to handle selection
 protocol VLCEditControllerDataSource {
-    func updateData(data: [AnyObject])
     func toolbarNeedsUpdate(editing: Bool)
 }
 
 class VLCEditController: NSObject {
-
-    private var dataSet = [AnyObject]()
     private let collectionView: UICollectionView
+    private let category: MediaLibraryBaseModel
 
     private lazy var editToolbar: VLCEditToolbar = {
         //        let editToolbar = VLCEditToolbar(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 50))
@@ -30,9 +26,9 @@ class VLCEditController: NSObject {
         return editToolbar
     }()
 
-    init(collectionView: UICollectionView) {
+    init(collectionView: UICollectionView, category: MediaLibraryBaseModel) {
         self.collectionView = collectionView
-
+        self.category = category
         super.init()
 
         collectionView.addSubview(editToolbar)
@@ -41,10 +37,6 @@ class VLCEditController: NSObject {
 }
 
 extension VLCEditController: VLCEditControllerDataSource {
-    func updateData(data: [AnyObject]) {
-        dataSet = data
-    }
-
     func toolbarNeedsUpdate(editing: Bool) {
         editToolbar.isHidden = !editing
     }
@@ -52,7 +44,7 @@ extension VLCEditController: VLCEditControllerDataSource {
 
 extension VLCEditController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSet.count
+        return category.anyfiles.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
