@@ -20,6 +20,7 @@ class VLCEditController: NSObject {
 
     private var dataSet = [AnyObject]()
     private let collectionView: UICollectionView
+    private let category: MediaLibraryBaseModel
 
     private lazy var editToolbar: VLCEditToolbar = {
         //        let editToolbar = VLCEditToolbar(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 50))
@@ -30,9 +31,9 @@ class VLCEditController: NSObject {
         return editToolbar
     }()
 
-    init(collectionView: UICollectionView) {
+    init(collectionView: UICollectionView, category: MediaLibraryBaseModel) {
         self.collectionView = collectionView
-
+        self.category = category
         super.init()
 
         collectionView.addSubview(editToolbar)
