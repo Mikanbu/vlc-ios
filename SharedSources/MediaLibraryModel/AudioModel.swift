@@ -44,9 +44,9 @@ extension AudioModel {
 // MARK: - MediaLibraryObserver
 
 extension AudioModel: MediaLibraryObserver {
-    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAudio audio: [VLCMLMedia]) {
-        print("AudioModel: didAddAudio: \(audio.count)")
-        audio.forEach({ append($0) })
+    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAudios audios: [VLCMLMedia]) {
+        print("AudioModel: didAddAudio: \(audios.count)")
+        audios.forEach({ append($0) })
         updateView?()
     }
 }
