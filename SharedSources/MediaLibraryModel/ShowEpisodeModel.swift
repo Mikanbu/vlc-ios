@@ -31,9 +31,9 @@ class ShowEpisodeModel: MLBaseModel {
 }
 
 extension ShowEpisodeModel: MediaLibraryObserver {
-    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddShowEpisode showEpisode: [VLCMLMedia]) {
-        print("ShowEpisode: didAddShowEpisode: \(showEpisode.count)")
-        showEpisode.forEach({ append($0) })
+    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddShowEpisodes showEpisodes: [VLCMLMedia]) {
+        print("ShowEpisode: didAddShowEpisode: \(showEpisodes.count)")
+        showEpisodes.forEach({ append($0) })
         updateView?()
     }
 }

@@ -32,9 +32,9 @@ class ArtistModel: MLBaseModel {
 }
 
 extension ArtistModel: MediaLibraryObserver {
-    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddArtist artist: [VLCMLArtist]) {
-        print("ArtistModel: didAddArtists: \(artist.count)")
-        artist.forEach({ append($0) })
+    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddArtists artists: [VLCMLArtist]) {
+        print("ArtistModel: didAddArtists: \(artists.count)")
+        artists.forEach({ append($0) })
         updateView?()
     }
 }

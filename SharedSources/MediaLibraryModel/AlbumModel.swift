@@ -32,9 +32,9 @@ class AlbumModel: MLBaseModel {
 }
 
 extension AlbumModel: MediaLibraryObserver {
-    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAlbum album: [VLCMLAlbum]) {
-        print("AlbumModel: didAddAlbum: \(album.count)")
-        album.forEach({ append($0) })
+    func medialibrary(_ medialibrary: VLCMediaLibraryManager, didAddAlbums albums: [VLCMLAlbum]) {
+        print("AlbumModel: didAddAlbum: \(albums.count)")
+        albums.forEach({ append($0) })
         updateView?()
     }
 }
