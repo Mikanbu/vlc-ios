@@ -9,20 +9,8 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
+// Expose a "shadow" version without associatedType in order to use it as a type
 protocol MediaLibraryBaseModel {
-//    associatedtype MLType where MLType: VLCMLObject
-//
-//    init(medialibrary: VLCMediaLibraryManager)
-//
-//    var files: [MLType] { get set }
-//
-//    var updateView: (() -> Void)? { get set }
-//
-//    var indicatorName: String { get }
-//
-//    func append(_ item: MLType)
-//    func isIncluded(_ item: MLType)
-
     init(medialibrary: VLCMediaLibraryManager)
 
     var anyfiles: [VLCMLObject] { get }
@@ -35,8 +23,6 @@ protocol MediaLibraryBaseModel {
     func isIncluded(_ item: VLCMLObject)
     func sort(by criteria: VLCMLSortingCriteria)
 }
-
-
 
 protocol MLBaseModel: MediaLibraryBaseModel {
     associatedtype MLType where MLType: VLCMLObject
@@ -58,7 +44,7 @@ protocol MLBaseModel: MediaLibraryBaseModel {
 
 extension MLBaseModel {
     var anyfiles: [VLCMLObject] {
-        return files as [VLCMLObject]
+        return files
     }
 
     func append(_ item: VLCMLObject) {
