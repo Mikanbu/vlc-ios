@@ -78,8 +78,8 @@ extension VLCEditController: UICollectionViewDataSource {
             // should call a view model method <-
             if let media = dataSet[indexPath.row] as? VLCMLMedia {
                 cell.titleLabel.text = media.title
-                cell.subInfoLabel.text = media.formatDuration(ofMedia: media)
-                cell.sizeLabel.text = media.formatSize(ofMedia: media)
+                cell.subInfoLabel.text = media.formatDuration()
+                cell.sizeLabel.text = media.formatSize()
             }
             return cell
         }
