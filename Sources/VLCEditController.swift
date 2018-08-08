@@ -47,6 +47,20 @@ private extension VLCEditController {
         }
         collectionView.reloadData()
     }
+
+    private func deleteFile(_ media: VLCMLMedia, at indexPath: IndexPath) {
+        do {
+            try FileManager.default.removeItem(atPath: media.mainFile().mrl.path)
+            NotificationCenter.default.post(name: .VLCNewFileAddedNotification, object: nil)
+            selectedCellIndexPaths.remove(indexPath)
+            resetCell(at: indexPath)
+        }
+        catch let error as NSError {
+            VLCAlertViewController.alertViewManager(title: NSLocalizedString("DELETE_INVALID_TITLE", comment: ""),
+                                                    errorMessage: error.localizedDescription,
+                                                    viewController: (UIApplication.shared.keyWindow?.rootViewController)!)
+        }
+    }
 }
 
 extension VLCEditController: VLCEditControllerDataSource {
@@ -65,6 +79,23 @@ extension VLCEditController: VLCEditToolbarDelegate {
     }
 
     func delete() {
+        for indexPath in selectedCellIndexPaths {
+            if let media = dataSet[indexPath.row] as? VLCMLMedia {
+
+                let cancelButton = VLCAlertButton(title: NSLocalizedString("BUTTON_CANCEL", comment: ""))
+                let deleteButton = VLCAlertButton(title: NSLocalizedString("BUTTON_DELETE", comment: ""),
+                                                  action: {
+                                                    [weak self] action in
+                                                    self?.deleteFile(media, at: indexPath)
+                })
+
+                VLCAlertViewController.alertViewManager(title: NSLocalizedString("DELETE_TITLE", comment: ""),
+                                                        errorMessage: NSLocalizedString("DELETE_MESSAGE", comment: ""),
+                                                        viewController: (UIApplication.shared.keyWindow?.rootViewController)!,
+                                                        buttonsAction: [cancelButton,
+                                                                        deleteButton])
+            }
+        }
     }
 
     func rename() {
