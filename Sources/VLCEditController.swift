@@ -43,6 +43,17 @@ class VLCEditController: NSObject {
     }
 }
 
+// MARK: - Helpers
+
+private extension VLCEditController {
+    private func resetCell(at indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) as? VLCMediaViewEditCell {
+            cell.checkView.isEnabled = false
+        }
+        collectionView.reloadData()
+    }
+}
+
 extension VLCEditController: VLCEditControllerDataSource {
     func updateData(data: [AnyObject]) {
         dataSet = data
@@ -63,7 +74,6 @@ extension VLCEditController: VLCEditToolbarDelegate {
     }
 
     func delete() {
-
     }
 
     func rename() {
@@ -88,10 +98,7 @@ extension VLCEditController: VLCEditToolbarDelegate {
                     guard let alertController = alertController,
                         let textField = alertController.textFields?.first else { return }
                     media.updateTitle(textField.text)
-                    if let cell = self?.collectionView.cellForItem(at: indexPath) as? VLCMediaViewEditCell {
-                        cell.checkView.isEnabled = false
-                    }
-                    self?.collectionView.reloadData()
+                    self?.resetCell(at: indexPath)
                 }
 
                 alertController.addAction(cancelButton)
