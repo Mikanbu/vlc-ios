@@ -48,6 +48,11 @@ extension NSNotification {
 
     @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
                                      didAddGenres genres: [VLCMLGenre])
+
+    // Playlist
+
+    @objc optional func medialibrary(_ medialibrary: VLCMediaLibraryManager,
+                                     didAddPlaylists playlists: [VLCMLPlaylist])
 }
 
 class VLCMediaLibraryManager: NSObject {
@@ -216,6 +221,17 @@ extension VLCMediaLibraryManager {
         print("VLCMediaLibraryDelegate: Did add albums: \(albums), with count: \(albums.count)")
         for observer in observers {
             observer.value.observer?.medialibrary?(self, didAddAlbums: albums)
+        }
+    }
+}
+
+// MARK: - VLCMediaLibraryDelegate - Playlists
+
+extension VLCMediaLibraryManager {
+    func medialibrary(_ medialibrary: VLCMediaLibrary, didAdd playlists: [VLCMLPlaylist]) {
+        print("VLCMediaLibraryDelegate: Did add playlists: \(playlists), with count: \(playlists.count)")
+        for observer in observers {
+            observer.value.observer?.medialibrary?(self, didAddPlaylists: playlists)
         }
     }
 }
