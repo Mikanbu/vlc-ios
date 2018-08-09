@@ -152,9 +152,6 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
         collectionView?.dataSource = editing ? editController : self
         collectionView?.delegate = editing ? editController : self
 
-        if editing {
-            editController.updateData(data: category.anyfiles)
-        }
         editController.toolbarNeedsUpdate(editing: editing)
 
         let layoutToBe = editing ? editCollectionViewLayout : UICollectionViewFlowLayout()

@@ -9,16 +9,12 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
-// datasource to fill the cells
-// delegate to handle selection
 protocol VLCEditControllerDataSource {
-    func updateData(data: [AnyObject])
     func toolbarNeedsUpdate(editing: Bool)
 }
 
 class VLCEditController: NSObject {
 
-    private var dataSet = [AnyObject]()
     private var selectedCellIndexPaths = Set<IndexPath>()
     private let collectionView: UICollectionView
     private let category: MediaLibraryBaseModel
@@ -69,10 +65,6 @@ private extension VLCEditController {
 }
 
 extension VLCEditController: VLCEditControllerDataSource {
-    func updateData(data: [AnyObject]) {
-        dataSet = data
-    }
-
     func toolbarNeedsUpdate(editing: Bool) {
         editToolbar.isHidden = !editing
         if !editing {
@@ -89,7 +81,7 @@ extension VLCEditController: VLCEditToolbarDelegate {
         } else if let model = category as? VideoModel {
             let playlist = model.medialibrary.createPlaylist(with: "new playlist videomo")
             for indexPath in selectedCellIndexPaths {
-                if let media = dataSet[indexPath.row] as? VLCMLMedia {
+                if let media = category.anyfiles[indexPath.row] as? VLCMLMedia {
                     playlist.appendMedia(withIdentifier: media.identifier())
                 }
             }
@@ -98,7 +90,7 @@ extension VLCEditController: VLCEditToolbarDelegate {
 
     func delete() {
         for indexPath in selectedCellIndexPaths {
-            if let media = dataSet[indexPath.row] as? VLCMLMedia {
+            if let media = category.anyfiles[indexPath.row] as? VLCMLMedia {
 
                 let cancelButton = VLCAlertButton(title: NSLocalizedString("BUTTON_CANCEL", comment: ""))
                 let deleteButton = VLCAlertButton(title: NSLocalizedString("BUTTON_DELETE", comment: ""),
@@ -118,7 +110,7 @@ extension VLCEditController: VLCEditToolbarDelegate {
 
     func rename() {
         for indexPath in selectedCellIndexPaths {
-            if let media = dataSet[indexPath.row] as? VLCMLMedia {
+            if let media = category.anyfiles[indexPath.row] as? VLCMLMedia {
                 // Not using VLCAlertViewController to have more customization in text fields
                 let alertController = UIAlertController(title: String(format: NSLocalizedString("RENAME_MEDIA_TO", comment: ""), media.title),
                                                         message: "",
@@ -152,7 +144,7 @@ extension VLCEditController: VLCEditToolbarDelegate {
 
 extension VLCEditController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSet.count
+        return category.anyfiles.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -160,7 +152,7 @@ extension VLCEditController: UICollectionViewDataSource {
                                                          for: indexPath) as? VLCMediaViewEditCell {
 
             // should call a view model method <-
-            if let media = dataSet[indexPath.row] as? VLCMLMedia {
+            if let media = category.anyfiles[indexPath.row] as? VLCMLMedia {
                 cell.titleLabel.text = media.title
                 cell.subInfoLabel.text = media.formatDuration()
                 cell.sizeLabel.text = media.formatSize()
