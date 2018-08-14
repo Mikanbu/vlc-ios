@@ -119,7 +119,7 @@ class VLCMediaLibraryManager: NSObject {
 
     // MARK: Internal
 
-    @objc private func reload() {
+    @objc func reload() {
         medialib.reload()
     }
 
