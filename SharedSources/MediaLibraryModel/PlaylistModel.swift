@@ -35,6 +35,14 @@ class PlaylistModel: MLBaseModel {
         files.append(item)
     }
 
+    func delete(_ items: [VLCMLObject]) {
+        for playlist in items where playlist is VLCMLPlaylist {
+            if !(medialibrary.deletePlaylist(with: playlist.identifier())) {
+                assertionFailure("PlaylistModel: Delete failed")
+            }
+        }
+    }
+
     // Creates a VLCMLPlaylist appending it and updates linked view
     func create(name: String) {
         append(medialibrary.createPlaylist(with: name))
