@@ -23,6 +23,7 @@ def iOS_pods
   pod 'MediaLibraryKit-prod'
   pod 'MobileVLCKit', '3.2.0'
   pod 'GTMAppAuth'
+  pod 'OneDriveSDK'
 end
 
 target 'VLC-iOS' do
