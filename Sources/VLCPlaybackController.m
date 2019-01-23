@@ -197,7 +197,7 @@ typedef NS_ENUM(NSUInteger, VLCAspectRatio) {
     /* to enable debug logging for the playback library instance, switch the boolean below
      * note that the library instance used for playback may not necessarily match the instance
      * used for media discovery or thumbnailing */
-    _listPlayer.mediaPlayer.libraryInstance.debugLogging = NO;
+    _listPlayer.mediaPlayer.libraryInstance.debugLogging = YES;
 
     _mediaPlayer = _listPlayer.mediaPlayer;
     [_mediaPlayer setDelegate:self];

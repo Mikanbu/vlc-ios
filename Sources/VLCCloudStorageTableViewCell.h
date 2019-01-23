@@ -31,7 +31,8 @@
 @property (nonatomic, strong) IBOutlet UIButton *downloadButton;
 
 @property (nonatomic, retain) DBFILESMetadata *dropboxFile;
-@property (nonatomic, retain) VLCOneDriveObject *oneDriveFile;
+//@property (nonatomic, retain) VLCOneDriveObject *oneDriveFile;
+@property (nonatomic, retain) ODItem *oneDriveFile;
 @property (nonatomic, retain) BoxItem *boxFile;
 #if TARGET_OS_IOS
 @property (nonatomic, retain) GTLDriveFile *driveFile;

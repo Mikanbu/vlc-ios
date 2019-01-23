@@ -128,6 +128,7 @@
         }
         case 3: {
             //OneDrive
+            // bubu: remove the usage of the shared instance
             BOOL isAuthorized = [[VLCOneDriveController sharedInstance] isAuthorized];
             cell.icon.image = [UIImage imageNamed:@"OneDrive"];
             cell.cloudTitle.text = @"OneDrive";

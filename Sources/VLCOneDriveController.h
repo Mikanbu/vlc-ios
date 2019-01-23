@@ -18,15 +18,20 @@
 @interface VLCOneDriveController : VLCCloudStorageController
 
 @property (readonly) BOOL activeSession;
-@property (nonatomic, readonly) VLCOneDriveObject *rootFolder;
-@property (nonatomic, readwrite) VLCOneDriveObject *currentFolder;
+@property (nonatomic, readwrite) ODItem *currentItem;
+@property (nonatomic, readwrite) ODItem *parentItem;
+@property (nonatomic, readonly) NSString *rootItemID;
+@property (nonatomic) UIViewController *presentingViewController;
 
 + (VLCOneDriveController *)sharedInstance;
 
 - (void)loginWithViewController:(UIViewController*)presentingViewController;
 
-- (void)downloadObject:(VLCOneDriveObject *)object;
+- (void)startDownloadingODItem:(ODItem *)item;
 
-- (void)loadCurrentFolder;
+- (NSString *)configureSubtitleWithFileName:(NSString *)fileName folderItems:(NSArray *)folderItems;
+
+- (void)loadODItems;
+- (void)loadODItemsWithCompletionHandler:(void (^)(void))completionHandler;
 
 @end

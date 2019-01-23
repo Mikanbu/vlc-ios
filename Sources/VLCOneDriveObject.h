@@ -12,6 +12,7 @@
  *****************************************************************************/
 
 #import "LiveConnectClient.h"
+#import <OneDriveSDK/ODClient.h>
 
 @class VLCOneDriveObject;
 
@@ -25,13 +26,13 @@
                             sender:(VLCOneDriveObject *) sender;
 @end
 
-@protocol VLCOneDriveObjectDownloadDelegate <NSObject>
-
-- (void)downloadStarted:(VLCOneDriveObject *)object;
-- (void)downloadEnded:(VLCOneDriveObject *)object;
-- (void)progressUpdated:(CGFloat)progress;
-- (void)calculateRemainingTime:(CGFloat)receivedDataSize expectedDownloadSize:(CGFloat)expectedDownloadSize;
-@end
+//@protocol VLCOneDriveObjectDownloadDelegate <NSObject>
+//
+//- (void)downloadStarted:(VLCOneDriveObject *)object;
+//- (void)downloadEnded:(VLCOneDriveObject *)object;
+//- (void)progressUpdated:(CGFloat)progress;
+//- (void)calculateRemainingTime:(CGFloat)receivedDataSize expectedDownloadSize:(CGFloat)expectedDownloadSize;
+//@end
 
 @interface VLCOneDriveObject : NSObject <LiveOperationDelegate, LiveDownloadOperationDelegate, VLCOneDriveObjectDelegate>
 
@@ -55,9 +56,10 @@
 @property (strong, nonatomic) NSString *subtitleURL;
 @property (readonly, nonatomic) BOOL hasFullFolderTree;
 
+@property (strong, nonatomic) ODClient *oneDriveClient;
 @property (strong, nonatomic) LiveConnectClient *liveClient;
 @property (strong, nonatomic) id<VLCOneDriveObjectDelegate>delegate;
-@property (strong, nonatomic) id<VLCOneDriveObjectDownloadDelegate>downloadDelegate;
+//@property (strong, nonatomic) id<VLCOneDriveObjectDownloadDelegate>downloadDelegate;
 
 - (void)loadFolderContent;
 - (void)saveObjectToDocuments;

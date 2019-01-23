@@ -15,6 +15,7 @@
 #import "VLCHTTPFileDownloader.h"
 #import "NSString+SupportedMedia.h"
 #import "UIDevice+VLC.h"
+#import <OneDriveSDK/OneDriveSDK.h>
 
 #if TARGET_OS_IOS
 @interface VLCOneDriveObject () <VLCHTTPFileDownloader>
@@ -77,31 +78,40 @@
 
 - (void)loadFolderContent
 {
-    if (!self.isFolder) {
-        APLog(@"%@ is no folder, can't load content", self.objectId);
-        return;
-    }
-
-    if (self.folders == nil) {
-        [self.liveClient getWithPath:self.filesPath
-                            delegate:self
-                           userState:@"load-folder-content"];
-    } else {
-        NSUInteger count = self.folders.count;
-
-        for (NSUInteger x = 0; x < count; x++) {
-            VLCOneDriveObject *folder = self.folders[x];
-            if (!folder.hasFullFolderTree) {
-                folder.delegate = self.delegate;
-                [folder loadFolderContent];
-                return;
-            }
-        }
-
-        [self.delegate fullFolderTreeLoaded:self];
-    }
+    [self.delegate fullFolderTreeLoaded:self];
 }
 
+//- (void)loadFolderContent
+//{
+//    if (!self.isFolder) {
+//        APLog(@"%@ is no folder, can't load content", self.objectId);
+//        return;
+//    }
+//
+//    if (self.folders == nil) {
+////        [self.liveClient getWithPath:self.filesPath
+////                            delegate:self
+////                           userState:@"load-folder-content"];
+//
+//        [[[[_oneDriveClient root] itemByPath:self.filesPath] request] getWithCompletion:^(ODItem *response, NSError *error) {
+//
+//        }];
+//
+//    } else {
+//        NSUInteger count = self.folders.count;
+//
+//        for (NSUInteger x = 0; x < count; x++) {
+//            VLCOneDriveObject *folder = self.folders[x];
+//            if (!folder.hasFullFolderTree) {
+//                folder.delegate = self.delegate;
+//                [folder loadFolderContent];
+//                return;
+//            }
+//        }
+//        [self.delegate fullFolderTreeLoaded:self];
+//    }
+//}
+//
 #pragma mark - live operations
 
 - (void)liveOperationSucceeded:(LiveDownloadOperation *)operation
@@ -258,30 +268,4 @@
     [_fileDownloader downloadFileFromURL:[NSURL URLWithString:self.downloadPath] withFileName:self.name];
 #endif
 }
-
-- (void)downloadStarted
-{
-    if ([self.downloadDelegate respondsToSelector:@selector(downloadStarted:)])
-        [self.downloadDelegate downloadStarted:self];
-}
-
-- (void)downloadEnded
-{
-    if ([self.downloadDelegate respondsToSelector:@selector(downloadEnded:)])
-        [self.downloadDelegate downloadEnded:self];
-}
-
-- (void)downloadFailedWithErrorDescription:(NSString *)description
-{
-    APLog(@"download failed (%@)", description);
-}
-
-- (void)progressUpdatedTo:(CGFloat)percentage receivedDataSize:(CGFloat)receivedDataSize expectedDownloadSize:(CGFloat)expectedDownloadSize
-{
-    if ([self.downloadDelegate respondsToSelector:@selector(progressUpdated:)])
-        [self.downloadDelegate progressUpdated:percentage];
-    if ([self.downloadDelegate respondsToSelector:@selector(calculateRemainingTime:expectedDownloadSize:)])
-        [self.downloadDelegate calculateRemainingTime:receivedDataSize expectedDownloadSize:expectedDownloadSize];
-}
-
 @end

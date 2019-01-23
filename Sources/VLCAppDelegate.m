@@ -38,6 +38,9 @@
 #import "PAPasscodeViewController.h"
 #import "VLC_iOS-Swift.h"
 
+#import <OneDriveSDK.h>
+#import "VLCOneDriveConstants.h"
+
 NSString *const VLCDropboxSessionWasAuthorized = @"VLCDropboxSessionWasAuthorized";
 
 #define BETA_DISTRIBUTION 1
@@ -100,6 +103,9 @@ NSString *const VLCDropboxSessionWasAuthorized = @"VLCDropboxSessionWasAuthorize
 
     // Configure Dropbox
     [DBClientsManager setupWithAppKey:kVLCDropboxAppKey];
+
+    // Configure OneDrive
+    [ODClient setMicrosoftAccountAppId:kVLCOneDriveClientID scopes:@[@"onedrive.readwrite", @"offline_access"]];
 
     [self setupAppearence];
 
