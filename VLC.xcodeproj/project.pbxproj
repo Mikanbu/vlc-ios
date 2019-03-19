@@ -1576,7 +1576,7 @@
 			);
 			name = PAPasscode;
 			path = PAPasscode/Assets;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 		7DADC55C1704FAA8001DAC63 /* XIBs */ = {
 			isa = PBXGroup;
