@@ -15,6 +15,7 @@ import UIKit
 class VLCMediaViewController: VLCPagingViewController<VLCLabelCell> {
     var services: Services
     private var rendererButton: UIButton
+    private lazy var searchButton = UIButton(frame: .zero)
     private var sortButton: UIBarButtonItem?
 
     init(services: Services) {
@@ -30,6 +31,7 @@ class VLCMediaViewController: VLCPagingViewController<VLCLabelCell> {
             oldCell?.iconLabel.textColor = PresentationTheme.current.colors.cellDetailTextColor
             newCell?.iconLabel.textColor = PresentationTheme.current.colors.orangeUI
         }
+        setupSearchButton()
         setupNavigationBar()
         super.viewDidLoad()
     }
@@ -39,11 +41,22 @@ class VLCMediaViewController: VLCPagingViewController<VLCLabelCell> {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
         navigationController?.navigationBar.isTranslucent = false
-        navigationItem.rightBarButtonItems = [editButtonItem, UIBarButtonItem(customView: rendererButton)]
+        navigationItem.rightBarButtonItems = [editButtonItem,
+                                              UIBarButtonItem(customView: searchButton),
+                                              UIBarButtonItem(customView: rendererButton)]
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("SORT", comment: ""),
                                                            style: .plain,
                                                            target: self,
                                                            action: #selector(handleSort))
+    }
+
+    private func setupSearchButton() {
+        searchButton.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+        searchButton.tintColor = PresentationTheme.current.colors.orangeUI
+        searchButton.setImage(UIImage(named: "search"), for: .normal)
+        searchButton.addTarget(self, action: #selector(handleSearch), for: .touchUpInside)
+        searchButton.accessibilityLabel = NSLocalizedString("BUTTON_SEARCH", comment: "")
+        searchButton.accessibilityHint = NSLocalizedString("BUTTON_SEARCH_HINT", comment: "")
     }
 
     // MARK: - PagerTabStripDataSource
@@ -76,8 +89,17 @@ class VLCMediaViewController: VLCPagingViewController<VLCLabelCell> {
     override func handleSort() {
         viewControllers[currentIndex].handleSort()
     }
+
+    override func handleSearch() {
+        viewControllers[currentIndex].handleSearch()
+    }
 }
 
 extension UIViewController {
     @objc func handleSort() {}
+
+    @objc func handleSearch() {
+        // The search isn't handled here because we need to have the current medialibrary context(model)
+        //  this is handled inside VLCMediaCategoryViewController.
+    }
 }

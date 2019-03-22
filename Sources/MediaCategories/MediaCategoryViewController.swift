@@ -18,7 +18,7 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
     var model: MediaLibraryBaseModel
 
     private var services: Services
-    private var searchController: UISearchController?
+    private var searchController: UISearchController = UISearchController(searchResultsController: nil)
     private let searchDataSource = VLCLibrarySearchDisplayDataSource()
     private lazy var editController = VLCEditController(collectionView: self.collectionView!, model: self.model)
     private lazy var editToolbar: VLCEditToolbar = {
@@ -28,6 +28,8 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
     }()
     private var editToolbarConstraint: NSLayoutConstraint?
     private var cachedCellSize = CGSize.zero
+
+//    private var searchController = UISearchController(searchResultsController: nil)
 
 //    @available(iOS 11.0, *)
 //    lazy var dragAndDropManager: VLCDragAndDropManager = { () -> VLCDragAndDropManager<T> in
@@ -129,7 +131,7 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
         if #available(iOS 11.0, *) {
             navigationItem.searchController = isEmpty ? nil : searchController
         } else {
-            navigationItem.titleView = isEmpty ? nil : searchController?.searchBar
+            navigationItem.titleView = isEmpty ? nil : searchController.searchBar
         }
     }
 
@@ -265,6 +267,14 @@ extension VLCMediaCategoryViewController {
 
         present(sortOptionsAlertController, animated: true)
     }
+
+    override func handleSearch() {
+        print("search inside mediacategoryVC")
+        // - Change the current collection view flow to edit flow(or create a new one)
+        // - Transition to search textfield like Calendar
+        // - Button to search globally as the first cell ?
+        view.addSubview(searchController.searchBar)
+    }
 }
 
 private extension VLCMediaCategoryViewController {
@@ -285,11 +295,11 @@ private extension VLCMediaCategoryViewController {
     }
 
     func setupSearchController() {
-        searchController = UISearchController(searchResultsController: nil)
-        searchController?.searchResultsUpdater = self
-        searchController?.dimsBackgroundDuringPresentation = false
-        searchController?.delegate = self
-        if let textfield = searchController?.searchBar.value(forKey: "searchField") as? UITextField {
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.delegate = self
+//        searchController.searchBar.frame = CGRect(x: 0, y: 0, width: 300, height: 60)
+        if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             if let backgroundview = textfield.subviews.first {
                 backgroundview.backgroundColor = UIColor.white
                 backgroundview.layer.cornerRadius = 10
