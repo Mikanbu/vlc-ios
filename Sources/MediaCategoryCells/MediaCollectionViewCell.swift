@@ -57,21 +57,21 @@ class MediaCollectionViewCell: BaseCollectionViewCell {
         thumbnailView.layer.masksToBounds = true
         thumbnailView.layer.cornerRadius = thumbnailView.frame.size.width / 2.0
         titleLabel.text = audiotrack.title
-        descriptionLabel.text = name(of: audiotrack.albumTrack?.artist)
+        descriptionLabel.text = audiotrack.albumTrackArtistName()
         newLabel.isHidden = !audiotrack.isNew
         thumbnailView.image = audiotrack.thumbnailImage()
     }
 
     func update(album: VLCMLAlbum) {
-        titleLabel.text = album.isUnknownAlbum() ? NSLocalizedString("UNKNOWN_ALBUM", comment: "") : album.title
-        descriptionLabel.text = name(of: album.albumArtist)
+        titleLabel.text = album.albumName()
+        descriptionLabel.text = album.albumArtistName()
         thumbnailView.image = album.thumbnail()
     }
 
     func update(artist: VLCMLArtist) {
         thumbnailView.layer.masksToBounds = true
         thumbnailView.layer.cornerRadius = thumbnailView.frame.size.width / 2.0
-        titleLabel.text = name(of: artist)
+        titleLabel.text = artist.artistName()
         descriptionLabel.text = artist.numberOfTracksString()
         thumbnailView.image = artist.thumbnail()
     }
@@ -130,23 +130,5 @@ class MediaCollectionViewCell: BaseCollectionViewCell {
         descriptionLabel.text = ""
         thumbnailView.image = nil
         newLabel.isHidden = true
-    }
-}
-
-// MARK: - Private helpers
-
-private extension MediaCollectionViewCell {
-    private func name(of artist: VLCMLArtist?) -> String {
-        guard let artist = artist else {
-            return NSLocalizedString("UNKNOWN_ARTIST", comment: "")
-        }
-
-        if artist.identifier() == UnknownArtistID {
-            return NSLocalizedString("UNKNOWN_ARTIST", comment: "")
-        } else if artist.identifier() == VariousArtistID {
-            return NSLocalizedString("VARIOUS_ARTIST", comment: "")
-        } else {
-            return artist.name
-        }
     }
 }
