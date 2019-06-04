@@ -9,6 +9,15 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
+class ActionSheetCellImageView: UIImageView {
+    override var image: UIImage? {
+        didSet {
+            super.image = image
+            isHidden = false
+        }
+    }
+}
+
 @objc(VLCActionSheetCell)
 class ActionSheetCell: UICollectionViewCell {
 
@@ -23,10 +32,11 @@ class ActionSheetCell: UICollectionViewCell {
         }
     }
 
-    let icon: UIImageView = {
-        let icon = UIImageView()
+    let icon: ActionSheetCellImageView = {
+        let icon = ActionSheetCellImageView()
         icon.translatesAutoresizingMaskIntoConstraints = false
         icon.contentMode = .scaleAspectFit
+        icon.isHidden = true
         return icon
     }()
 
