@@ -273,10 +273,12 @@ class VLCMediaCategoryViewController: UICollectionViewController, UICollectionVi
 
     // MARK: - UICollectionViewDelegate
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let media = model.anyfiles[indexPath.row] as? VLCMLMedia {
+        let modelContent = searchBar.isFirstResponder ? searchDataSource.objectAtIndex(index: indexPath.row) : model.anyfiles[indexPath.row]
+
+        if let media = modelContent as? VLCMLMedia {
             play(media: media, at: indexPath)
             createSpotlightItem(media: media)
-        } else if let mediaCollection = model.anyfiles[indexPath.row] as? MediaCollectionModel {
+        } else if let mediaCollection = modelContent as? MediaCollectionModel {
             let collectionViewController = VLCCollectionCategoryViewController(services, mediaCollection: mediaCollection)
             navigationController?.pushViewController(collectionViewController, animated: true)
         }
@@ -492,7 +494,7 @@ extension VLCMediaCategoryViewController {
         if let model = model as? MediaCollectionModel {
             tracks = model.files() ?? []
         } else {
-            tracks = model.anyfiles as? [VLCMLMedia] ?? []
+            tracks = (searchBar.isFirstResponder ? searchDataSource.searchData : model.anyfiles) as? [VLCMLMedia] ?? []
         }
         playbackController.playMedia(at: indexPath.row, fromCollection: tracks)
     }
