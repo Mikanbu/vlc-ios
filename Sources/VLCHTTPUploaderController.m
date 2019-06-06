@@ -314,7 +314,33 @@
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    // Re-create the folder structure of the user
+    // Get first directory of the imported structure
+    NSString *tmpPath = [finalFilePath stringByReplacingOccurrencesOfString:libraryPath withString:@""];
+    // Second element in the array since `/` will always be the firstObject
+    NSString *topDirectoryName = [NSString stringWithFormat:@"/%@", [tmpPath pathComponents][1]];
+
+    // Check if we can create the directory
+    if (![fileManager createDirectoryAtPath:[libraryPath stringByAppendingString:topDirectoryName]
+               withIntermediateDirectories:NO attributes:nil error:nil]) {
+        // Unable to create, directory exist
+        NSString *potentialFullPath;
+        for (NSUInteger x = 1; x < 100; x++) {
+            potentialFullPath = [libraryPath stringByAppendingString:[NSString
+                                                                      stringWithFormat:@"/%@-%lu",
+                                                                      topDirectoryName,
+                                                                      (unsigned long)x]];
+
+            if ([fileManager createDirectoryAtPath:potentialFullPath
+                        withIntermediateDirectories:NO attributes:nil error:nil]) {
+                // We were able to create the directory, set the final path with the correct name
+                finalFilePath = potentialFullPath;
+                finalFilePath = [finalFilePath stringByAppendingString:[tmpPath stringByReplacingOccurrencesOfString:topDirectoryName withString:@""]];
+                break;
+            }
+        }
+    }
+
+    // Re-create the complete folder structure of the user
     if (![fileManager createDirectoryAtPath:[finalFilePath stringByDeletingLastPathComponent]
                 withIntermediateDirectories:YES attributes:nil error:nil])
         APLog(@"Could not create directory at path: %@", finalFilePath);
