@@ -110,6 +110,9 @@ class MediaLibraryService: NSObject {
     private static let databaseName: String = "medialibrary.db"
     private static let migrationKey: String = "MigratedToVLCMediaLibraryKit"
 
+    private let thumbnailWidth: UInt = 160
+    private let thumbnailHeight: UInt = 100
+
     private var didMigrate = UserDefaults.standard.bool(forKey: MediaLibraryService.migrationKey)
     private var didFinishDiscovery = false
     // Using ObjectIdentifier to avoid duplication and facilitate
@@ -169,6 +172,7 @@ private extension MediaLibraryService {
             }
             medialib.reload()
             medialib.discover(onEntryPoint: "file://" + documentPath)
+            medialib.enableFailedThumbnailRegeneration()
         case .alreadyInitialized:
             assertionFailure("MediaLibraryService: Medialibrary already initialized.")
         case .failed:
@@ -363,7 +367,8 @@ extension MediaLibraryService {
         media.forEach() {
             guard !$0.isThumbnailGenerated() else { return }
 
-            if !medialib.requestThumbnail(for: $0) {
+            if !$0.requestThumbnail(of: .thumbnail, desiredWidth: thumbnailWidth,
+                                    desiredHeight: thumbnailHeight, atPosition: 0.2) {
                 assertionFailure("MediaLibraryService: Failed to generate thumbnail for: \($0.identifier())")
             }
         }

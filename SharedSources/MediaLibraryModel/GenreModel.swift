@@ -91,10 +91,14 @@ extension VLCMLGenre {
 
     func thumbnail() -> UIImage? {
         var image: UIImage? = nil
+
         for track in tracks() ?? [] where track.isThumbnailGenerated() {
-            image = UIImage(contentsOfFile: track.thumbnail.path)
-            break
+            if let thumbnailPath = track.thumbnail()?.path {
+                image = UIImage(contentsOfFile: thumbnailPath)
+                break
+            }
         }
+
         if image == nil {
             let isDarktheme = PresentationTheme.current == PresentationTheme.darkTheme
             image = isDarktheme ? UIImage(named: "song-placeholder-dark") : UIImage(named: "song-placeholder-white")

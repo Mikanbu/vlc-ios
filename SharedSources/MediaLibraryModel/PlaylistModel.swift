@@ -113,8 +113,10 @@ extension VLCMLPlaylist {
         var image = UIImage(contentsOfFile: artworkMrl())
         if image == nil {
             for track in files() ?? [] where track.isThumbnailGenerated() {
-                image = UIImage(contentsOfFile: track.thumbnail.path)
-                break
+                if let thumbnailPath = track.thumbnail()?.path {
+                    image = UIImage(contentsOfFile: thumbnailPath)
+                    break
+                }
             }
         }
         if image == nil {

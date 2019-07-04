@@ -88,7 +88,9 @@ class MediaCollectionViewCell: BaseCollectionViewCell {
         accessibilityLabel = movie.accessibilityText(editing: false)
         descriptionLabel.text = movie.mediaDuration()
         if movie.isThumbnailGenerated() {
-            thumbnailView.image = UIImage(contentsOfFile: movie.thumbnail.path)
+            if let thumbnailPath = movie.thumbnail()?.path {
+                thumbnailView.image = UIImage(contentsOfFile: thumbnailPath)
+            }
         }
         newLabel.isHidden = !movie.isNew
     }

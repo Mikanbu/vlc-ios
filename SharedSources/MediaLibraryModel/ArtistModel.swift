@@ -102,13 +102,20 @@ extension VLCMLArtist {
     }
 
     @objc func thumbnail() -> UIImage? {
-        var image = UIImage(contentsOfFile: artworkMrl.path)
-        if image == nil {
-            for track in files() ?? [] where track.isThumbnailGenerated() {
-                image = UIImage(contentsOfFile: track.thumbnail.path)
-                break
+        var image: UIImage?
+
+        if let artworkPath = artworkMRL()?.path {
+            image = UIImage(contentsOfFile: artworkPath)
+            if image == nil {
+                for track in files() ?? [] where track.isThumbnailGenerated() {
+                    if let thumbnailPath = track.thumbnail()?.path {
+                        image = UIImage(contentsOfFile: thumbnailPath)
+                        break
+                    }
+                }
             }
         }
+
         if image == nil {
             let isDarktheme = PresentationTheme.current == PresentationTheme.darkTheme
             image = isDarktheme ? UIImage(named: "artist-placeholder-dark") : UIImage(named: "artist-placeholder-white")
