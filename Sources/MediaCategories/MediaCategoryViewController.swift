@@ -42,7 +42,12 @@ class MediaCategoryViewController: UICollectionViewController, UICollectionViewD
     private var longPressGesture: UILongPressGestureRecognizer!
     weak var delegate: MediaCategoryViewControllerDelegate?
 
-//    @available(iOS 11.0, *)
+    @available(iOS 11.0, *)
+    private lazy var dragAndDropController: DragAndDropController = {
+        return DragAndDropController(mediaLibraryService: services.medialibraryService,
+                                     model: model,
+                                     presentingVC: self)
+    }()
 //    lazy var dragAndDropManager: VLCDragAndDropManager = { () -> VLCDragAndDropManager<T> in
 //        VLCDragAndDropManager<T>(subcategory: VLCMediaSubcategories<>)
 //    }()
@@ -501,8 +506,8 @@ private extension MediaCategoryViewController {
         collectionView?.addGestureRecognizer(longPressGesture)
         if #available(iOS 11.0, *) {
             collectionView?.contentInsetAdjustmentBehavior = .always
-            //            collectionView?.dragDelegate = dragAndDropManager
-            //            collectionView?.dropDelegate = dragAndDropManager
+            collectionView?.dragDelegate = dragAndDropController
+            collectionView?.dropDelegate = dragAndDropController
         }
     }
 
