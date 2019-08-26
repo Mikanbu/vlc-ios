@@ -1,8 +1,8 @@
 /*****************************************************************************
- * VLCDragAndDropManager.swift
+ * DragAndDropController.swift
  * VLC for iOS
  *****************************************************************************
- * Copyright (c) 2017 VideoLAN. All rights reserved.
+ * Copyright (c) 2019 VideoLAN. All rights reserved.
  * $Id$
  *
  * Authors: Carola Nitz <caro # videolan.org>
@@ -24,7 +24,7 @@ struct DropError: Error {
 }
 
 @available(iOS 11.0, *)
-protocol VLCDragAndDropManagerDelegate: NSObjectProtocol {
+protocol DragAndDropManagerDelegate: NSObjectProtocol {
     func dragAndDropManagerRequestsFile(manager: NSObject, atIndexPath indexPath: IndexPath) -> Any?
     func dragAndDropManagerInsertItem(manager: NSObject, item: NSManagedObject, atIndexPath indexPath: IndexPath)
     func dragAndDropManagerDeleteItem(manager: NSObject, atIndexPath indexPath: IndexPath)
@@ -33,7 +33,15 @@ protocol VLCDragAndDropManagerDelegate: NSObjectProtocol {
 }
 
 @available(iOS 11.0, *)
-class VLCDragAndDropManager<ModelType>: NSObject {
+class DragAndDropController: NSObject {
+    private var mediaLibraryService: MediaLibraryService
+    private var model: MediaLibraryBaseModel
+
+    init(mediaLibraryService: MediaLibraryService, model: MediaLibraryBaseModel) {
+        self.mediaLibraryService = mediaLibraryService
+        self.model = model
+        super.init()
+    }
 //, UICollectionViewDragDelegate, UITableViewDragDelegate, UICollectionViewDropDelegate, UITableViewDropDelegate, UIDropInteractionDelegate {
 
 //    let utiTypeIdentifiers: [String] = VLCDragAndDropManager.supportedTypeIdentifiers()
