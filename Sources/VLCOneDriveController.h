@@ -15,6 +15,7 @@
 #define VLCOneDriveControllerSessionUpdated @"VLCOneDriveControllerSessionUpdated"
 
 @class ODItem;
+@class VLCPlaybackService;
 
 @interface VLCOneDriveController : VLCCloudStorageController
 
@@ -23,8 +24,6 @@
 @property (nonatomic, readwrite) ODItem *parentItem;
 @property (nonatomic, readonly) NSString *rootItemID;
 @property (nonatomic) UIViewController *presentingViewController;
-
-+ (VLCOneDriveController *)sharedInstance;
 
 - (void)loginWithViewController:(UIViewController*)presentingViewController;
 
@@ -35,5 +34,7 @@
 - (void)loadODItems;
 - (void)loadODParentItem;
 - (void)loadODItemsWithCompletionHandler:(void (^)(void))completionHandler;
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
 
 @end

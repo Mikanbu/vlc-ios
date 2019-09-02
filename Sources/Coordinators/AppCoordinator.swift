@@ -12,12 +12,13 @@
 
 @objc(VLCServices)
 class Services: NSObject {
+    @objc let playbackService = PlaybackService()
     @objc let medialibraryService = MediaLibraryService()
     @objc let rendererDiscovererManager = VLCRendererDiscovererManager(presentingViewController: nil)
 }
 
 @objc class AppCoordinator: NSObject {
-    private var services = Services()
+    private var services: Services
     private var childCoordinators: [NSObject] = []
     private var playerDisplayController: VLCPlayerDisplayController
     private var tabBarController: UITabBarController
@@ -27,10 +28,14 @@ class Services: NSObject {
     private var migrationViewController = VLCMigrationViewController(nibName: String(describing: VLCMigrationViewController.self),
                                                                      bundle: nil)
 
-    @objc init(tabBarController: UITabBarController) {
+    @objc init(tabBarController: UITabBarController, services: Services) {
+        self.services = services
         self.playerDisplayController = VLCPlayerDisplayController(services: services)
         self.tabBarController = tabBarController
         super.init()
+
+        services.rendererDiscovererManager.playbackService = services.playbackService
+
         setupChildViewControllers()
 
         // Init the HTTP Server and clean its cache

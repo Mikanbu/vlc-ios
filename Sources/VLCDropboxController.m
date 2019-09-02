@@ -23,6 +23,9 @@
 #endif
 
 @interface VLCDropboxController ()
+{
+    VLCPlaybackService *_playbackService;
+}
 
 @property (strong, nonatomic) DBUserClient *client;
 @property (strong, nonatomic) NSArray *currentFileList;
@@ -40,20 +43,18 @@
 
 @implementation VLCDropboxController
 
-#pragma mark - session handling
 
-+ (instancetype)sharedInstance
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
 {
-    static VLCDropboxController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCDropboxController new];
-        [sharedInstance shareCredentials];
-    });
-
-    return sharedInstance;
+    self = [super init];
+    if (self) {
+        _playbackService = playbackService;
+        [self shareCredentials];
+    }
+    return self;
 }
+
+#pragma mark - session handling
 
 - (void)shareCredentials
 {
@@ -276,7 +277,7 @@
             VLCMedia *media = [VLCMedia mediaWithURL:[NSURL URLWithString:result.link]];
             VLCMediaList *medialist = [[VLCMediaList alloc] init];
             [medialist addMedia:media];
-            [[VLCPlaybackService sharedInstance] playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+            [self->_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
 #if TARGET_OS_TV
             if (self.lastKnownNavigationController) {
                 VLCFullscreenMovieTVViewController *movieVC = [VLCFullscreenMovieTVViewController fullscreenMovieTVViewController];

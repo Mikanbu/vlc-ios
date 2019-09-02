@@ -32,6 +32,17 @@
 
 @implementation VLCCloudStorageTableViewController
 
+- (instancetype)initWithPlaybackSerivce:(VLCPlaybackService *)playbackService
+{
+    self = [super initWithNibName:@"VLCCloudStorageTableViewController" bundle:nil];
+    if (self) {
+        NSAssert([playbackService isKindOfClass:[VLCPlaybackService class]],
+                 @"VLCCloudStorageTableViewController: Incorrect playbackSerivce class type");
+        _playbackService = playbackService;
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];

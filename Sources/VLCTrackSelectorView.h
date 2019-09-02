@@ -12,10 +12,15 @@
 
 #import "VLCFrostedGlasView.h"
 
+@class VLCPlaybackService;
+
 @interface VLCTrackSelectorView : VLCFrostedGlasView
 
 @property (nonatomic, assign) BOOL switchingTracksNotChapters;
 @property(nonatomic, copy) void (^completionHandler)(BOOL finished);
 
 - (void)updateView;
+- (instancetype)initWithFrame:(CGRect)frame
+              playbackService:(VLCPlaybackService *)playbackService;
+
 @end

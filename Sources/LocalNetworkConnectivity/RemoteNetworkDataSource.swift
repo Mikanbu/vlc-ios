@@ -9,6 +9,7 @@
  *
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
+
 import Foundation
 
 enum RemoteNetworkCellType: Int {
@@ -30,11 +31,21 @@ protocol RemoteNetworkDataSourceDelegate {
 
 @objc(VLCRemoteNetworkDataSourceAndDelegate)
 class RemoteNetworkDataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
-    let cloudVC = VLCCloudServicesTableViewController(nibName: "VLCCloudServicesTableViewController", bundle: Bundle.main)
-    let streamingVC = VLCOpenNetworkStreamViewController(nibName: "VLCOpenNetworkStreamViewController", bundle: Bundle.main)
+    private var cloudVC: CloudServicesTableViewController
+    private var streamingVC: VLCOpenNetworkStreamViewController
+
     let downloadVC = VLCDownloadViewController(nibName: "VLCDownloadViewController", bundle: Bundle.main)
 
     @objc weak var delegate: RemoteNetworkDataSourceDelegate?
+
+    private var services: Services
+
+    @objc init(_ services: Services) {
+        self.services = services
+        self.cloudVC = CloudServicesTableViewController(services: services)
+        self.streamingVC = VLCOpenNetworkStreamViewController(playbackService: services.playbackService)
+        super.init()
+    }
 
     // MARK: - DataSource
 

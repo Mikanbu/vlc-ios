@@ -13,5 +13,6 @@
 #import <UIKit/UIKit.h>
 
 @interface VLCFrostedGlasView : UIView
-
+- (id)initWithCoder:(NSCoder *)aDecoder;
+- (instancetype)initWithFrame:(CGRect)frame;
 @end

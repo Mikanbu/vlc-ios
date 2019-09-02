@@ -531,12 +531,12 @@ private extension MediaCategoryViewController {
 extension MediaCategoryViewController {
 
     func play(media: VLCMLMedia, at indexPath: IndexPath) {
-        let playbackController = PlaybackService.sharedInstance()
+        let playbackService = services.playbackService
         let autoPlayNextItem = UserDefaults.standard.bool(forKey: kVLCAutomaticallyPlayNextItem)
 
-        playbackController.fullscreenSessionRequested = media.type() != .audio
+        playbackService.fullscreenSessionRequested = media.type() != .audio
         if !autoPlayNextItem {
-            playbackController.play(media)
+            playbackService.play(media)
             return
         }
 
@@ -547,6 +547,6 @@ extension MediaCategoryViewController {
         } else {
             tracks = (isSearching ? searchDataSource.searchData : model.anyfiles) as? [VLCMLMedia] ?? []
         }
-        playbackController.playMedia(at: indexPath.row, fromCollection: tracks)
+        playbackService.playMedia(at: indexPath.row, fromCollection: tracks)
     }
 }

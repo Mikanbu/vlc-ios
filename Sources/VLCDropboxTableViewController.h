@@ -16,4 +16,6 @@
 
 @interface VLCDropboxTableViewController : VLCCloudStorageTableViewController
 
+@property (readonly) VLCDropboxController *dropboxController;
+
 @end

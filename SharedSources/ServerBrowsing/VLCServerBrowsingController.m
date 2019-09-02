@@ -20,15 +20,26 @@
 #if TARGET_OS_TV
 #import "VLCFullscreenMovieTVViewController.h"
 #import "MetaDataFetcherKit.h"
+#else
+# import "VLC-Swift.h"
 #endif
 
 #if DOWNLOAD_SUPPORTED
 #import "VLCDownloadViewController.h"
 #endif
 
+
+@interface VLCServerBrowsingController()
+{
+    VLCServices *_services;
+}
+@end
+
 @implementation VLCServerBrowsingController
 
-- (instancetype)initWithViewController:(UIViewController *)viewController serverBrowser:(id<VLCNetworkServerBrowser>)browser
+- (instancetype)initWithViewController:(UIViewController *)viewController
+                         serverBrowser:(id<VLCNetworkServerBrowser>)browser
+                              services:(VLCServices *)services
 {
     self = [super init];
     if (self) {
@@ -203,9 +214,8 @@
 
 - (void)streamMediaList:(VLCMediaList *)mediaList startingAtIndex:(NSInteger)startIndex
 {
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
-    vpc.fullscreenSessionRequested = YES;
-    [vpc playMediaList:mediaList firstIndex:startIndex subtitlesFilePath:nil];
+    _services.playbackService.fullscreenSessionRequested = YES;
+    [_services.playbackService playMediaList:mediaList firstIndex:startIndex subtitlesFilePath:nil];
     [self showMovieViewController];
 }
 
@@ -224,11 +234,10 @@
     if(remoteSubtitleURL)
         URLofSubtitle = [self _getFileSubtitleFromServer:remoteSubtitleURL];
 
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
-    vpc.fullscreenSessionRequested = YES;
+    _services.playbackService.fullscreenSessionRequested = YES;
     VLCMediaList *medialist = [[VLCMediaList alloc] init];
     [medialist addMedia:[VLCMedia mediaWithURL:item.URL]];
-    [vpc playMediaList:medialist firstIndex:0 subtitlesFilePath:URLofSubtitle];
+    [_services.playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:URLofSubtitle];
     [self showMovieViewController];
 }
 

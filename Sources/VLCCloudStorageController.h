@@ -35,9 +35,6 @@ typedef NS_ENUM (NSInteger, VLCCloudSortingCriteria) {
 @property (nonatomic, readonly) BOOL canPlayAll;
 @property (nonatomic, readwrite) VLCCloudSortingCriteria sortBy;
 
-
-+ (instancetype)sharedInstance;
-
 - (void)startSession;
 - (void)logout;
 - (void)requestDirectoryListingAtPath:(NSString *)path;

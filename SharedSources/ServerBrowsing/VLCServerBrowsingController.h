@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 @end
 
+@class VLCServices;
 
 @interface VLCServerBrowsingController : NSObject
 @property (nonatomic, nullable) NSByteCountFormatter *byteCountFormatter;
@@ -38,7 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithViewController:(UIViewController *)viewController serverBrowser:(id<VLCNetworkServerBrowser>)browser;
+- (instancetype)initWithViewController:(UIViewController *)viewController
+                         serverBrowser:(id<VLCNetworkServerBrowser>)browser
+                              services:(VLCServices *)services;
 
 - (void)configureCell:(id<VLCRemoteBrowsingCell>)cell withItem:(id<VLCNetworkServerBrowserItem>)item;
 

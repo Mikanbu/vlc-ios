@@ -150,7 +150,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 {
     [super viewDidLoad];
 
-    _vpc = [VLCPlaybackService sharedInstance];
+    _vpc = _services.playbackService;
 
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.edgesForExtendedLayout = UIRectEdgeAll;
@@ -233,7 +233,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     [self.view addSubview:_trackSelectorContainer];
 
     _equalizerView = [[VLCEqualizerView alloc] initWithFrame:CGRectMake(0, 0, 450., 240.)];
-    _equalizerView.delegate = [VLCPlaybackService sharedInstance];
+    _equalizerView.delegate = _services.playbackService;
     _equalizerView.UIdelegate = self;
     _equalizerView.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
     _equalizerView.hidden = YES;
@@ -325,7 +325,8 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
 
 - (void)setupControlPanel
 {
-    _controllerPanel = [[VLCMovieViewControlPanelView alloc] initWithFrame:CGRectZero];
+    _controllerPanel = [[VLCMovieViewControlPanelView alloc] initWithFrame:CGRectZero
+                                                           playbackService:_services.playbackService];
     [_controllerPanel.bwdButton addTarget:self action:@selector(backward:) forControlEvents:UIControlEventTouchUpInside];
     [_controllerPanel.fwdButton addTarget:self action:@selector(forward:) forControlEvents:UIControlEventTouchUpInside];
     [_controllerPanel.playPauseButton addTarget:self action:@selector(playPause) forControlEvents:UIControlEventTouchUpInside];
@@ -1519,11 +1520,13 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 
 - (void)toggleRepeatMode
 {
-    [[VLCPlaybackService sharedInstance] toggleRepeatMode];
+    VLCPlaybackService *playbackService = _services.playbackService;
+
+    [playbackService toggleRepeatMode];
     #if !NEW_UI
-        _multiSelectionView.repeatMode = [VLCPlaybackService sharedInstance].repeatMode;
+        _multiSelectionView.repeatMode = playbackService.repeatMode;
     #else
-        _videoOptionsControlBar.repeatMode = [VLCPlaybackService sharedInstance].repeatMode;
+        _videoOptionsControlBar.repeatMode = playbackService.repeatMode;
     #endif
 }
 
@@ -1806,7 +1809,7 @@ currentMediaHasTrackToChooseFrom:(BOOL)currentMediaHasTrackToChooseFrom
 - (IBAction)videoDimensionAction:(id)sender
 {
     if (sender == self.timeNavigationTitleView.aspectRatioButton) {
-        [[VLCPlaybackService sharedInstance] switchAspectRatio:NO];
+        [_services.playbackService switchAspectRatio:NO];
     }
 }
 

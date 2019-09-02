@@ -25,6 +25,9 @@
 #import "VLC-Swift.h"
 
 @interface VLCCloudServicesTableViewController ()
+{
+    VLCServices *_services;
+}
 
 @property (nonatomic) VLCDropboxTableViewController *dropboxTableViewController;
 @property (nonatomic) VLCGoogleDriveTableViewController *googleDriveTableViewController;
@@ -43,18 +46,27 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themeDidChange) name:kVLCThemeDidChangeNotification object:nil];
     [self themeDidChange];
 
-    self.dropboxTableViewController = [[VLCDropboxTableViewController alloc] initWithNibName:@"VLCCloudStorageTableViewController" bundle:nil];
-    self.googleDriveTableViewController = [[VLCGoogleDriveTableViewController alloc] initWithNibName:@"VLCCloudStorageTableViewController" bundle:nil];
-    [[VLCBoxController sharedInstance] startSession];
-    self.boxTableViewController = [[VLCBoxTableViewController alloc] initWithNibName:@"VLCCloudStorageTableViewController" bundle:nil];
-    self.oneDriveTableViewController = [[VLCOneDriveTableViewController alloc] initWithNibName:@"VLCCloudStorageTableViewController" bundle:nil];
+    self.dropboxTableViewController = [[VLCDropboxTableViewController alloc]
+                                       initWithPlaybackSerivce:_services.playbackService];
+    self.googleDriveTableViewController = [[VLCGoogleDriveTableViewController alloc]
+                                           initWithPlaybackSerivce:_services.playbackService];
+
+    self.boxTableViewController = [[VLCBoxTableViewController alloc]
+                                   initWithPlaybackSerivce:_services.playbackService];
+
+    self.oneDriveTableViewController = [[VLCOneDriveTableViewController alloc]
+                                        initWithPlaybackSerivce:_services.playbackService];
+
     self.documentPickerController = [VLCDocumentPickerController new];
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)initWithServices:(VLCServices *)services
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    self = [super initWithNibName:@"VLCCloudServicesTableViewController" bundle:NSBundle.mainBundle];
     if (self) {
+        NSAssert([services isKindOfClass:[VLCServices class]],
+                 @"VLCCloudServicesTableViewController: Incorrect services class type");
+        _services = services;
         self.title = NSLocalizedString(@"CLOUD_SERVICES", @"");
     }
     return self;
@@ -95,10 +107,10 @@
 
 - (int)numberOfAuthorizedServices
 {
-    int i = [[VLCDropboxController sharedInstance] isAuthorized] ? 1 : 0;
-    i += [[VLCGoogleDriveController sharedInstance] isAuthorized] ? 1 : 0;
+    int i = [self.dropboxTableViewController.controller isAuthorized] ? 1 : 0;
+    i += [self.googleDriveTableViewController.controller isAuthorized] ? 1 : 0;
     i += [[BoxSDK sharedSDK].OAuth2Session isAuthorized] ? 1 : 0;
-    i += [[VLCOneDriveController sharedInstance] isAuthorized] ? 1 : 0;
+    i += [self.oneDriveTableViewController.controller isAuthorized] ? 1 : 0;
     return i;
 }
 
@@ -134,7 +146,7 @@
     switch (indexPath.row) {
         case 0: {
             //Dropbox
-            BOOL isAuthorized = [[VLCDropboxController sharedInstance] isAuthorized];
+            BOOL isAuthorized = [self.dropboxTableViewController.controller isAuthorized];
             cell.icon.image = [UIImage imageNamed:@"DropboxCell"];
             cell.cloudTitle.text = @"Dropbox";
             cell.cloudInformation.text = isAuthorized ? NSLocalizedString(@"LOGGED_IN", "") : NSLocalizedString(@"LOGIN", "");
@@ -144,7 +156,7 @@
         }
         case 1: {
             //GoogleDrive
-            BOOL isAuthorized = [[VLCGoogleDriveController sharedInstance] isAuthorized];
+            BOOL isAuthorized = [self.googleDriveTableViewController.controller isAuthorized];
             cell.icon.image = [UIImage imageNamed:@"DriveCell"];
             cell.cloudTitle.text = @"Google Drive";
             cell.cloudInformation.text = isAuthorized ? NSLocalizedString(@"LOGGED_IN", "") : NSLocalizedString(@"LOGIN", "");
@@ -164,7 +176,7 @@
         }
         case 3: {
             //OneDrive
-            BOOL isAuthorized = [[VLCOneDriveController sharedInstance] isAuthorized];
+            BOOL isAuthorized = [self.oneDriveTableViewController.controller isAuthorized];
             cell.icon.image = [UIImage imageNamed:@"OneDriveCell"];
             cell.cloudTitle.text = @"OneDrive";
             cell.cloudInformation.text = isAuthorized ? NSLocalizedString(@"LOGGED_IN", "") : NSLocalizedString(@"LOGIN", "");

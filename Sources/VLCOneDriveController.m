@@ -33,6 +33,8 @@
 
     ODClient *_oneDriveClient;
     NSMutableArray *_currentItems;
+
+    VLCPlaybackService *_playbackService;
 }
 
 @end
@@ -41,25 +43,14 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 @implementation VLCOneDriveController
 
-+ (VLCCloudStorageController *)sharedInstance
-{
-    static VLCOneDriveController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [[VLCOneDriveController alloc] init];
-    });
-
-    return sharedInstance;
-}
-
-- (instancetype)init
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
 {
     self = [super init];
 
     if (!self)
         return self;
 //    [self restoreFromSharedCredentials];
+    _playbackService = playbackService;
     _oneDriveClient = [ODClient loadCurrentClient];
     [self setupSession];
     return self;

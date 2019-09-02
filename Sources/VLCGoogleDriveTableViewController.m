@@ -37,7 +37,8 @@
 {
     [super viewDidLoad];
 
-    _googleDriveController = [VLCGoogleDriveController sharedInstance];
+    _googleDriveController = [[VLCGoogleDriveController alloc]
+                              initWithPlaybackService:self.playbackService];
     _googleDriveController.delegate = self;
     self.controller = _googleDriveController;
 

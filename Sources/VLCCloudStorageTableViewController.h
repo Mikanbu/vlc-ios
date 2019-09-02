@@ -14,6 +14,8 @@
 
 #import "VLCCloudStorageController.h"
 
+@class VLCPlaybackService;
+
 @interface VLCCloudStorageTableViewController : UIViewController <VLCCloudStorageDelegate>
 
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
@@ -27,6 +29,7 @@
 @property (nonatomic, strong) NSString *currentPath;
 @property (nonatomic) BOOL authorizationInProgress;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, readonly) VLCPlaybackService *playbackService;
 
 - (IBAction)loginAction:(id)sender;
 - (IBAction)playAllAction:(id)sender;
@@ -35,5 +38,7 @@
 - (void)showLoginPanel;
 - (void)updateViewAfterSessionChange;
 - (void)goBack;
+
+- (instancetype)initWithPlaybackSerivce:(VLCPlaybackService *)playbackService;
 
 @end
