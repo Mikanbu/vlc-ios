@@ -40,6 +40,7 @@
 {
     BOOL _isComingFromHandoff;
     VLCKeychainCoordinator *_keychainCoordinator;
+    VLCServices *services;
     AppCoordinator *appCoordinator;
     UITabBarController *rootViewController;
 }
@@ -88,7 +89,8 @@
 - (void)setup
 {
     void (^setupAppCoordinator)(void) = ^{
-        self->appCoordinator = [[AppCoordinator alloc] initWithTabBarController:self->rootViewController];
+        self->appCoordinator = [[AppCoordinator alloc] initWithTabBarController:self->rootViewController
+                                                                       services:self->services];
         [self->appCoordinator start];
     };
     [self validatePasscodeIfNeededWithCompletion:setupAppCoordinator];
@@ -115,6 +117,9 @@
     rootViewController = [UITabBarController new];
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
+
+    services = [[VLCServices alloc] init];
+
     [self setup];
 
     /* add our static shortcut items the dynamic way to ease l10n and dynamic elements to be introduced later */
@@ -160,7 +165,7 @@ continueUserActivity:(NSUserActivity *)userActivity
     if (!media) return NO;
 
     [self validatePasscodeIfNeededWithCompletion:^{
-        [[VLCPlaybackService sharedInstance] playMedia:media];
+        [self->services.playbackService playMedia:media];
     }];
     return YES;
 }
@@ -178,7 +183,8 @@ didFailToContinueUserActivityWithType:(NSString *)userActivityType
 {
     for (id<VLCURLHandler> handler in URLHandlers.handlers) {
         if ([handler canHandleOpenWithUrl:url options:options]) {
-            if ([handler performOpenWithUrl:url options:options]) {
+            if ([handler performOpenWithUrl:url options:options
+                                       with:services.playbackService]) {
                 return YES;
             }
         }
@@ -202,9 +208,9 @@ didFailToContinueUserActivityWithType:(NSString *)userActivityType
     }
     [self validatePasscodeIfNeededWithCompletion:^{
         //TODO: handle updating the videoview and
-        if ([VLCPlaybackService sharedInstance].isPlaying){
+        // if (services.playbackService.isPlaying){
             //TODO: push playback
-        }
+        //}
     }];
     [[MLMediaLibrary sharedMediaLibrary] applicationWillExit];
 }
@@ -214,7 +220,7 @@ didFailToContinueUserActivityWithType:(NSString *)userActivityType
     if (!_isComingFromHandoff) {
         [[MLMediaLibrary sharedMediaLibrary] updateMediaDatabase];
       //  [[VLCMediaFileDiscoverer sharedInstance] updateMediaList];
-        [[VLCPlaybackService sharedInstance] recoverDisplayedMetadata];
+        [services.playbackService recoverDisplayedMetadata];
     } else if(_isComingFromHandoff) {
         _isComingFromHandoff = NO;
     }

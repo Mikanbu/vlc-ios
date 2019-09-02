@@ -14,7 +14,9 @@ import Foundation
 
 @objc public protocol VLCURLHandler {
     func canHandleOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool
-    func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool
+    func performOpen(url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                     with playbackService: PlaybackService) -> Bool
 }
 
 @objc class URLHandlers: NSObject {
@@ -45,7 +47,9 @@ class DropBoxURLHandler: NSObject, VLCURLHandler {
         return url.scheme == "db-a60fc6qj9zdg7bw"
     }
 
-    @objc func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
+    @objc func performOpen(url: URL,
+                           options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                           with playbackService: PlaybackService) -> Bool {
         let authResult = DBClientsManager.handleRedirectURL(url)
 
         if  let authResult = authResult, authResult.isSuccess() == true {
@@ -64,7 +68,9 @@ class GoogleURLHandler: NSObject, VLCURLHandler {
         return url.scheme == "com.googleusercontent.apps.CLIENT"
     }
 
-    @objc func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
+    @objc func performOpen(url: URL,
+                           options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                           with playbackService: PlaybackService) -> Bool {
         if currentGoogleAuthorizationFlow?.resumeExternalUserAgentFlow(with: url) == true {
             currentGoogleAuthorizationFlow = nil
             return true
@@ -79,10 +85,12 @@ class FileURLHandler: NSObject, VLCURLHandler {
         return url.isFileURL
     }
 
-    @objc func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
+    @objc func performOpen(url: URL,
+                           options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                           with playbackService: PlaybackService) -> Bool {
         let subclass = DocumentClass(fileURL: url)
         subclass.open { _ in
-            self.play(url: url) { _ in
+            self.play(url: url, with: playbackService) { _ in
                 subclass.close(completionHandler: nil)
             }
         }
@@ -96,7 +104,9 @@ class XCallbackURLHandler: NSObject, VLCURLHandler {
         return url.scheme == "vlc-x-callback" || url.scheme == "x-callback-url"
     }
 
-    @objc func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
+    @objc func performOpen(url: URL,
+                           options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                           with playbackService: PlaybackService) -> Bool {
         let action = url.path.replacingOccurrences(of: "/", with: "")
         var movieURL: URL?
         var subURL: URL?
@@ -130,7 +140,7 @@ class XCallbackURLHandler: NSObject, VLCURLHandler {
             }
         }
         if action == "stream", let movieURL = movieURL {
-            play(url: movieURL, sub: subURL) { success in
+            play(url: movieURL, sub: subURL, with: playbackService) { success in
                 guard let callback = success ? successCallback : errorCallback else {
                     assertionFailure("no CallbackURL")
                     return
@@ -167,7 +177,9 @@ public class VLCCallbackURLHandler: NSObject, VLCURLHandler {
         return URL(string: parsedString)!
     }
 
-    public func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
+    public func performOpen(url: URL,
+                            options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                            with playbackService: PlaybackService) -> Bool {
 
         let transformedURL = transformVLCURL(url)
         let scheme = transformedURL.scheme
@@ -178,12 +190,12 @@ public class VLCCallbackURLHandler: NSObject, VLCURLHandler {
             }
             alert.addAction(downloadAction)
             let playAction = UIAlertAction(title: NSLocalizedString("PLAY_BUTTON", comment:""), style: .default) { _ in
-                self.play(url: transformedURL, completion: nil)
+                self.play(url: transformedURL, with: playbackService, completion: nil)
             }
             alert.addAction(playAction)
             alert.show(UIApplication.shared.keyWindow!.rootViewController!, sender: nil)
         } else {
-            self.play(url: transformedURL, completion: nil)
+            self.play(url: transformedURL, with: playbackService, completion: nil)
         }
         return true
     }
@@ -198,19 +210,23 @@ class ElseCallbackURLHandler: NSObject, VLCURLHandler {
                             options: [.regularExpression, .caseInsensitive], range: nil, locale: nil) != nil
     }
 
-    func performOpen(url: URL, options: [UIApplication.OpenURLOptionsKey: AnyObject]) -> Bool {
-        self.play(url: url, completion: nil)
+    func performOpen(url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: AnyObject],
+                     with playbackService: PlaybackService) -> Bool {
+        self.play(url: url, with: playbackService, completion: nil)
         return true
     }
 }
 
 extension VLCURLHandler {
     // TODO: This code should probably not live here
-    func play(url: URL, sub: URL? = nil, completion: ((Bool) -> Void)?) {
-        let vpc = PlaybackService.sharedInstance()
-        vpc.fullscreenSessionRequested = true
+    func play(url: URL, sub: URL? = nil,
+              with playbackService: PlaybackService, completion: ((Bool) -> Void)?) {
+        playbackService.fullscreenSessionRequested = true
         if let mediaList = VLCMediaList(array: [VLCMedia(url: url)]) {
-            vpc.playMediaList(mediaList, firstIndex: 0, subtitlesFilePath: sub?.absoluteString, completion: completion)
+            playbackService.playMediaList(mediaList, firstIndex: 0,
+                                          subtitlesFilePath: sub?.absoluteString,
+                                          completion: completion)
         }
     }
 

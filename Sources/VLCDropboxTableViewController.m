@@ -23,7 +23,6 @@
 
 @interface VLCDropboxTableViewController () <VLCCloudStorageTableViewCell, VLCCloudStorageDelegate>
 {
-    VLCDropboxController *_dropboxController;
     DBFILESMetadata *_selectedFile;
     NSArray *_mediaList;
 }
@@ -45,7 +44,8 @@
 {
     [super viewDidLoad];
 
-    _dropboxController = [VLCDropboxController sharedInstance];
+    _dropboxController = [[VLCDropboxController alloc]
+                          initWithPlaybackService:self.playbackService];
     self.controller = _dropboxController;
     self.controller.delegate = self;
 
@@ -70,8 +70,7 @@
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
 
-    self.controller = [VLCDropboxController sharedInstance];
-    self.controller.delegate = self;
+    _dropboxController.delegate = self;
 
     if (self.currentPath != nil)
         self.title = self.currentPath.lastPathComponent;

@@ -14,6 +14,8 @@
 }
 
 class VLCRendererDiscovererManager: NSObject {
+    var playbackService: PlaybackService!
+
     // Array of RendererDiscoverers(Chromecast, UPnP, ...)
     @objc var discoverers: [VLCRendererDiscoverer] = [VLCRendererDiscoverer]()
 
@@ -99,7 +101,7 @@ class VLCRendererDiscovererManager: NSObject {
     }
 
     fileprivate func setRendererItem(rendererItem: VLCRendererItem) {
-        let vpcRenderer = PlaybackService.sharedInstance().renderer
+        let vpcRenderer = playbackService.renderer
         var finalRendererItem: VLCRendererItem?
         var isSelected: Bool = false
 
@@ -108,7 +110,7 @@ class VLCRendererDiscovererManager: NSObject {
             isSelected = true
         }
 
-        PlaybackService.sharedInstance().renderer = finalRendererItem
+        playbackService.renderer = finalRendererItem
         for button in rendererButtons {
             button.isSelected = isSelected
         }
@@ -118,7 +120,7 @@ class VLCRendererDiscovererManager: NSObject {
         actionSheet.setAction { [weak self] (item) in
             if let rendererItem = item as? VLCRendererItem {
                 //if we select the same renderer we want to disconnect
-                let oldRenderer = PlaybackService.sharedInstance().renderer
+                let oldRenderer = self?.playbackService.renderer
                 self?.setRendererItem(rendererItem: rendererItem)
                 if let handler = selectionHandler {
                     handler(oldRenderer == rendererItem ? nil : rendererItem)
@@ -162,10 +164,9 @@ extension VLCRendererDiscovererManager: VLCRendererDiscovererDelegate {
     }
 
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
-        let playbackController = PlaybackService.sharedInstance()
         // Current renderer has been removed
-        if playbackController.renderer == item {
-            playbackController.renderer = nil
+        if playbackService.renderer == item {
+            playbackService.renderer = nil
             delegate?.removedCurrentRendererItem?(item)
             // Reset buttons state
             for button in rendererButtons {
@@ -226,7 +227,7 @@ extension VLCRendererDiscovererManager: ActionSheetDelegate {
             assertionFailure("VLCRendererDiscovererManager: VLCActionSheetDelegate: Cell is not a VLCActionSheetCell")
             return
         }
-        let isCurrentlySelectedRenderer = renderer == PlaybackService.sharedInstance().renderer
+        let isCurrentlySelectedRenderer = renderer == playbackService.renderer
 
         if !isCurrentlySelectedRenderer {
             collectionView.reloadData()
@@ -254,7 +255,7 @@ extension VLCRendererDiscovererManager: ActionSheetDataSource {
         let renderers = getAllRenderers()
         if indexPath.row < renderers.count {
             cell.name.text = renderers[indexPath.row].name
-            let isSelectedRenderer = renderers[indexPath.row] == PlaybackService.sharedInstance().renderer ? true : false
+            let isSelectedRenderer = renderers[indexPath.row] == playbackService.renderer ? true : false
             updateCollectionViewCellApparence(cell: cell, highlighted: isSelectedRenderer)
         } else {
             assertionFailure("VLCRendererDiscovererManager: VLCActionSheetDataSource: IndexPath out of range")

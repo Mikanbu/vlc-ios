@@ -23,17 +23,18 @@
 @property (nonatomic, strong) UIView *spacer2;
 @property (nonatomic, strong) NSMutableArray *constraints;
 @property (nonatomic, assign) BOOL compactMode;
-@property (nonatomic, strong) VLCPlaybackService *playbackController;
+@property (nonatomic, strong) VLCPlaybackService *playbackService;
 @end
 
 @implementation VLCMovieViewControlPanelView
 
 static const CGFloat maxControlsWidth = 474.0;
 
-- (instancetype)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame playbackService:(VLCPlaybackService *)playbackService
 {
     self = [super initWithFrame:frame];
     if (self) {
+        _playbackService = playbackService;
         [self setupSubviews];
         [self setupConstraints];
         _compactMode = YES;
@@ -221,14 +222,6 @@ static const CGFloat maxControlsWidth = 474.0;
     [self updateViewConstraints];
 }
 
-- (VLCPlaybackService *)playbackController
-{
-    if (!_playbackController) {
-        _playbackController = [VLCPlaybackService sharedInstance];
-    }
-    return _playbackController;
-}
-
 - (void)playPauseLongPress:(UILongPressGestureRecognizer *)recognizer
 {
     switch (recognizer.state) {
@@ -238,7 +231,7 @@ static const CGFloat maxControlsWidth = 474.0;
         }
             break;
         case UIGestureRecognizerStateEnded:
-            [self.playbackController stopPlayback];
+            [self.playbackService stopPlayback];
             break;
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
@@ -253,13 +246,13 @@ static const CGFloat maxControlsWidth = 474.0;
 {
     [self updatePlayPauseButton];
 
-    self.trackSwitcherButton.hidden = !self.playbackController.currentMediaHasTrackToChooseFrom;
-    self.videoFilterButton.hidden = self.playbackController.metadata.isAudioOnly;
+    self.trackSwitcherButton.hidden = !self.playbackService.currentMediaHasTrackToChooseFrom;
+    self.videoFilterButton.hidden = self.playbackService.metadata.isAudioOnly;
 }
 
 - (void)updatePlayPauseButton
 {
-    const BOOL isPlaying = self.playbackController.isPlaying;
+    const BOOL isPlaying = self.playbackService.isPlaying;
     UIImage *playPauseImage = isPlaying ? [UIImage imageNamed:@"pauseIcon"] : [UIImage imageNamed:@"playIcon"];
     [_playPauseButton setImage:playPauseImage forState:UIControlStateNormal];
 }

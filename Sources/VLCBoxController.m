@@ -36,6 +36,8 @@
     CGFloat _averageSpeed;
     NSTimeInterval _startDL;
     NSTimeInterval _lastStatsUpdate;
+
+    VLCPlaybackService *_playbackService;
 }
 
 @end
@@ -44,16 +46,14 @@
 
 #pragma mark - session handling
 
-+ (VLCCloudStorageController *)sharedInstance
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
 {
-    static VLCBoxController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCBoxController new];
-    });
-
-    return sharedInstance;
+    self = [super init];
+    if (self) {
+        _playbackService = playbackService;
+        [self startSession];
+    }
+    return self;
 }
 
 - (void)startSession

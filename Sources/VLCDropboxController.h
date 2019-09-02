@@ -13,11 +13,13 @@
 #import "VLCCloudStorageController.h"
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 
+@class VLCPlaybackService;
+
 @interface VLCDropboxController : VLCCloudStorageController
 
 @property (nonatomic, readonly) NSInteger numberOfFilesWaitingToBeDownloaded;
 
-+ (instancetype)sharedInstance;
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
 
 - (void)shareCredentials;
 - (BOOL)restoreFromSharedCredentials;

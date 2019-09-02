@@ -64,7 +64,8 @@
 - (void)prepareOneDriveControllerIfNeeded
 {
     if (!_oneDriveController) {
-        _oneDriveController = [VLCOneDriveController sharedInstance];
+        _oneDriveController = [[VLCOneDriveController alloc]
+                               initWithPlaybackService:self.playbackService];
         _oneDriveController.presentingViewController = self;
     }
 }
@@ -170,7 +171,7 @@
         return;
     }
 
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
+    VLCPlaybackService *vpc = self.playbackService;
     vpc.fullscreenSessionRequested = NO;
     [vpc playMediaList:mediaList firstIndex:startIndex subtitlesFilePath:subtitlesFilePath];
 }

@@ -53,13 +53,29 @@
     VLCRemoteNetworkDataSourceAndDelegate *_remoteNetworkDataSourceAndDelegate;
     NSLayoutConstraint* _localNetworkHeight;
     NSLayoutConstraint* _remoteNetworkHeight;
+
+    VLCServices *_services;
 }
 
 @end
 
 @implementation VLCServerListViewController
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)initWithServices:(VLCServices *)services
+{
+    self = [self initWithNibName:nil bundle:nil];
+
+    if (self) {
+        NSAssert([services isKindOfClass:[VLCServices class]],
+                 @"VLCServerListViewController: Incorrect services class type");
+        _services = services;
+        [self setupUI];
+    }
+    return self;
+}
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil
+                         bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 
@@ -84,7 +100,7 @@
                                               [_scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
                                               ]];
 
-    _remoteNetworkDataSourceAndDelegate = [VLCRemoteNetworkDataSourceAndDelegate new];
+    _remoteNetworkDataSourceAndDelegate = [[VLCRemoteNetworkDataSourceAndDelegate alloc] init:_services];
     _remoteNetworkDataSourceAndDelegate.delegate = self;
 
     _localNetworkTableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStylePlain];
@@ -282,7 +298,9 @@
     if ([service respondsToSelector:@selector(serverBrowser)]) {
         id<VLCNetworkServerBrowser> serverBrowser = [service serverBrowser];
         if (serverBrowser) {
-            VLCNetworkServerBrowserViewController *vc = [[VLCNetworkServerBrowserViewController alloc] initWithServerBrowser:serverBrowser];
+            VLCNetworkServerBrowserViewController *vc = [[VLCNetworkServerBrowserViewController alloc]
+                                                         initWithServerBrowser:serverBrowser
+                                                         services:_services];
             [self.navigationController pushViewController:vc animated:YES];
             return;
         }
@@ -294,7 +312,7 @@
 
             VLCMediaList *medialist = [[VLCMediaList alloc] init];
             [medialist addMedia:[VLCMedia mediaWithURL:playbackURL]];
-            [[VLCPlaybackService sharedInstance] playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+            [_services.playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
             return;
         }
     }
@@ -394,8 +412,10 @@
     [self _dismissLogin];
 
     if (serverBrowser) {
-        VLCNetworkServerBrowserViewController *targetViewController = [[VLCNetworkServerBrowserViewController alloc] initWithServerBrowser:serverBrowser];
-        [self.navigationController pushViewController:targetViewController animated:YES];
+        VLCNetworkServerBrowserViewController *targetVC = [[VLCNetworkServerBrowserViewController alloc]
+                                                           initWithServerBrowser:serverBrowser
+                                                           services:_services];
+        [self.navigationController pushViewController:targetVC animated:YES];
     }
 }
 

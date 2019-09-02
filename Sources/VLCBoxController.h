@@ -16,6 +16,8 @@
 
 #define VLCBoxControllerSessionUpdated @"VLCBoxControllerSessionUpdated"
 
+@class VLCPlaybackService;
+
 @interface VLCBoxController : VLCCloudStorageController
 
 - (void)stopSession;
@@ -23,5 +25,7 @@
 #if TARGET_OS_IOS
 - (void)downloadFileToDocumentFolder:(BoxFile *)file;
 #endif
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
 
 @end

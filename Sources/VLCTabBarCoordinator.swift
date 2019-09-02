@@ -52,7 +52,7 @@ class VLCTabBarCoordinator: NSObject {
             VLCVideoViewController(services: services),
             VLCAudioViewController(services: services),
             VLCPlaylistViewController(services: services),
-            VLCServerListViewController(nibName: nil, bundle: nil),
+            VLCServerListViewController(services: services),
             VLCSettingsController(mediaLibraryService: services.medialibraryService)
         ]
 

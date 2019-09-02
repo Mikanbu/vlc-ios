@@ -38,6 +38,8 @@
     CGFloat _averageSpeed;
     NSTimeInterval _startDL;
     NSTimeInterval _lastStatsUpdate;
+
+    VLCPlaybackService *_playbackService;
 }
 
 @end
@@ -46,17 +48,15 @@
 
 #pragma mark - session handling
 
-+ (instancetype)sharedInstance
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
 {
-    static VLCGoogleDriveController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCGoogleDriveController new];
-        sharedInstance.sortBy = VLCCloudSortingCriteriaName; //Default sort by file names
-    });
-
-    return sharedInstance;
+    self = [super init];
+    if (self) {
+        _playbackService = playbackService;
+        //Default sort by file names
+        self.sortBy = VLCCloudSortingCriteriaName;
+    }
+    return self;
 }
 
 - (void)startSession
@@ -225,11 +225,10 @@
     NSString *urlString = [NSString stringWithFormat:@"https://www.googleapis.com/drive/v3/files/%@?alt=media&access_token=%@",
                      file.identifier, token];
 
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
     VLCMedia *media = [VLCMedia mediaWithURL:[NSURL URLWithString:urlString]];
     VLCMediaList *medialist = [[VLCMediaList alloc] init];
     [medialist addMedia:media];
-    [vpc playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+    [_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
 }
 
 - (void)_triggerNextDownload

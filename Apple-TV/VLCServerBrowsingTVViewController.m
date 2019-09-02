@@ -35,7 +35,9 @@
         _serverBrowser = serverBrowser;
         serverBrowser.delegate = self;
 
-        _browsingController = [[VLCServerBrowsingController alloc] initWithViewController:self serverBrowser:serverBrowser];
+        _browsingController = [[VLCServerBrowsingController alloc]
+                               initWithViewController:self
+                               serverBrowser:serverBrowser];
 
         self.title = serverBrowser.title;
 

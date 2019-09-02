@@ -15,6 +15,8 @@
 #import "VLCCloudStorageController.h"
 #import "VLCGoogleDriveConstants.h"
 
+@class VLCPlaybackService;
+
 @interface VLCGoogleDriveController : VLCCloudStorageController
 
 @property (nonatomic, retain) GTLRDriveService *driveService;
@@ -24,4 +26,7 @@
 - (void)downloadFileToDocumentFolder:(GTLRDrive_File *)file;
 - (BOOL)hasMoreFiles;
 - (BOOL)supportSorting;
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
+
 @end

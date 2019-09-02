@@ -20,6 +20,7 @@
 
 @interface VLCOpenNetworkStreamViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VLCStreamingHistoryCellMenuItemProtocol>
 {
+    VLCPlaybackService *_playbackService;
     NSMutableArray *_recentURLs;
     NSMutableDictionary *_recentURLTitles;
 }
@@ -33,6 +34,18 @@
 
     NSDictionary *appDefaults = @{kVLCRecentURLs : @[], kVLCRecentURLTitles : @{}, kVLCPrivateWebStreaming : @(NO)};
     [defaults registerDefaults:appDefaults];
+}
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
+{
+    self = [super initWithNibName:@"VLCOpenNetworkStreamViewController" bundle:NSBundle.mainBundle];
+    if (self) {
+        NSAssert([playbackService isKindOfClass:[VLCPlaybackService class]],
+                 @"VLCOpenNetworkStreamViewController: Incorrect playbackService class type");
+        _playbackService = playbackService;
+        self.title = NSLocalizedString(@"OPEN_NETWORK", comment: "");
+    }
+    return self;
 }
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -377,7 +390,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     VLCMedia *media = [VLCMedia mediaWithURL:[NSURL URLWithString:url]];
     VLCMediaList *medialist = [[VLCMediaList alloc] init];
     [medialist addMedia:media];
-    [[VLCPlaybackService sharedInstance] playMediaList:medialist firstIndex:0 subtitlesFilePath:subtitlesURL.absoluteString];
+    [_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:subtitlesURL.absoluteString];
 }
 
 - (NSURL *)_checkURLofSubtitle:(NSURL *)url

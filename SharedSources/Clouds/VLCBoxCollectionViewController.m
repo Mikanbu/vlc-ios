@@ -40,7 +40,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    _boxController = [VLCBoxController sharedInstance];
+//    _boxController = [VLCBoxController sharedInstance];
     self.controller = _boxController;
     self.controller.delegate = self;
 
@@ -62,7 +62,7 @@
 {
     [super viewWillAppear:animated];
 
-    _boxController = [VLCBoxController sharedInstance];
+//    _boxController = [VLCBoxController sharedInstance];
     self.controller = _boxController;
     self.controller.delegate = self;
 
@@ -82,7 +82,7 @@
 
 - (void)mediaListUpdated
 {
-    _listOfFiles = [[VLCBoxController sharedInstance].currentListFiles copy];
+//    _listOfFiles = [[VLCBoxController sharedInstance].currentListFiles copy];
     [self.collectionView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 

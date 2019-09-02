@@ -45,8 +45,8 @@
     }
 
 //    _oneDriveController = [VLCOneDriveController sharedInstance];
-    _boxController = [VLCBoxController sharedInstance];
-    [_boxController startSession];
+//    _boxController = [VLCBoxController sharedInstance];
+//    [_boxController startSession];
 
     self.dropboxButton.enabled = self.gDriveButton.enabled = NO;
 //    [self oneDriveSessionUpdated:nil];
@@ -68,7 +68,7 @@
 
 - (void)updateDropbox
 {
-    self.dropboxButton.enabled = [[VLCDropboxController sharedInstance] restoreFromSharedCredentials];
+//    self.dropboxButton.enabled = [[VLCDropboxController sharedInstance] restoreFromSharedCredentials];
 }
 
 //- (void)oneDriveSessionUpdated:(NSNotification *)aNotification

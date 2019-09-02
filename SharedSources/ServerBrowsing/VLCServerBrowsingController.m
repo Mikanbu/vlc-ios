@@ -16,6 +16,7 @@
 #import "UIDevice+VLC.h"
 
 #import "VLCPlaybackService.h"
+#import "VLC-Swift.h"
 
 #if TARGET_OS_TV
 #import "VLCFullscreenMovieTVViewController.h"
@@ -26,15 +27,29 @@
 #import "VLCDownloadViewController.h"
 #endif
 
+
+@interface VLCServerBrowsingController()
+{
+    VLCPlaybackService *_playbackService;
+}
+@end
+
 @implementation VLCServerBrowsingController
 
-- (instancetype)initWithViewController:(UIViewController *)viewController serverBrowser:(id<VLCNetworkServerBrowser>)browser
+- (instancetype)initWithViewController:(UIViewController *)viewController
+                         serverBrowser:(id<VLCNetworkServerBrowser>)browser
+#if TARGET_OS_IOS
+                       playbackService:(VLCPlaybackService *)playbackService
+#endif
 {
     self = [super init];
     if (self) {
         _viewController = viewController;
         _serverBrowser = browser;
-#if TARGET_OS_TV
+#if TARGET_OS_IOS
+        _playbackService = playbackService;
+#elif TARGET_OS_TV
+        _playbackService = [VLCPlaybackService sharedInstance];
         if (![kVLCfortvOSMovieDBKey isEqualToString:@""]) {
             MDFMovieDBSessionManager *movieDBSessionManager = [MDFMovieDBSessionManager sharedInstance];
             movieDBSessionManager.apiKey = kVLCfortvOSMovieDBKey;
@@ -203,9 +218,8 @@
 
 - (void)streamMediaList:(VLCMediaList *)mediaList startingAtIndex:(NSInteger)startIndex
 {
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
-    vpc.fullscreenSessionRequested = YES;
-    [vpc playMediaList:mediaList firstIndex:startIndex subtitlesFilePath:nil];
+    _playbackService.fullscreenSessionRequested = YES;
+    [_playbackService playMediaList:mediaList firstIndex:startIndex subtitlesFilePath:nil];
     [self showMovieViewController];
 }
 
@@ -224,11 +238,10 @@
     if(remoteSubtitleURL)
         URLofSubtitle = [self _getFileSubtitleFromServer:remoteSubtitleURL];
 
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
-    vpc.fullscreenSessionRequested = YES;
+    _playbackService.fullscreenSessionRequested = YES;
     VLCMediaList *medialist = [[VLCMediaList alloc] init];
     [medialist addMedia:[VLCMedia mediaWithURL:item.URL]];
-    [vpc playMediaList:medialist firstIndex:0 subtitlesFilePath:URLofSubtitle];
+    [_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:URLofSubtitle];
     [self showMovieViewController];
 }
 

@@ -112,7 +112,10 @@ NS_SWIFT_NAME(PlaybackService)
 
 @property (nonatomic, nullable) VLCRendererItem *renderer;
 
+#if TARGET_OS_TV
 + (VLCPlaybackService *)sharedInstance;
+#endif
+
 - (VLCTime *)playedTime;
 #pragma mark - playback
 - (void)startPlayback;

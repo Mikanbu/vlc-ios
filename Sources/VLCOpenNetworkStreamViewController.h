@@ -27,4 +27,6 @@
 
 - (IBAction)openButtonAction:(id)sender;
 
+- (instancetype)initWithPlaybackService:(NSObject *)playbackService;
+
 @end

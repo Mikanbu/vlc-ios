@@ -10,9 +10,6 @@
 
 @implementation VLCCloudStorageController
 
-+ (VLCCloudStorageController *)sharedInstance {
-    return nil;
-}
 - (void)startSession
 {
     // nop

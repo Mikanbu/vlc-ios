@@ -13,7 +13,10 @@
 #import "VLCNetworkListViewController.h"
 #import "VLCNetworkServerBrowser-Protocol.h"
 
+@class VLCServices;
+
 @interface VLCNetworkServerBrowserViewController : VLCNetworkListViewController
 
-- (instancetype)initWithServerBrowser:(id<VLCNetworkServerBrowser>)browser;
+- (instancetype)initWithServerBrowser:(id<VLCNetworkServerBrowser>)browser
+                             services:(VLCServices *)services;
 @end

@@ -27,6 +27,7 @@
 @interface VLCNetworkServerBrowserViewController () <VLCNetworkServerBrowserDelegate,VLCNetworkListCellDelegate, UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 {
     UIRefreshControl *_refreshControl;
+    VLCServices *_services;
 }
 @property (nonatomic) id<VLCNetworkServerBrowser> serverBrowser;
 @property (nonatomic) VLCServerBrowsingController *browsingController;
@@ -36,12 +37,17 @@
 @implementation VLCNetworkServerBrowserViewController
 
 - (instancetype)initWithServerBrowser:(id<VLCNetworkServerBrowser>)browser
+                             services:(VLCServices *)services
 {
     self = [super init];
     if (self) {
+        _services = services;
         _serverBrowser = browser;
         browser.delegate = self;
-        _browsingController = [[VLCServerBrowsingController alloc] initWithViewController:self serverBrowser:browser];
+        _browsingController = [[VLCServerBrowsingController alloc]
+                               initWithViewController:self
+                               serverBrowser:browser
+                               playbackService:services.playbackService];
     }
     return self;
 }
@@ -113,8 +119,10 @@
 - (void)didSelectItem:(id<VLCNetworkServerBrowserItem>)item index:(NSUInteger)index singlePlayback:(BOOL)singlePlayback
 {
     if (item.isContainer) {
-        VLCNetworkServerBrowserViewController *targetViewController = [[VLCNetworkServerBrowserViewController alloc] initWithServerBrowser:item.containerBrowser];
-        [self.navigationController pushViewController:targetViewController animated:YES];
+        VLCNetworkServerBrowserViewController *targetVC = [[VLCNetworkServerBrowserViewController alloc]
+                                                           initWithServerBrowser:item.containerBrowser
+                                                           services:_services];
+        [self.navigationController pushViewController:targetVC animated:YES];
     } else {
         if (singlePlayback) {
             [self.browsingController streamFileForItem:item];

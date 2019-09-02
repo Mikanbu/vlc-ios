@@ -46,7 +46,7 @@
 {
     [super viewDidLoad];
 
-    _boxController = [VLCBoxController sharedInstance];
+    _boxController = [[VLCBoxController alloc] initWithPlaybackService:self.playbackService];
     self.controller = _boxController;
     self.controller.delegate = self;
 
@@ -110,7 +110,6 @@
 {
     [super viewWillAppear:animated];
 
-    _boxController = [VLCBoxController sharedInstance];
     self.controller = _boxController;
     self.controller.delegate = self;
 
@@ -135,7 +134,7 @@
 
 - (void)mediaListUpdated
 {
-    _listOfFiles = [[VLCBoxController sharedInstance].currentListFiles copy];
+    _listOfFiles = [_boxController.currentListFiles copy];
     [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
@@ -223,7 +222,7 @@
         VLCMedia *media = [VLCMedia mediaWithURL:theActualURL];
         VLCMediaList *medialist = [[VLCMediaList alloc] init];
         [medialist addMedia:media];
-        [[VLCPlaybackService sharedInstance] playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+        [self.playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
     }
 
     return request;

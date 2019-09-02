@@ -12,9 +12,14 @@
 
 #import <UIKit/UIKit.h>
 
+NS_SWIFT_NAME(CloudServicesTableViewController)
 @interface VLCCloudServicesTableViewController : UITableViewController
 
 @property (nonatomic, readonly, copy) NSString *detailText;
 @property (nonatomic, readonly) UIImage *cellImage;
+
+// Since Swift seems to ignore Swift type parameter such as VLCServices,
+// we pass an abstraction in order for it to be visible in Swift.
+- (instancetype)initWithServices:(NSObject *)services;
 
 @end

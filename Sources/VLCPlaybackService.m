@@ -71,6 +71,7 @@ NSString *const VLCPlaybackServicePlaybackPositionUpdated = @"VLCPlaybackService
 
 #pragma mark instance management
 
+#if TARGET_OS_TV
 + (VLCPlaybackService *)sharedInstance
 {
     static VLCPlaybackService *sharedInstance = nil;
@@ -82,6 +83,7 @@ NSString *const VLCPlaybackServicePlaybackPositionUpdated = @"VLCPlaybackService
 
     return sharedInstance;
 }
+#endif
 
 - (void)dealloc
 {

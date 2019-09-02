@@ -15,6 +15,8 @@
 #import "VLCVolumeView.h"
 #import "VLCFrostedGlasView.h"
 
+@class VLCPlaybackService;
+
 @interface VLCMovieViewControlPanelView : VLCFrostedGlasView
 
 @property (nonatomic, strong)  UIButton *playbackSpeedButton;
@@ -30,5 +32,8 @@
 @property (nonatomic, strong)  VLCVolumeView *volumeView;
 
 - (void)updateButtons;
+
+- (instancetype)initWithFrame:(CGRect)frame
+              playbackService:(VLCPlaybackService *)playbackService;
 
 @end
