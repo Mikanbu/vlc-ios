@@ -12,6 +12,8 @@
 #import <UIKit/UIKit.h>
 #import "VLCDeletionCapableViewController.h"
 
+@class VLCPlaybackService;
+
 @interface VLCRemotePlaybackViewController : VLCDeletionCapableViewController
 
 @property (readwrite, nonatomic, weak) IBOutlet UILabel *httpServerLabel;
@@ -23,5 +25,7 @@
 @property (readwrite, nonatomic, weak) IBOutlet UIImageView *cachedMediaConeImageView;
 
 - (IBAction)toggleHTTPServer:(id)sender;
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
 
 @end

@@ -13,8 +13,12 @@
 #import "VLCRemoteBrowsingCollectionViewController.h"
 #import "VLCLocalServerDiscoveryController.h"
 
+@class VLCPlaybackService;
+
 @interface VLCServerListTVViewController : VLCRemoteBrowsingCollectionViewController <VLCLocalServerDiscoveryControllerDelegate>
 
 @property (nonatomic) VLCLocalServerDiscoveryController *discoveryController;
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
 
 @end

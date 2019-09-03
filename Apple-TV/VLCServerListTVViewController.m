@@ -38,12 +38,23 @@
 @interface VLCServerListTVViewController ()
 {
     UILabel *_nothingFoundLabel;
+    VLCPlaybackService *_playbackService;
 }
 @property (nonatomic, copy) NSMutableArray<id<VLCLocalNetworkService>> *networkServices;
 
 @end
 
 @implementation VLCServerListTVViewController
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
+{
+    self = [self initWithNibName:nil bundle:nil];
+
+    if (self) {
+        _playbackService = playbackService;
+    }
+    return self;
+}
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -191,7 +202,7 @@
         VLCMediaList *medialist = [[VLCMediaList alloc] init];
         [medialist addMedia:[VLCMedia mediaWithURL:url]];
 
-        [[VLCPlaybackService sharedInstance] playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+        [_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
 
         [self presentViewController:[VLCFullscreenMovieTVViewController fullscreenMovieTVViewController]
                            animated:YES

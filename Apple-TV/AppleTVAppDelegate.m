@@ -27,6 +27,8 @@
     VLCRemotePlaybackViewController *_remotePlaybackVC;
     VLCOpenNetworkStreamTVViewController *_openNetworkVC;
     VLCSettingsViewController *_settingsVC;
+
+    VLCPlaybackService *_playbackService;
 }
 
 @end
@@ -67,19 +69,23 @@
     // Configure the SDK in here only!
     [hockeyManager startManager];
 
+    _playbackService = [[VLCPlaybackService alloc] init];
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    _localNetworkVC = [[VLCServerListTVViewController alloc] initWithNibName:nil bundle:nil];
-    _remotePlaybackVC = [[VLCRemotePlaybackViewController alloc] initWithNibName:nil bundle:nil];
-    _openNetworkVC = [[VLCOpenNetworkStreamTVViewController alloc] initWithNibName:nil bundle:nil];
+    _localNetworkVC = [[VLCServerListTVViewController alloc] initWithPlaybackService:_playbackService];
+    _remotePlaybackVC = [[VLCRemotePlaybackViewController alloc] initWithPlaybackService:_playbackService];
+    _openNetworkVC = [[VLCOpenNetworkStreamTVViewController alloc] initWithPlaybackService:_playbackService];
     _settingsVC = [[VLCSettingsViewController alloc] initWithNibName:nil bundle:nil];
 
     _mainViewController = [[UITabBarController alloc] init];
     _mainViewController.tabBar.barTintColor = [UIColor VLCOrangeTintColor];
 
-    _mainViewController.viewControllers = @[[[UINavigationController alloc] initWithRootViewController:_localNetworkVC],
+    _mainViewController.viewControllers = @[[[UINavigationController alloc]
+                                             initWithRootViewController:_localNetworkVC],
                                             [[UINavigationController alloc] initWithRootViewController:_remotePlaybackVC],
                                             [[UINavigationController alloc] initWithRootViewController:_openNetworkVC],
-                                            [[UINavigationController alloc] initWithRootViewController:_settingsVC]];
+                                            [[UINavigationController alloc]
+                                             initWithRootViewController:_settingsVC]];
 
     self.window.rootViewController = _mainViewController;
 

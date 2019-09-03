@@ -23,4 +23,6 @@
 
 - (IBAction)URLEnteredInField:(id)sender;
 
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService;
+
 @end

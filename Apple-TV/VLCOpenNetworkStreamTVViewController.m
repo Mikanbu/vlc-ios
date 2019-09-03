@@ -19,11 +19,23 @@
 {
     NSMutableArray *_recentURLs;
     NSMutableDictionary *_recentURLTitles;
+
+    VLCPlaybackService *_playbackService;
 }
 @property (nonatomic) NSIndexPath *currentlyFocusedIndexPath;
 @end
 
 @implementation VLCOpenNetworkStreamTVViewController
+
+- (instancetype)initWithPlaybackService:(VLCPlaybackService *)playbackService
+{
+    self = [super initWithNibName:nil bundle:nil];
+
+    if (self) {
+        _playbackService = playbackService;
+    }
+    return self;
+}
 
 - (NSString *)title
 {
@@ -145,12 +157,11 @@
 
 - (void)_openURLStringAndDismiss:(NSString *)urlString
 {
-    VLCPlaybackService *vpc = [VLCPlaybackService sharedInstance];
     VLCMedia *media = [VLCMedia mediaWithURL:[NSURL URLWithString:urlString]];
     VLCMediaList *medialist = [[VLCMediaList alloc] init];
     [medialist addMedia:media];
 
-    [vpc playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
+    [_playbackService playMediaList:medialist firstIndex:0 subtitlesFilePath:nil];
     [self presentViewController:[VLCFullscreenMovieTVViewController fullscreenMovieTVViewController]
                        animated:YES
                      completion:nil];

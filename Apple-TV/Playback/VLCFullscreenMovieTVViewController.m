@@ -46,10 +46,10 @@ typedef NS_ENUM(NSInteger, VLCPlayerScanState)
 
 @implementation VLCFullscreenMovieTVViewController
 
-+ (instancetype)fullscreenMovieTVViewController
-{
-    return [[self alloc] initWithNibName:nil bundle:nil];
-}
+//+ (instancetype)fullscreenMovieTVViewController
+//{
+//    return [[self alloc] initWithNibName:nil bundle:nil];
+//}
 
 - (void)viewDidLoad
 {
