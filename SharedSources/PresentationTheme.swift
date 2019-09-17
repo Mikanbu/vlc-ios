@@ -82,17 +82,22 @@ extension Notification.Name {
     }
 }
 
+// MARK: - PresentationThemeType
+
+enum PresentationThemeType: Int {
+    case bright = 0
+    case dark
+    case auto
+}
+
 @objcMembers class PresentationTheme: NSObject {
 
     static let brightTheme = PresentationTheme(colors: brightPalette)
     static let darkTheme = PresentationTheme(colors: darkPalette)
 
     static var current: PresentationTheme = {
-        if let appTheme = UserDefaults.standard.value(forKey: kVLCSettingAppTheme) {
-            return appTheme as! Int32 == kVLCSettingAppThemeDark ? PresentationTheme.darkTheme : PresentationTheme.brightTheme
-        } else {
-            return PresentationTheme.brightTheme
-        }
+        let themeSettings = UserDefaults.standard.integer(forKey: kVLCSettingAppTheme)
+        return PresentationTheme.respectiveTheme(for: PresentationThemeType(rawValue: themeSettings))
     }() {
         didSet {
             AppearanceManager.setupAppearance(theme: self.current)
@@ -106,19 +111,27 @@ extension Notification.Name {
     }
 
     static func settingsDidUpdate() {
-        if let themeSettings = UserDefaults.standard.value(forKey: kVLCSettingAppTheme) {
-            let mode = themeSettings as! Int32
-            if mode == kVLCSettingAppThemeBright {
-                PresentationTheme.current = PresentationTheme.brightTheme
-            } else if mode == kVLCSettingAppThemeDark {
-                PresentationTheme.current = PresentationTheme.darkTheme
-            } else {
-                if #available(iOS 13.0, *) {
-                    let isSystemDarkTheme = UIScreen.main.traitCollection.userInterfaceStyle == .dark
-                    PresentationTheme.current = isSystemDarkTheme ? PresentationTheme.darkTheme : PresentationTheme.brightTheme
-                }
+        let themeSettings = UserDefaults.standard.integer(forKey: kVLCSettingAppTheme)
+        PresentationTheme.current = PresentationTheme.respectiveTheme(for:
+            PresentationThemeType(rawValue: themeSettings))
+    }
+
+    static func respectiveTheme(for theme: PresentationThemeType?) -> PresentationTheme {
+        guard let theme = theme else {
+            return PresentationTheme.brightTheme
+        }
+
+        var presentationTheme = PresentationTheme.brightTheme
+
+        if theme == .dark {
+            presentationTheme = PresentationTheme.darkTheme
+        } else if theme == .auto {
+            if #available(iOS 13.0, *) {
+                let isSystemDarkTheme = UIScreen.main.traitCollection.userInterfaceStyle == .dark
+                presentationTheme = isSystemDarkTheme ? PresentationTheme.darkTheme : PresentationTheme.brightTheme
             }
         }
+        return presentationTheme
     }
 
     let colors: ColorPalette
