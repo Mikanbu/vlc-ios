@@ -148,7 +148,7 @@ private extension MediaLibraryService {
     }
 
     private func startMediaLibrary(on path: String) {
-        guard medialib.start() else {
+        guard medialib.start() == .success else {
             assertionFailure("MediaLibraryService: Medialibrary failed to start.")
             return
         }
