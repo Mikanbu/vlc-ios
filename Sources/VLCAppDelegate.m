@@ -87,7 +87,6 @@
                                   kVLCSettingOpenAppForPlayback : kVLCSettingOpenAppForPlaybackDefaultValue,
                                   kVLCAutomaticallyPlayNextItem : @(YES),
                                   kVLCSettingEnableMediaCellTextScrolling : @(NO),
-                                  kVLCSettingsMediaLibraryVideoGroupPrefixLength: kVLCSettingsMediaLibraryVideoGroupPrefixLengthDefaultValue,
                                   kVLCSettingShowThumbnails : kVLCSettingShowThumbnailsDefaultValue,
                                   kVLCSettingShowArtworks : kVLCSettingShowArtworksDefaultValue,
                                   kVLCSettingBackupMediaLibrary : kVLCSettingBackupMediaLibraryDefaultValue
