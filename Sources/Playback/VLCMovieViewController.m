@@ -46,7 +46,7 @@
 #define DEFAULT_FOV 80.f
 #define MAX_FOV 150.f
 #define MIN_FOV 20.f
-#define NEW_UI 0
+#define NEW_UI 1
 
 typedef NS_ENUM(NSInteger, VLCPanType) {
   VLCPanTypeNone,
@@ -211,7 +211,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.artistNameLabel.text = self.albumNameLabel.text = @"";
 
     _movieView.userInteractionEnabled = NO;
-
+    // stopped here for the refacotr
     [self setupGestureRecognizers];
 
     _isTapSeeking = NO;
