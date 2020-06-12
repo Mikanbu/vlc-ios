@@ -265,6 +265,7 @@
 		8D83219B234256A900B28912 /* MediaGroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D83219A234256A900B28912 /* MediaGroupViewModel.swift */; };
 		8D95896623A7BCA400290362 /* Array+Safety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D95896523A7BCA400290362 /* Array+Safety.swift */; };
 		8D96D2F2233A3D4000E3FB44 /* CustomDialogRendererHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418DFE9E211C93C6005D3652 /* CustomDialogRendererHandler.swift */; };
+		8D9F1F9F24938B680074BDBB /* VideoPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9F1F9E24938B680074BDBB /* VideoPlayerViewController.swift */; };
 		8DD6516F208C89BC0052EE68 /* VLCAccessibilityIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6516E208C89BC0052EE68 /* VLCAccessibilityIdentifier.swift */; };
 		8DD651BA208F6AF00052EE68 /* ActionSheetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD651B9208F6AF00052EE68 /* ActionSheetCell.swift */; };
 		8DD651C4208F786F0052EE68 /* ActionSheetSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD651C3208F786F0052EE68 /* ActionSheetSectionHeader.swift */; };
@@ -851,6 +852,7 @@
 		8D6E1587223BBAF600077DD3 /* MiniPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayer.swift; sourceTree = "<group>"; };
 		8D83219A234256A900B28912 /* MediaGroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaGroupViewModel.swift; sourceTree = "<group>"; };
 		8D95896523A7BCA400290362 /* Array+Safety.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Array+Safety.swift"; path = "Sources/Extensions/Array+Safety.swift"; sourceTree = "<group>"; };
+		8D9F1F9E24938B680074BDBB /* VideoPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerViewController.swift; sourceTree = "<group>"; };
 		8DD6516E208C89BC0052EE68 /* VLCAccessibilityIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCAccessibilityIdentifier.swift; sourceTree = "<group>"; };
 		8DD651B9208F6AF00052EE68 /* ActionSheetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetCell.swift; sourceTree = "<group>"; };
 		8DD651C3208F786F0052EE68 /* ActionSheetSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetSectionHeader.swift; sourceTree = "<group>"; };
@@ -1946,6 +1948,7 @@
 				E0BA21B822D7C8C700937CFD /* VideoPlayerMainControl.swift */,
 				E0539E8B22E5E2EC009317CB /* VideoPlayerSubControl.swift */,
 				E0F8980322D399E10061DB2F /* MediaScrubProgressBar.swift */,
+				8D9F1F9E24938B680074BDBB /* VideoPlayerViewController.swift */,
 			);
 			path = MovieView;
 			sourceTree = "<group>";
@@ -3052,6 +3055,7 @@
 				7DF9352F1958AB0600E60FD4 /* UIColor+Presets.m in Sources */,
 				7DBBF182183AB3B80009A339 /* VLCAppDelegate.m in Sources */,
 				8DE1887421089B3A00A091D2 /* MediaLibraryBaseModel.swift in Sources */,
+				8D9F1F9F24938B680074BDBB /* VideoPlayerViewController.swift in Sources */,
 				418B145020179CB9000447AA /* LayoutAnchorContainer.swift in Sources */,
 				7D3784C0183A9938009EE944 /* VLCLinearProgressIndicator.m in Sources */,
 				41CD695D1A29D72600E60BCE /* VLCBoxTableViewController.m in Sources */,
