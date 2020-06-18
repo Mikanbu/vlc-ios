@@ -13,19 +13,60 @@ protocol VideoPlayerViewControllerDelegate: class {
     func videoPlayerViewControllerShouldBeDisplayed(_ videoPlayerViewController: VideoPlayerViewController) -> Bool
 }
 
-class VideoPlayerViewController: UIViewController {
+enum VideoPlayerSeekState {
+    case `default`
+    case forward
+    case backward
+}
 
+struct VideoPlayerSeek {
+    static let shortSeek: Int = 10
+
+    struct Swipe {
+        static let forward: Int = 10
+        static let backward: Int = 10
+    }
+}
+
+@objc(VLCVideoPlayerViewController)
+class VideoPlayerViewController: UIViewController {
     weak var delegate: VideoPlayerViewControllerDelegate?
 
     private var services: Services
 
+    private var playerController: PlayerController
+
     private var playbackService: PlaybackService = PlaybackService.sharedInstance()
 
-    // MARK: - States
+    // MARK: - Constants
 
-    private var isInterfaceLocked: Bool = false
+    private let ZOOM_SENSITIVITY: CGFloat = 5
+
+    private let screenPixelSize = CGSize(width: UIScreen.main.bounds.width,
+                                         height: UIScreen.main.bounds.height)
+
+    // MARK: - Private
+
+    // MARK: - 360
+    private var fov: CGFloat = 0
+
+    // MARK: - Seek
+    private var numberOfTapSeek: Int = 0
+    private var previousSeekState: VideoPlayerSeekState = .default
 
     // MARK: - UI elements
+
+    private lazy var layoutGuide: UILayoutGuide = {
+        var layoutGuide = view.layoutMarginsGuide
+
+        if #available(iOS 11.0, *) {
+            layoutGuide = view.safeAreaLayoutGuide
+        }
+        return layoutGuide
+    }()
+
+    private lazy var videoOutputLeadingConstraint: NSLayoutConstraint
+    private lazy var videoOutputTrailingConstraint: NSLayoutConstraint
 
     private lazy var mediaNavigationBar: MediaNavigationBar = {
         var mediaNavigationBar = MediaNavigationBar()
@@ -71,11 +112,34 @@ class VideoPlayerViewController: UIViewController {
         return videoOutputView
     }()
 
+    // MARK: Gestures
+
+    private lazy var tapOnVideoRecognizer: UITapGestureRecognizer = {
+        var tapOnVideoRecognizer = UITapGestureRecognizer(target: self,
+                                                          action: #selector(handleTapOnVideo))
+        return tapOnVideoRecognizer
+    }()
+
+    private lazy var pinchRecognizer: UIPinchGestureRecognizer = {
+        var pinchRecognizer = UIPinchGestureRecognizer(target: self,
+                                                       action: #selector(handlePinchGesture(recognizer:)))
+        return pinchRecognizer
+    }()
+
+    private lazy var doubleTapRecognizer: UITapGestureRecognizer = {
+        var doubleTapRecognizer = UITapGestureRecognizer(target: self,
+                                                         action: #selector(handleDoubleTapGesture(recognizer:)))
+        doubleTapRecognizer.numberOfTouchesRequired = 2
+        tapOnVideoRecognizer.shouldRequireFailure(of: doubleTapRecognizer)
+        return doubleTapRecognizer
+    }()
+
     // MARK: -
-    init(services: Services) {
+
+    @objc init(services: Services, playerController: PlayerController) {
         self.services = services
-        super.init(nibName: String(describing: VideoPlayerViewController.self),
-                   bundle: nil)
+        self.playerController = playerController
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -90,7 +154,67 @@ class VideoPlayerViewController: UIViewController {
 //        edgesForExtendedLayout = .all
         navigationController?.navigationBar.isHidden = true
         setupViews()
-        setupObservers()
+        setupGestures()
+        setupConstraints()
+    }
+}
+
+// MARK: - Gesture handlers
+
+extension VideoPlayerViewController {
+    @objc func handleTapOnVideo() {
+        // - (void)toggleControlsVisible
+    }
+
+    @objc func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
+        if playbackService.currentMediaIs360Video {
+            let zoom: CGFloat = MediaProjection.FOV.default * -(ZOOM_SENSITIVITY * recognizer.velocity / screenPixelSize.width)
+            if playbackService.updateViewpoint(0, pitch: 0,
+                                               roll: 0, fov: zoom, absolute: false) {
+                // Clam FOV between min and max
+                fov = max(min(fov + zoom, MediaProjection.FOV.max), MediaProjection.FOV.min)
+            }
+        } else if recognizer.velocity < 0
+            && UserDefaults.standard.bool(forKey: kVLCSettingCloseGesture) {
+            // minimize playback
+            delegate?.videoPlayerViewControllerDidMinimize(self)
+        }
+    }
+
+    @objc func handleDoubleTapGesture(recognizer: UITapGestureRecognizer) {
+        let screenWidth: CGFloat = view.frame.size.width
+        let backwardBoundary: CGFloat = screenWidth / 3.0
+        let forwardBoundary: CGFloat = 2 * screenWidth / 3.0
+
+        let tapPosition = recognizer.location(in: view)
+
+        // Reset number(set to -1/1) of seek when orientation has been changed.
+        if tapPosition.x < backwardBoundary {
+            numberOfTapSeek = previousSeekState == .forward ? -1 : numberOfTapSeek - 1
+        } else if tapPosition.y > forwardBoundary {
+            numberOfTapSeek = previousSeekState == .backward ? 1 : numberOfTapSeek + 1
+        } else {
+            playbackService.switchAspectRatio(true)
+        }
+        //_isTapSeeking = YES;
+        executeSeekFromTap()
+    }
+
+    private func executeSeekFromTap() {
+        // FIXME: Need to add interface (ripple effect) for seek indicator
+
+        let seekDuration: Int = numberOfTapSeek * VideoPlayerSeek.shortSeek
+
+        if seekDuration > 0 {
+            playbackService.jumpForward(Int32(VideoPlayerSeek.shortSeek))
+            previousSeekState = .forward
+        } else {
+            playbackService.jumpBackward(Int32(VideoPlayerSeek.shortSeek))
+            previousSeekState = .backward
+        }
+        // state inside controller?
+        //        if (_controlsHidden)
+        //            [self setControlsHidden:NO animated:NO];
     }
 }
 
@@ -102,60 +226,136 @@ private extension VideoPlayerViewController {
         view.addSubview(mainControls)
         view.addSubview(subControls)
         view.addSubview(scrubProgressBar)
+        view.addSubview(videoOutputView)
     }
 
-    private func setupObservers() {
-        let notificationCenter = NotificationCenter.default
-
-        // External Screen
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleExternalScreenDidConnect),
-                                       name: UIScreen.didConnectNotification,
-                                       object: nil)
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleExternalScreenDidDisconnect),
-                                       name: UIScreen.didDisconnectNotification,
-                                       object: nil)
-        // UIApplication
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleAppBecameActive),
-                                       name: UIApplication.didBecomeActiveNotification,
-                                       object: nil)
-        //
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handlePlaybackDidStop),
-                                       name: NSNotification.Name(rawValue: VLCPlaybackServicePlaybackDidStop),
-                                       object: nil)
+    private func setupGestures() {
+        view.addGestureRecognizer(tapOnVideoRecognizer)
+        view.addGestureRecognizer(pinchRecognizer)
+        view.addGestureRecognizer(doubleTapRecognizer)
     }
 
-    private func setupMediaNavigationBar() {
+    private func setupConstraints() {
+        setupVideoOutputConstraints()
+        setupMediaNavigationBarConstraints()
+        setupVideoPlayerMainControlConstraints()
+        setupVideoPlayerSubControlConstraints()
+        setupScrubProgressBarConstraints()
+    }
+
+    private func setupVideoOutputConstraints() {
 
     }
 
-    private func setupVideoPlayerMainControl() {
+    private func setupMediaNavigationBarConstraints() {
+        let padding: CGFloat = 20
 
+        NSLayoutConstraint.activate([
+            mediaNavigationBar.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            mediaNavigationBar.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
+                                                        constant: padding),
+            mediaNavigationBar.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
+                                                         constant: -padding),
+            mediaNavigationBar.topAnchor.constraint(equalTo: layoutGuide.topAnchor,
+                                                    constant: padding)
+        ])
     }
 
-    private func setupVideoPlayerSubControl() {
+    private func setupVideoPlayerMainControlConstraints() {
+        let margin: CGFloat = 40
 
+        NSLayoutConstraint.activate([
+//            mainControls.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
+//                                                  constant: margin),
+//            mainControls.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
+//                                                   constant: -margin),
+            mainControls.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mainControls.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+//            mainControls.bottomAnchor.constraint(equalTo: subControls.topAnchor,
+//                                                 constant: -margin)
+        ])
     }
 
-    private func setupMediaScrubProgressionBar() {
+    private func setupVideoPlayerSubControlConstraints() {
+        NSLayoutConstraint.activate([
+            subControls.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            subControls.topAnchor.constraint(equalTo: mainControls.bottomAnchor,
+                                             constant: 50)
+        ])
+    }
 
+    private func setupScrubProgressBarConstraints() {
+        let margin: CGFloat = 20
+
+        NSLayoutConstraint.activate([
+            scrubProgressBar.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
+                                                      constant: margin),
+            scrubProgressBar.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
+                                                       constant: -margin),
+            scrubProgressBar.topAnchor.constraint(equalTo: subControls.bottomAnchor,
+                                                  constant: margin)
+        ])
     }
 }
-// MARK: - Observers
 
-extension VideoPlayerViewController {
-    @objc func handleExternalScreenDidConnect() {
-//        [self showOnDisplay:_playingExternalView.displayView];
+// MARK: - Delegation
+
+// MARK: - VLCPlaybackServiceDelegate
+
+extension VideoPlayerViewController: VLCPlaybackServiceDelegate {
+    func prepare(forMediaPlayback playbackService: PlaybackService) {
+        mediaNavigationBar.setMediaTitleLabelText("")
+        // FIXME: -
     }
 
-    @objc func handleExternalScreenDidDisconnect() {
-//        [self showOnDisplay:_movieView];
+    func playbackPositionUpdated(_ playbackService: PlaybackService) {
+        scrubProgressBar.updateInterfacePosition()
     }
 
-    @objc func handleAppBecameActive() {
+    func mediaPlayerStateChanged(_ currentState: VLCMediaPlayerState,
+                                 isPlaying: Bool,
+                                 currentMediaHasTrackToChooseFrom: Bool, currentMediaHasChapters: Bool,
+                                 for playbackService: PlaybackService) {
+        if currentState == .buffering {
+
+        } else if currentState == .error {
+
+        }
+    }
+
+    func savePlaybackState(_ playbackService: PlaybackService) {
+        services.medialibraryService.savePlaybackState(from: playbackService)
+    }
+
+    func media(forPlaying media: VLCMedia?) -> VLCMLMedia? {
+        return services.medialibraryService.fetchMedia(with: media?.url)
+    }
+
+    func showStatusMessage(_ statusMessage: String) {
+        // FIXME
+    }
+
+    func playbackServiceDidSwitch(_ aspectRatio: VLCAspectRatio) {
+        subControls.isInFullScreen = aspectRatio == .fillToScreen
+
+        if #available(iOS 11.0, *) {
+            //         [self adaptMovieViewToNotch];
+        }
+    }
+}
+
+// MARK: - PlayerControllerDelegate
+
+extension VideoPlayerViewController: PlayerControllerDelegate {
+    func playerControllerExternalScreenDidConnect(_ playerController: PlayerController) {
+        //        [self showOnDisplay:_playingExternalView.displayView];
+    }
+
+    func playerControllerExternalScreenDidDisconnect(_ playerController: PlayerController) {
+        //        [self showOnDisplay:_movieView];
+    }
+
+    func playerControllerApplicationBecameActive(_ playerController: PlayerController) {
         guard let delegate = delegate else {
             preconditionFailure("VideoPlayerViewController: Delegate not assigned.")
         }
@@ -168,7 +368,7 @@ extension VideoPlayerViewController {
         }
     }
 
-    @objc func handlePlaybackDidStop() {
+    func playerControllerPlaybackDidStop(_ playerController: PlayerController) {
         guard let delegate = delegate else {
             preconditionFailure("VideoPlayerViewController: Delegate not assigned.")
         }
@@ -179,7 +379,7 @@ extension VideoPlayerViewController {
     }
 }
 
-// MARK: - Delegation
+// MARK: -
 
 // MARK: - MediaNavigationBarDelegate
 
@@ -218,7 +418,7 @@ extension VideoPlayerViewController: VideoPlayerSubControlDelegate {
     func didSelectMoreOptions(_ optionsBar: VideoPlayerSubControl) {
         present(moreOptionsActionSheet, animated: false) {
             [unowned self] in
-            self.moreOptionsActionSheet.interfaceDisabled = self.isInterfaceLocked
+            self.moreOptionsActionSheet.interfaceDisabled = self.playerController.isInterfaceLocked
         }
     }
 

@@ -313,6 +313,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     [self.view addGestureRecognizer:_doubleTapRecognizer];
     [_tapOnVideoRecognizer requireGestureRecognizerToFail:_doubleTapRecognizer];
 
+    // bubu: Stopped here refactor
     _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(togglePlayPause)];
     [_tapRecognizer setNumberOfTouchesRequired:2];
 

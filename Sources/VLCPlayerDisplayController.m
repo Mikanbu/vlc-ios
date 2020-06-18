@@ -21,6 +21,8 @@
 #import "VLCFullscreenMovieTVViewController.h"
 #endif
 
+#define SWIFT_VIDEO_PLAYER 1
+
 static NSString *const VLCPlayerDisplayControllerDisplayModeKey = @"VLCPlayerDisplayControllerDisplayMode";
 
 NSString *const VLCPlayerDisplayControllerDisplayMiniPlayer = @"VLCPlayerDisplayControllerDisplayMiniPlayer";
@@ -96,8 +98,16 @@ NSString *const VLCPlayerDisplayControllerHideMiniPlayer = @"VLCPlayerDisplayCon
 {
     if (!_movieViewController) {
 #if TARGET_OS_IOS
+# if !SWIFT_VIDEO_PLAYER
         _movieViewController = [[VLCMovieViewController alloc] initWithServices:_services];
         ((VLCMovieViewController *)_movieViewController).delegate = self;
+# else
+
+        VLCPlayerController *pc = [[VLCPlayerController alloc] initWithServices:_services];
+        _movieViewController = [[VLCVideoPlayerViewController alloc]
+                                initWithServices:_services
+                                playerController:pc];
+# endif
 #else
         _movieViewController = [[VLCFullscreenMovieTVViewController alloc] initWithNibName:nil bundle:nil];
 #endif
