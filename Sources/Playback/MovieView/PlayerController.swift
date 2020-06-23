@@ -33,13 +33,50 @@ class PlayerController: NSObject {
 
     // MARK: - States
 
+    var lockedOrientation: UIInterfaceOrientation = .unknown
+
     var isInterfaceLocked: Bool = false
+
     var isTapSeeking: Bool = false
+
+    // MARK: - UserDefaults computed properties getters
+
+    var displayRemainingTime: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCShowRemainingTime)
+    }
+
+    var isVolumeGestureEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingVolumeGesture)
+    }
+
+    var isPlayPauseGestureEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingPlayPauseGesture)
+    }
+
+    var isBrightnessGestureEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingBrightnessGesture)
+    }
+
+    var isSwipeSeekGestureEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingSeekGesture)
+    }
+
+    var isCloseGestureEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingCloseGesture)
+    }
+
+    var isVariableJumpDurationEnabled: Bool {
+        return UserDefaults.standard.bool(forKey: kVLCSettingVariableJumpDuration)
+    }
 
     @objc init(services: Services) {
         self.services = services
         super.init()
         setupObservers()
+    }
+
+    func updateUserDefaults() {
+
     }
 
     private func setupObservers() {

@@ -48,13 +48,37 @@ class VideoPlayerViewController: UIViewController {
     // MARK: - Private
 
     // MARK: - 360
+
     private var fov: CGFloat = 0
+    private lazy var deviceMotion: DeviceMotion = {
+        let deviceMotion = DeviceMotion()
+        deviceMotion.delegate = self
+        return deviceMotion
+    }()
 
     // MARK: - Seek
+
     private var numberOfTapSeek: Int = 0
     private var previousSeekState: VideoPlayerSeekState = .default
 
     // MARK: - UI elements
+
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    // FIXME: -
+//    override var prefersStatusBarHidden: Bool {
+//        return _viewAppeared ? _controlsHidden : NO;
+//    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
 
     private lazy var layoutGuide: UILayoutGuide = {
         var layoutGuide = view.layoutMarginsGuide
@@ -65,8 +89,15 @@ class VideoPlayerViewController: UIViewController {
         return layoutGuide
     }()
 
-    private lazy var videoOutputLeadingConstraint: NSLayoutConstraint
-    private lazy var videoOutputTrailingConstraint: NSLayoutConstraint
+    private lazy var videoOutputViewLeadingConstraint: NSLayoutConstraint = {
+        let videoOutputViewLeadingConstraint = videoOutputView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        return videoOutputViewLeadingConstraint
+    }()
+
+    private lazy var videoOutputViewTrailingConstraint: NSLayoutConstraint = {
+        let videoOutputViewTrailingConstraint = videoOutputView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        return videoOutputViewTrailingConstraint
+    }()
 
     private lazy var mediaNavigationBar: MediaNavigationBar = {
         var mediaNavigationBar = MediaNavigationBar()
@@ -97,9 +128,21 @@ class VideoPlayerViewController: UIViewController {
         return moreOptionsActionSheet
     }()
 
+    // MARK: - VideoOutput
+
+    private lazy var shadowView: UIView = {
+        let shadowView = UIView()
+        shadowView.alpha = 1
+        shadowView.frame = UIScreen.main.bounds
+        shadowView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        shadowView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        return shadowView
+    }()
+
     private var videoOutputView: UIView = {
         var videoOutputView = UIView()
         videoOutputView.isUserInteractionEnabled = false
+        videoOutputView.translatesAutoresizingMaskIntoConstraints = false
 
         if #available(iOS 11.0, *) {
             videoOutputView.accessibilityIgnoresInvertColors = true
@@ -112,7 +155,19 @@ class VideoPlayerViewController: UIViewController {
         return videoOutputView
     }()
 
-    // MARK: Gestures
+    // FIXME: - Crash(inf loop) on init
+    private lazy var externalVideoOutput: PlayingExternallyView = PlayingExternallyView()
+//        = {
+////        guard let externalVideoOutput = PlayingExternallyView() else {
+//        guard let nib = Bundle.main.loadNibNamed("PlayingExternallyView",
+//                                                 owner: self,
+//                                                 options: nil)?.first as? PlayingExternallyView else {
+//                                                    preconditionFailure("VideoPlayerViewController: Failed to load PlayingExternallyView.")
+//        }
+//        return  nib
+//    }()
+
+    // MARK: - Gestures
 
     private lazy var tapOnVideoRecognizer: UITapGestureRecognizer = {
         var tapOnVideoRecognizer = UITapGestureRecognizer(target: self,
@@ -148,6 +203,79 @@ class VideoPlayerViewController: UIViewController {
 
     // MARK: -
 
+    @available(iOS 11.0, *)
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+
+        if UIDevice.current.userInterfaceIdiom != .phone {
+            return
+        }
+
+        // safeAreaInsets can take some time to get set.
+        // Once updated, check if we need to update the constraints for notches
+        adaptVideoOutputToNotch()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        playbackService.delegate = self
+        playbackService.recoverPlaybackState()
+
+        playerController.lockedOrientation = .portrait
+        navigationController?.navigationBar.isHidden = true
+        //     [self setControlsHidden:NO animated:animated];
+        // FIXME: Test userdefault
+        // FIXME: Renderer discoverer
+
+        if playbackService.isPlayingOnExternalScreen() {
+            // FIXME: Handle error case
+            changeVideoOuput(to: externalVideoOutput.displayView ?? videoOutputView)
+        }
+
+        if #available(iOS 11.0, *) {
+            adaptVideoOutputToNotch()
+        }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        _viewAppeared = YES;
+//        _playbackWillClose = NO;
+
+        playbackService.recoverDisplayedMetadata()
+//        [self resetVideoFiltersSliders];
+        playbackService.videoOutputView = videoOutputView
+        subControls.repeatMode = playbackService.repeatMode
+
+        // Media is loaded in the media player, checking the projection type and configuring accordingly.
+        setupForMediaProjection()
+    }
+
+    override func viewDidLayoutSubviews() {
+        // FIXME: - equalizer
+//        self.scrubViewTopConstraint.constant = CGRectGetMaxY(self.navigationController.navigationBar.frame);
+
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if playbackService.videoOutputView == videoOutputView {
+            playbackService.videoOutputView = nil
+        }
+        // FIXME: -
+//        _viewAppeared = NO;
+
+        // FIXME: - interface
+
+        numberOfTapSeek = 0
+        previousSeekState = .default
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        deviceMotion.stopDeviceMotion()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 //        extendedLayoutIncludesOpaqueBars = true
@@ -156,6 +284,68 @@ class VideoPlayerViewController: UIViewController {
         setupViews()
         setupGestures()
         setupConstraints()
+    }
+}
+
+// MARK: -
+private extension VideoPlayerViewController {
+    @available(iOS 11.0, *)
+    private func adaptVideoOutputToNotch() {
+        // Ignore the constraint updates for iPads and notchless devices.
+        let interfaceIdiom = UIDevice.current.userInterfaceIdiom
+        if interfaceIdiom != .phone
+            || (interfaceIdiom == .phone && view.safeAreaInsets.bottom == 0) {
+            return
+        }
+
+        // Ignore if playing on a external screen since there is no notches.
+        if playbackService.isPlayingOnExternalScreen() {
+            return
+        }
+
+        // 30.0 represents the exact size of the notch
+        let constant: CGFloat = playbackService.currentAspectRatio != .fillToScreen ? 30.0 : 0.0
+        let interfaceOrientation = UIApplication.shared.statusBarOrientation
+
+        if interfaceOrientation == .landscapeLeft
+            || interfaceOrientation == .landscapeRight {
+            videoOutputViewLeadingConstraint.constant = constant
+            videoOutputViewTrailingConstraint.constant = -constant
+        } else {
+            videoOutputViewLeadingConstraint.constant = 0
+            videoOutputViewTrailingConstraint.constant = 0
+        }
+        videoOutputView.layoutIfNeeded()
+    }
+
+    func changeVideoOuput(to view: UIView) {
+        let shouldDisplayExternally = view != videoOutputView
+
+        externalVideoOutput.shouldDisplay(shouldDisplayExternally, movieView: videoOutputView)
+
+        let displayView = externalVideoOutput.displayView
+
+        if let displayView = displayView,
+            shouldDisplayExternally &&  videoOutputView.superview == displayView {
+            // Adjust constraints for external display
+            NSLayoutConstraint.activate([
+                videoOutputView.leadingAnchor.constraint(equalTo: displayView.leadingAnchor),
+                videoOutputView.trailingAnchor.constraint(equalTo: displayView.trailingAnchor),
+                videoOutputView.topAnchor.constraint(equalTo: displayView.topAnchor),
+                videoOutputView.bottomAnchor.constraint(equalTo: displayView.bottomAnchor)
+            ])
+        }
+
+        if !shouldDisplayExternally && videoOutputView.superview != view {
+            view.addSubview(videoOutputView)
+            view.sendSubviewToBack(videoOutputView)
+            videoOutputView.frame = view.frame
+            // Adjust constraint for local display
+            setupVideoOutputConstraints()
+            if #available(iOS 11.0, *) {
+                adaptVideoOutputToNotch()
+            }
+        }
     }
 }
 
@@ -226,7 +416,10 @@ private extension VideoPlayerViewController {
         view.addSubview(mainControls)
         view.addSubview(subControls)
         view.addSubview(scrubProgressBar)
+
         view.addSubview(videoOutputView)
+        view.sendSubviewToBack(videoOutputView)
+        view.insertSubview(shadowView, aboveSubview: videoOutputView)
     }
 
     private func setupGestures() {
@@ -234,6 +427,8 @@ private extension VideoPlayerViewController {
         view.addGestureRecognizer(pinchRecognizer)
         view.addGestureRecognizer(doubleTapRecognizer)
     }
+
+    // MARK: - Constraints
 
     private func setupConstraints() {
         setupVideoOutputConstraints()
@@ -244,14 +439,22 @@ private extension VideoPlayerViewController {
     }
 
     private func setupVideoOutputConstraints() {
+        videoOutputViewLeadingConstraint = videoOutputView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        videoOutputViewTrailingConstraint = videoOutputView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
 
+        NSLayoutConstraint.activate([
+            videoOutputViewLeadingConstraint,
+            videoOutputViewTrailingConstraint,
+            videoOutputView.topAnchor.constraint(equalTo: view.topAnchor),
+            videoOutputView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
     }
 
     private func setupMediaNavigationBarConstraints() {
         let padding: CGFloat = 20
 
         NSLayoutConstraint.activate([
-            mediaNavigationBar.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            mediaNavigationBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             mediaNavigationBar.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
                                                         constant: padding),
             mediaNavigationBar.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
@@ -293,12 +496,34 @@ private extension VideoPlayerViewController {
             scrubProgressBar.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
                                                        constant: -margin),
             scrubProgressBar.topAnchor.constraint(equalTo: subControls.bottomAnchor,
-                                                  constant: margin)
+                                                  constant: 8)
         ])
+    }
+
+    // MARK: - Others
+
+    private func setupForMediaProjection() {
+        let mediaHasProjection = playbackService.currentMediaIs360Video
+
+        fov = mediaHasProjection ? MediaProjection.FOV.default : 0
+        // Disable swipe gestures.
+        if mediaHasProjection {
+            deviceMotion.startDeviceMotion()
+        }
     }
 }
 
 // MARK: - Delegation
+
+// MARK: - DeviceMotionDelegate
+
+extension VideoPlayerViewController: DeviceMotionDelegate {
+    func deviceMotionHasAttitude(deviceMotion: DeviceMotion, pitch: Double, yaw: Double) {
+//        if (_panRecognizer.state != UIGestureRecognizerStateChanged || UIGestureRecognizerStateBegan) {
+//            [self applyYaw:yaw pitch:pitch];
+//        }
+    }
+}
 
 // MARK: - VLCPlaybackServiceDelegate
 
@@ -316,6 +541,7 @@ extension VideoPlayerViewController: VLCPlaybackServiceDelegate {
                                  isPlaying: Bool,
                                  currentMediaHasTrackToChooseFrom: Bool, currentMediaHasChapters: Bool,
                                  for playbackService: PlaybackService) {
+        // FIXME -
         if currentState == .buffering {
 
         } else if currentState == .error {
@@ -339,8 +565,23 @@ extension VideoPlayerViewController: VLCPlaybackServiceDelegate {
         subControls.isInFullScreen = aspectRatio == .fillToScreen
 
         if #available(iOS 11.0, *) {
-            //         [self adaptMovieViewToNotch];
+            adaptVideoOutputToNotch()
         }
+    }
+
+    func displayMetadata(for playbackService: PlaybackService, metadata: VLCMetaData) {
+        // FIXME: -
+//        if (!_viewAppeared)
+//            return;
+        if !isViewLoaded {
+            return
+        }
+        mediaNavigationBar.setMediaTitleLabelText(metadata.title)
+
+        if playbackService.isPlayingOnExternalScreen() {
+            externalVideoOutput.updateUI(rendererItem: playbackService.renderer, title: metadata.title)
+        }
+//        subControls.toggleFullscreen().hidden = _audioOnly
     }
 }
 
