@@ -41,7 +41,7 @@ NSString *const VLCPlayerDisplayControllerHideMiniPlayer = @"VLCPlayerDisplayCon
 
 @end
 
-@interface VLCPlayerDisplayController () <VLCMovieViewControllerDelegate>
+@interface VLCPlayerDisplayController () <VLCMovieViewControllerDelegate, VLCVideoPlayerViewControllerDelegate>
 @property (nonatomic, strong) UIViewController<VLCPlaybackServiceDelegate> *movieViewController;
 @property (nonatomic, strong) UIView<VLCPlaybackServiceDelegate, VLCMiniPlayer> *miniPlaybackView;
 @property (nonatomic, strong) NSLayoutConstraint *bottomConstraint;
@@ -107,6 +107,7 @@ NSString *const VLCPlayerDisplayControllerHideMiniPlayer = @"VLCPlayerDisplayCon
         _movieViewController = [[VLCVideoPlayerViewController alloc]
                                 initWithServices:_services
                                 playerController:pc];
+        ((VLCVideoPlayerViewController *)_movieViewController).delegate = self;
 # endif
 #else
         _movieViewController = [[VLCFullscreenMovieTVViewController alloc] initWithNibName:nil bundle:nil];
@@ -360,4 +361,17 @@ NSString *const VLCPlayerDisplayControllerHideMiniPlayer = @"VLCPlayerDisplayCon
 {
     return self.displayMode == VLCPlayerDisplayControllerDisplayModeFullscreen;
 }
+
+#pragma mark - VideoPlayerViewControllerDelegate
+
+- (void)videoPlayerViewControllerDidMinimize:(VLCVideoPlayerViewController *)videoPlayerViewController
+{
+    [self closeFullscreenPlayback];
+}
+
+- (BOOL)videoPlayerViewControllerShouldBeDisplayed:(VLCVideoPlayerViewController *)videoPlayerViewController
+{
+    return self.displayMode == VLCPlayerDisplayControllerDisplayModeFullscreen;
+}
+
 @end

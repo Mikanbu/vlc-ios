@@ -8,6 +8,7 @@
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
 
+@objc(VLCVideoPlayerViewControllerDelegate)
 protocol VideoPlayerViewControllerDelegate: class {
     func videoPlayerViewControllerDidMinimize(_ videoPlayerViewController: VideoPlayerViewController)
     func videoPlayerViewControllerShouldBeDisplayed(_ videoPlayerViewController: VideoPlayerViewController) -> Bool
@@ -30,7 +31,7 @@ struct VideoPlayerSeek {
 
 @objc(VLCVideoPlayerViewController)
 class VideoPlayerViewController: UIViewController {
-    weak var delegate: VideoPlayerViewControllerDelegate?
+    @objc weak var delegate: VideoPlayerViewControllerDelegate?
 
     private var services: Services
 
@@ -66,6 +67,8 @@ class VideoPlayerViewController: UIViewController {
     override var canBecomeFirstResponder: Bool {
         return true
     }
+
+    private var idleTimer: Timer?
 
     // FIXME: -
 //    override var prefersStatusBarHidden: Bool {
@@ -141,6 +144,7 @@ class VideoPlayerViewController: UIViewController {
 
     private var videoOutputView: UIView = {
         var videoOutputView = UIView()
+        videoOutputView.backgroundColor = .black
         videoOutputView.isUserInteractionEnabled = false
         videoOutputView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -170,22 +174,29 @@ class VideoPlayerViewController: UIViewController {
     // MARK: - Gestures
 
     private lazy var tapOnVideoRecognizer: UITapGestureRecognizer = {
-        var tapOnVideoRecognizer = UITapGestureRecognizer(target: self,
+        let tapOnVideoRecognizer = UITapGestureRecognizer(target: self,
                                                           action: #selector(handleTapOnVideo))
         return tapOnVideoRecognizer
     }()
 
+    private lazy var playPauseRecognizer: UITapGestureRecognizer = {
+        let playPauseRecognizer = UITapGestureRecognizer(target: self,
+                                                          action: #selector(handlePlayPauseGesture))
+        playPauseRecognizer.numberOfTouchesRequired = 2
+        return playPauseRecognizer
+    }()
+
     private lazy var pinchRecognizer: UIPinchGestureRecognizer = {
-        var pinchRecognizer = UIPinchGestureRecognizer(target: self,
+        let pinchRecognizer = UIPinchGestureRecognizer(target: self,
                                                        action: #selector(handlePinchGesture(recognizer:)))
         return pinchRecognizer
     }()
 
     private lazy var doubleTapRecognizer: UITapGestureRecognizer = {
-        var doubleTapRecognizer = UITapGestureRecognizer(target: self,
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self,
                                                          action: #selector(handleDoubleTapGesture(recognizer:)))
-        doubleTapRecognizer.numberOfTouchesRequired = 2
-        tapOnVideoRecognizer.shouldRequireFailure(of: doubleTapRecognizer)
+        doubleTapRecognizer.numberOfTapsRequired = 2
+        tapOnVideoRecognizer.require(toFail: doubleTapRecognizer)
         return doubleTapRecognizer
     }()
 
@@ -223,7 +234,8 @@ class VideoPlayerViewController: UIViewController {
 
         playerController.lockedOrientation = .portrait
         navigationController?.navigationBar.isHidden = true
-        //     [self setControlsHidden:NO animated:animated];
+        setControlsHidden(true, animated: false)
+
         // FIXME: Test userdefault
         // FIXME: Renderer discoverer
 
@@ -241,21 +253,24 @@ class VideoPlayerViewController: UIViewController {
         super.viewDidAppear(animated)
 //        _viewAppeared = YES;
 //        _playbackWillClose = NO;
+//        setControlsHidden(true, animated: false)
 
         playbackService.recoverDisplayedMetadata()
 //        [self resetVideoFiltersSliders];
-        playbackService.videoOutputView = videoOutputView
+        if playbackService.videoOutputView != videoOutputView {
+            playbackService.videoOutputView = videoOutputView
+        }
         subControls.repeatMode = playbackService.repeatMode
 
         // Media is loaded in the media player, checking the projection type and configuring accordingly.
         setupForMediaProjection()
     }
 
-    override func viewDidLayoutSubviews() {
+//    override func viewDidLayoutSubviews() {
         // FIXME: - equalizer
 //        self.scrubViewTopConstraint.constant = CGRectGetMaxY(self.navigationController.navigationBar.frame);
 
-    }
+  //  }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -266,9 +281,19 @@ class VideoPlayerViewController: UIViewController {
 //        _viewAppeared = NO;
 
         // FIXME: - interface
-
+        if idleTimer != nil {
+            idleTimer?.invalidate()
+            idleTimer = nil
+        }
         numberOfTapSeek = 0
         previousSeekState = .default
+    }
+
+    override var next: UIResponder? {
+        get {
+            resetIdleTimer()
+            return super.next
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -278,8 +303,6 @@ class VideoPlayerViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        extendedLayoutIncludesOpaqueBars = true
-//        edgesForExtendedLayout = .all
         navigationController?.navigationBar.isHidden = true
         setupViews()
         setupGestures()
@@ -288,6 +311,7 @@ class VideoPlayerViewController: UIViewController {
 }
 
 // MARK: -
+
 private extension VideoPlayerViewController {
     @available(iOS 11.0, *)
     private func adaptVideoOutputToNotch() {
@@ -347,13 +371,94 @@ private extension VideoPlayerViewController {
             }
         }
     }
+
+    @objc private func handleIdleTimerExceeded() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.handleIdleTimerExceeded()
+            }
+            return
+        }
+
+        idleTimer = nil
+        numberOfTapSeek = 0
+        if !playerController.isControlsHidden {
+            setControlsHidden(!playerController.isControlsHidden, animated: true)
+        }
+        // FIXME:- other states to reset
+    }
+
+    private func resetIdleTimer() {
+        guard let safeIdleTimer = idleTimer else {
+            idleTimer = Timer.scheduledTimer(timeInterval: 4,
+                                             target: self,
+                                             selector: #selector(handleIdleTimerExceeded),
+                                             userInfo: nil,
+                                             repeats: false)
+            return
+        }
+
+        if fabs(safeIdleTimer.fireDate.timeIntervalSinceNow) < 4 {
+            safeIdleTimer.fireDate = Date(timeIntervalSinceNow: 4)
+        }
+    }
+
+    private func executeSeekFromTap() {
+        // FIXME: Need to add interface (ripple effect) for seek indicator
+
+        let seekDuration: Int = numberOfTapSeek * VideoPlayerSeek.shortSeek
+
+        if seekDuration > 0 {
+            playbackService.jumpForward(Int32(VideoPlayerSeek.shortSeek))
+            previousSeekState = .forward
+        } else {
+            playbackService.jumpBackward(Int32(VideoPlayerSeek.shortSeek))
+            previousSeekState = .backward
+        }
+        // FIXME: - animation after seek yt
+    }
 }
 
 // MARK: - Gesture handlers
 
 extension VideoPlayerViewController {
     @objc func handleTapOnVideo() {
-        // - (void)toggleControlsVisible
+        // FIXME: -
+        numberOfTapSeek = 0
+        setControlsHidden(!playerController.isControlsHidden, animated: true)
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        if playbackService.isPlaying && playerController.isControlsHidden {
+            setControlsHidden(false, animated: true)
+        }
+    }
+
+    private func setControlsHidden(_ hidden: Bool, animated: Bool) {
+        playerController.isControlsHidden = hidden
+        let alpha: CGFloat = hidden ? 0 : 1
+
+        UIView.animate(withDuration: animated ? 0.2 : 0) {
+            // FIXME: retain cycle?
+            self.mediaNavigationBar.alpha = alpha
+            self.mainControls.alpha = alpha
+            self.subControls.alpha = alpha
+            self.scrubProgressBar.alpha = alpha
+            self.shadowView.alpha = alpha
+        }
+    }
+
+    @objc func handlePlayPauseGesture() {
+        guard playerController.isPlayPauseGestureEnabled else {
+            return
+        }
+
+        if playbackService.isPlaying {
+            playbackService.pause()
+            setControlsHidden(false, animated: playerController.isControlsHidden)
+        } else {
+            playbackService.play()
+        }
     }
 
     @objc func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
@@ -381,30 +486,13 @@ extension VideoPlayerViewController {
         // Reset number(set to -1/1) of seek when orientation has been changed.
         if tapPosition.x < backwardBoundary {
             numberOfTapSeek = previousSeekState == .forward ? -1 : numberOfTapSeek - 1
-        } else if tapPosition.y > forwardBoundary {
+        } else if tapPosition.x > forwardBoundary {
             numberOfTapSeek = previousSeekState == .backward ? 1 : numberOfTapSeek + 1
         } else {
             playbackService.switchAspectRatio(true)
         }
         //_isTapSeeking = YES;
         executeSeekFromTap()
-    }
-
-    private func executeSeekFromTap() {
-        // FIXME: Need to add interface (ripple effect) for seek indicator
-
-        let seekDuration: Int = numberOfTapSeek * VideoPlayerSeek.shortSeek
-
-        if seekDuration > 0 {
-            playbackService.jumpForward(Int32(VideoPlayerSeek.shortSeek))
-            previousSeekState = .forward
-        } else {
-            playbackService.jumpBackward(Int32(VideoPlayerSeek.shortSeek))
-            previousSeekState = .backward
-        }
-        // state inside controller?
-        //        if (_controlsHidden)
-        //            [self setControlsHidden:NO animated:NO];
     }
 }
 
@@ -426,6 +514,7 @@ private extension VideoPlayerViewController {
         view.addGestureRecognizer(tapOnVideoRecognizer)
         view.addGestureRecognizer(pinchRecognizer)
         view.addGestureRecognizer(doubleTapRecognizer)
+        view.addGestureRecognizer(playPauseRecognizer)
     }
 
     // MARK: - Constraints
@@ -465,7 +554,7 @@ private extension VideoPlayerViewController {
     }
 
     private func setupVideoPlayerMainControlConstraints() {
-        let margin: CGFloat = 40
+//        let margin: CGFloat = 40
 
         NSLayoutConstraint.activate([
 //            mainControls.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
@@ -480,6 +569,7 @@ private extension VideoPlayerViewController {
     }
 
     private func setupVideoPlayerSubControlConstraints() {
+        // FIXME: constant change on portrait/landscape
         NSLayoutConstraint.activate([
             subControls.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             subControls.topAnchor.constraint(equalTo: mainControls.bottomAnchor,
@@ -488,15 +578,14 @@ private extension VideoPlayerViewController {
     }
 
     private func setupScrubProgressBarConstraints() {
-        let margin: CGFloat = 20
+        let margin: CGFloat = 10
 
         NSLayoutConstraint.activate([
             scrubProgressBar.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,
                                                       constant: margin),
             scrubProgressBar.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,
                                                        constant: -margin),
-            scrubProgressBar.topAnchor.constraint(equalTo: subControls.bottomAnchor,
-                                                  constant: 8)
+            scrubProgressBar.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -margin * 2)
         ])
     }
 
@@ -531,6 +620,7 @@ extension VideoPlayerViewController: VLCPlaybackServiceDelegate {
     func prepare(forMediaPlayback playbackService: PlaybackService) {
         mediaNavigationBar.setMediaTitleLabelText("")
         // FIXME: -
+        resetIdleTimer()
     }
 
     func playbackPositionUpdated(_ playbackService: PlaybackService) {
@@ -672,7 +762,7 @@ extension VideoPlayerViewController: VideoPlayerSubControlDelegate {
 
 extension VideoPlayerViewController: MediaScrubProgressBarDelegate {
     func mediaScrubProgressBarShouldResetIdleTimer() {
-        // resetIdleTimer for animation
+        resetIdleTimer()
     }
 }
 

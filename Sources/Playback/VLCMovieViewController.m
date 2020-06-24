@@ -211,7 +211,6 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.artistNameLabel.text = self.albumNameLabel.text = @"";
 
     _movieView.userInteractionEnabled = NO;
-    // stopped here for the refacotr
     [self setupGestureRecognizers];
 
     _isTapSeeking = NO;
@@ -223,6 +222,7 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     self.resetVideoFilterButton.frame = rect;
 
     [self setupMovieView];
+    // bubu: stopped here for the refactor
 
     _trackSelectorContainer = [[VLCTrackSelectorView alloc] initWithFrame:CGRectZero];
     _trackSelectorContainer.parentViewController = self;
@@ -313,10 +313,9 @@ typedef NS_ENUM(NSInteger, VLCPanType) {
     [self.view addGestureRecognizer:_doubleTapRecognizer];
     [_tapOnVideoRecognizer requireGestureRecognizerToFail:_doubleTapRecognizer];
 
-    // bubu: Stopped here refactor
     _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(togglePlayPause)];
     [_tapRecognizer setNumberOfTouchesRequired:2];
-
+    // bubu: Stopped here refactor
     _currentPanType = VLCPanTypeNone;
     _panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panRecognized:)];
     [_panRecognizer setMinimumNumberOfTouches:1];

@@ -33,6 +33,8 @@ class PlayerController: NSObject {
 
     // MARK: - States
 
+    var isControlsHidden: Bool = false
+
     var lockedOrientation: UIInterfaceOrientation = .unknown
 
     var isInterfaceLocked: Bool = false
